@@ -80,6 +80,7 @@ def _parameter_to_option(spec: ParameterSpec) -> inspect.Parameter:
             option_default,
             help=spec.help,
             autocompletion=spec.completion,
+            callback=spec.callback,
         ),
     )
 

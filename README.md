@@ -6,7 +6,8 @@ CLI scaffold for Corva-style pluggable tools using Python 3.14, Typer, and optio
 
 | Command | Description |
 | --- | --- |
-| `timelog` | Resolves `auto_*` windows (or uses a record limit) and proxies an aggregate pipeline to the Corva Data API. |
+| `timelog` | Resolves `auto_*` windows (or uses a record limit) and proxies an aggregate pipeline to the Corva Data API for timelog entries. |
+| `assets` | Shares the same interface but queries the `assets` dataset for asset metadata. |
 
 Example:
 
@@ -21,6 +22,15 @@ uv run corva timelog \
 ```
 
 The `auto_*` syntax subtracts durations from "now", so `auto_0d` equals the current UTC timestamp, `auto_2h30m` subtracts 2.5 hours, etc. Multiple units can be chained in any order. Omit both `--start-time` and `--end-time` to fall back to a simple limit (default `1000` documents) using `--limit`. Scope requests to a single company via `--company-id`. By default the CLI prints only the raw API response; add `--verbose` to include query/debug metadata.
+
+Need only asset metadata? Use the `assets` command (same flags apply, and `--asset-ids` is optional as long as you supply `--company-id`):
+
+```bash
+uv run corva assets \
+  --api-key YOUR_TOKEN \
+  --company-id 42 \
+  --limit 25
+```
 
 ### Settings & Overrides
 

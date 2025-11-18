@@ -5,6 +5,8 @@ import asyncio
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
+import typer
+
 from corva_cli.settings import get_settings
 from corva_cli.timewindow import resolve_auto_window
 from corva_cli.tools.base import ParameterSpec, ToolContext, ToolResult
@@ -30,13 +32,14 @@ def _build_timelog_pipeline(
     limit: int,
     skip: int,
 ) -> List[Dict[str, Any]]:
-    asset_filter: Any
-    if len(assets) == 1:
-        asset_filter = assets[0]
-    else:
-        asset_filter = {"$in": assets}
-
-    window_filter: Dict[str, Any] = {"asset_id": asset_filter}
+    window_filter: Dict[str, Any] = {}
+    if assets:
+        asset_filter: Any
+        if len(assets) == 1:
+            asset_filter = assets[0]
+        else:
+            asset_filter = {"$in": assets}
+        window_filter["asset_id"] = asset_filter
     if company_id is not None:
         window_filter["company_id"] = company_id
     if start_dt and end_dt:
@@ -78,21 +81,9 @@ def _build_timelog_pipeline(
     return stages
 
 
-@registry.tool(
-    name="timelog",
-    description="Return synthetic timelog data for one or more assets.",
-    parameters=[
-        ParameterSpec(
-            "asset_ids",
-            help="Comma-separated integer asset IDs",
-        ),
-        ParameterSpec(
-            "company_id",
-            type=int,
-            help="Single company identifier",
-            required=False,
-            default=None,
-        ),
+def _common_optionals(company_spec: ParameterSpec) -> List[ParameterSpec]:
+    return [
+        company_spec,
         ParameterSpec(
             "start_time",
             help="Window start in auto_* syntax (e.g. auto_2h30m)",
@@ -132,11 +123,61 @@ def _build_timelog_pipeline(
             required=False,
             default=0,
         ),
-    ],
+    ]
+
+
+ASSET_ID_REQUIRED = ParameterSpec(
+    "asset_ids",
+    help="Comma-separated integer asset IDs",
 )
-def get_timelog_data(
+
+ASSET_ID_OPTIONAL = ParameterSpec(
+    "asset_ids",
+    help="Comma-separated integer asset IDs",
+    required=False,
+    default="",
+)
+
+
+def _require_company_when_no_assets(ctx, param, value):
+    asset_ids = ctx.params.get("asset_ids", "")
+    if not asset_ids and value is None:
+        raise typer.BadParameter("Provide --company-id when --asset-ids is omitted.")
+    return value
+
+
+TIMELOG_PARAMETERS = [
+    ASSET_ID_REQUIRED,
+    *_common_optionals(
+        ParameterSpec(
+            "company_id",
+            type=int,
+            help="Single company identifier",
+            required=False,
+            default=None,
+        )
+    ),
+]
+
+ASSETS_PARAMETERS = [
+    ASSET_ID_OPTIONAL,
+    *_common_optionals(
+        ParameterSpec(
+            "company_id",
+            type=int,
+            help="Single company identifier",
+            required=False,
+            default=None,
+            callback=_require_company_when_no_assets,
+        )
+    ),
+]
+
+
+def _run_dataset_query(
+    dataset_name: Optional[str],
     context: ToolContext,
-    asset_ids: str,
+    asset_ids: Optional[str],
     company_id: Optional[int] = None,
     start_time: Optional[str] = None,
     end_time: Optional[str] = None,
@@ -144,16 +185,22 @@ def get_timelog_data(
     statuses: Optional[str] = None,
     limit: Optional[int] = 1000,
     skip: Optional[int] = 0,
+    require_assets: bool = True,
 ) -> ToolResult:
+    asset_ids = asset_ids or ""
     raw_assets = [asset.strip() for asset in asset_ids.split(",") if asset.strip()]
     if not raw_assets:
-        raise ValueError("Provide at least one asset id.")
-    try:
-        assets = [int(asset) for asset in raw_assets]
-    except ValueError as exc:
-        raise ValueError("Asset ids must be integers.") from exc
+        if require_assets:
+            raise ValueError("Provide at least one asset id.")
+        assets: List[int] = []
+    else:
+        try:
+            assets = [int(asset) for asset in raw_assets]
+        except ValueError as exc:
+            raise ValueError("Asset ids must be integers.") from exc
 
     settings = get_settings()
+    dataset = dataset_name or settings.timelog_dataset
     effective_step = max(step_minutes or settings.timelog_step_minutes, 1)
     effective_limit = max(limit or 1000, 1)
     effective_skip = max(skip or 0, 0)
@@ -189,7 +236,7 @@ def get_timelog_data(
     (api_result, api_debug) = asyncio.run(
         utils.execute_data_api_pipeline(
             settings.timelog_provider,
-            settings.timelog_dataset,
+            dataset,
             pipeline,
             headers,
         )
@@ -203,7 +250,7 @@ def get_timelog_data(
             "statuses": status_choices,
             "limit": effective_limit,
             "provider": settings.timelog_provider,
-            "dataset": settings.timelog_dataset,
+            "dataset": dataset,
             "window": (
                 {
                     "start": start_dt.isoformat(),
@@ -222,3 +269,64 @@ def get_timelog_data(
     else:
         payload = api_result
     return ToolResult(payload=payload, metadata={"assets": len(assets)})
+
+
+@registry.tool(
+    name="timelog",
+    description="Return timelog data for one or more assets.",
+    parameters=TIMELOG_PARAMETERS,
+)
+def get_timelog_data(
+    context: ToolContext,
+    asset_ids: str,
+    company_id: Optional[int] = None,
+    start_time: Optional[str] = None,
+    end_time: Optional[str] = None,
+    step_minutes: Optional[int] = None,
+    statuses: Optional[str] = None,
+    limit: Optional[int] = 1000,
+    skip: Optional[int] = 0,
+) -> ToolResult:
+    return _run_dataset_query(
+        None,
+        context,
+        asset_ids,
+        company_id,
+        start_time,
+        end_time,
+        step_minutes,
+        statuses,
+        limit,
+        skip,
+    )
+
+
+@registry.tool(
+    name="assets",
+    description="Return asset metadata for one or more assets.",
+    parameters=ASSETS_PARAMETERS,
+)
+def get_assets(
+    context: ToolContext,
+    asset_ids: str = "",
+    company_id: Optional[int] = None,
+    start_time: Optional[str] = None,
+    end_time: Optional[str] = None,
+    step_minutes: Optional[int] = None,
+    statuses: Optional[str] = None,
+    limit: Optional[int] = 1000,
+    skip: Optional[int] = 0,
+) -> ToolResult:
+    return _run_dataset_query(
+        "assets",
+        context,
+        asset_ids,
+        company_id,
+        start_time,
+        end_time,
+        step_minutes,
+        statuses,
+        limit,
+        skip,
+        require_assets=False,
+    )

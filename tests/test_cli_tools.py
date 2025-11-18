@@ -130,3 +130,84 @@ def test_timelog_without_window_uses_limit(monkeypatch):
     assert captured["mql"][1] == {"$skip": 25}
     assert captured["mql"][2] == {"$limit": 200}
     assert payload == {"docs": []}
+
+
+def test_assets_command(monkeypatch):
+    captured = {}
+
+    async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
+        captured["provider"] = provider
+        captured["dataset"] = dataset_name
+        captured["mql"] = mql
+        return ({"assets": []}, {"status_code": 200, "request_body": {"stages": mql}})
+
+    monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
+
+    result = runner.invoke(
+        app,
+        [
+            "assets",
+            "--api-key",
+            "demo",
+            "--asset-ids",
+            "909",
+            "--company-id",
+            "77",
+            "--limit",
+            "5",
+        ],
+    )
+    assert result.exit_code == 0, result.stdout
+    assert captured["dataset"] == "assets"
+    assert captured["provider"] == "corva"
+    match_stage = captured["mql"][0]["$match"]
+    assert match_stage["company_id"] == 77
+    assert captured["mql"][1] == {"$limit": 5}
+    assert json.loads(result.stdout) == {"assets": []}
+
+
+def test_assets_command_without_asset_ids(monkeypatch):
+    captured = {}
+
+    async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
+        captured["mql"] = mql
+        return ({"assets": []}, {"status_code": 200, "request_body": {"stages": mql}})
+
+    monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
+
+    result = runner.invoke(
+        app,
+        [
+            "assets",
+            "--api-key",
+            "demo",
+            "--company-id",
+            "55",
+            "--limit",
+            "10",
+        ],
+    )
+    assert result.exit_code == 0, result.stdout
+    match_stage = captured["mql"][0]["$match"]
+    assert "asset_id" not in match_stage
+    assert match_stage["company_id"] == 55
+
+
+def test_assets_requires_company_when_no_assets(monkeypatch):
+    async def fake_execute(*args, **kwargs):
+        return {}, {}
+
+    monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
+
+    result = runner.invoke(
+        app,
+        [
+            "assets",
+            "--api-key",
+            "demo",
+            "--limit",
+            "10",
+        ],
+    )
+    assert result.exit_code != 0
+    assert "--company-id" in result.stdout.lower()

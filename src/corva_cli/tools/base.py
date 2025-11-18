@@ -34,6 +34,7 @@ class ParameterSpec:
     required: bool = True
     default: Any = inspect._empty
     completion: Optional[CompletionFn] = None
+    callback: Optional[Callable[..., Any]] = None
 
 
 @dataclass(slots=True)
