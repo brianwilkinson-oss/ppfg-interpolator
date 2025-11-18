@@ -19,9 +19,41 @@ def _dict_to_markdown_table(data: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _flatten_dict(data: Dict[str, Any], prefix: str = "") -> Dict[str, Any]:
+    flat: Dict[str, Any] = {}
+    for key, value in data.items():
+        path = f"{prefix}.{key}" if prefix else key
+        if isinstance(value, dict):
+            flat.update(_flatten_dict(value, path))
+        else:
+            flat[path] = value
+    return flat
+
+
+def _list_dicts_to_table(items: List[Dict[str, Any]]) -> str:
+    flattened_items = [_flatten_dict(item) for item in items]
+    keys: List[str] = []
+    for item in flattened_items:
+        for key in item.keys():
+            if key not in keys:
+                keys.append(key)
+    if not keys:
+        return "_empty_"
+    header = "| " + " | ".join(keys) + " |"
+    divider = "| " + " | ".join(["---"] * len(keys)) + " |"
+    rows = []
+    for item in flattened_items:
+        row = "| " + " | ".join(f"`{item.get(key, '')}`" for key in keys) + " |"
+        rows.append(row)
+    return "\n".join([header, divider, *rows])
+
+
 def _list_to_markdown(items: Iterable[Any]) -> str:
+    items_list = list(items)
+    if items_list and all(isinstance(item, dict) for item in items_list):
+        return _list_dicts_to_table(items_list)  # type: ignore[arg-type]
     rendered: List[str] = []
-    for item in items:
+    for item in items_list:
         if isinstance(item, dict):
             rendered.append(_dict_to_markdown_table(item))
         else:
