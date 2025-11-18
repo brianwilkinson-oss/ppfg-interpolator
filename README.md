@@ -6,20 +6,20 @@ CLI scaffold for Corva-style pluggable tools using Python 3.14, Typer, and optio
 
 | Command | Description |
 | --- | --- |
-| `get-timelog-data` | Resolves `auto_*` time windows and returns synthetic timelog entries for one or more assets. |
+| `timelog` | Resolves `auto_*` windows (or uses a record limit) and proxies an aggregate pipeline to the Corva Data API. |
 
 Example:
 
 ```bash
-uv run corva get-timelog-data \
+uv run corva timelog \
   --api-key YOUR_TOKEN \
-  --asset-ids asset-1,asset-2 \
+  --asset-ids 101,202 \
   --start-time auto_2h30m \
   --end-time auto_0d \
   --output markdown
 ```
 
-The `auto_*` syntax subtracts durations from "now", so `auto_0d` equals the current UTC timestamp, `auto_2h30m` subtracts 2.5 hours, etc. Multiple units can be chained in any order.
+The `auto_*` syntax subtracts durations from "now", so `auto_0d` equals the current UTC timestamp, `auto_2h30m` subtracts 2.5 hours, etc. Multiple units can be chained in any order. Omit both `--start-time` and `--end-time` to fall back to a simple limit (default `1000` documents) using `--limit`. By default the CLI prints only the raw API response; add `--verbose` to include query/debug metadata.
 
 ### Settings & Overrides
 
@@ -29,18 +29,20 @@ Configuration lives in `src/corva_cli/settings.py` with sensible defaults:
 - `CORVA_TIMELOG_STATUSES` (default `online,maintenance,offline`)
 - `CORVA_DATA_API_ROOT_URL` (default `https://data.example.com`)
 - `CORVA_DATA_API_TIMEOUT_SECONDS` (default `30`)
-- `CORVA_TIMELOG_PROVIDER` / `CORVA_TIMELOG_DATASET` (default `timelog` / `entries`)
+- `CORVA_TIMELOG_PROVIDER` / `CORVA_TIMELOG_DATASET` (default `corva` / `drilling.timelog.data`)
 
 Drop a `.env` file (see `.env.example`) or set environment variables to override these values globally. Any command can still override them ad-hoc:
 
 ```bash
-uv run corva get-timelog-data \
+uv run corva timelog \
   --api-key YOUR_TOKEN \
-  --asset-ids asset-1 \
+  --asset-ids 303 \
   --start-time auto_6h \
   --end-time auto_0d \
   --step-minutes 30 \
-  --statuses online,idle
+  --statuses online,idle \
+  --limit 500 \
+  --skip 100
 ```
 
 ## Notes on Retired Samples

@@ -58,6 +58,12 @@ def _common_parameters() -> List[inspect.Parameter]:
             annotation=bool,
             default=typer.Option(False, "--show-plot", help="Attempt a plotext preview when supported"),
         ),
+        inspect.Parameter(
+            "verbose",
+            inspect.Parameter.KEYWORD_ONLY,
+            annotation=bool,
+            default=typer.Option(False, "--verbose", help="Include query/debug metadata in output"),
+        ),
     ]
 
 
@@ -90,11 +96,12 @@ def _execute_tool_by_name(
     jwt: Optional[str],
     output: OutputFormat,
     show_plot: bool,
+    verbose: bool,
     **tool_kwargs: Any,
 ):
     tool = registry.get(tool_name)
     auth_ctx = resolve_auth(api_key, jwt)
-    context = ToolContext(auth=auth_ctx, output_format=output)
+    context = ToolContext(auth=auth_ctx, output_format=output, verbose=verbose)
     result = tool.callback(context, **tool_kwargs)
     typer.echo(format_result(result, output))
     if show_plot:
@@ -140,6 +147,7 @@ def run_group(
     jwt: Optional[str] = typer.Option(None, envvar="CORVA_JWT"),
     output: OutputFormat = typer.Option(OutputFormat.JSON, case_sensitive=False),
     show_plot: bool = typer.Option(False, help="Attempt a plot preview"),
+    verbose: bool = typer.Option(False, "--verbose", help="Include query/debug metadata"),
 ) -> None:
     groups = _parse_group_file(groups_file)
     if name not in groups:
@@ -150,7 +158,7 @@ def run_group(
 
     def executor(tool_name: str, params: Dict[str, Any]):
         tool = registry.get(tool_name)
-        context = ToolContext(auth=auth_ctx, output_format=output)
+        context = ToolContext(auth=auth_ctx, output_format=output, verbose=verbose)
         result = tool.callback(context, **params)
         typer.echo(format_result(result, output))
         if show_plot:

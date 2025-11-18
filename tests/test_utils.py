@@ -25,7 +25,7 @@ def test_ensure_mql_variants():
 
 def test_build_auth_headers():
     api_headers = build_auth_headers(AuthContext(method=AuthMethod.API_KEY, token="key"))
-    assert api_headers["X-API-Key"] == "key"
+    assert api_headers["Authorization"] == "API key"
     jwt_headers = build_auth_headers(AuthContext(method=AuthMethod.JWT, token="jwt"))
     assert jwt_headers["Authorization"] == "Bearer jwt"
 
@@ -44,14 +44,36 @@ async def test_execute_data_api_pipeline(monkeypatch):
 
     transport = httpx.MockTransport(handler)
     async with httpx.AsyncClient(transport=transport) as client:
-        data = await execute_data_api_pipeline(
+        data, debug = await execute_data_api_pipeline(
             provider="provider",
             dataset_name="dataset",
             mql={"$match": {"foo": "bar"}},
-            headers={"X-API-Key": "token"},
+            headers={"Authorization": "API token"},
             client=client,
         )
 
     assert data == {"data": [1, 2, 3]}
     assert captured["url"].endswith("/api/v1/data/provider/dataset/aggregate/pipeline/")
     assert captured["json"] == {"stages": [{"$match": {"foo": "bar"}}]}
+    assert debug["status_code"] == 200
+    assert debug["request_body"]["stages"][0] == {"$match": {"foo": "bar"}}
+
+
+@pytest.mark.asyncio
+async def test_execute_data_api_pipeline_error(monkeypatch):
+    monkeypatch.setenv("CORVA_DATA_API_ROOT_URL", "https://example.com")
+    settings_module.reload_settings()
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(400, text="bad things happened")
+
+    transport = httpx.MockTransport(handler)
+    async with httpx.AsyncClient(transport=transport) as client:
+        with pytest.raises(httpx.HTTPStatusError):
+            await execute_data_api_pipeline(
+                provider="provider",
+                dataset_name="dataset",
+                mql={"$match": {"foo": "bar"}},
+                headers={},
+                client=client,
+            )

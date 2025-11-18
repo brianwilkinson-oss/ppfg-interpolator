@@ -1,9 +1,9 @@
-"""Shared utility helpers."""
+"""Shared utility helpers for Corva CLI tools."""
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
 import asyncio
-from typing import Any, Dict, Iterable, List, Optional
+from collections.abc import Mapping, Sequence
+from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
 
@@ -36,7 +36,7 @@ def build_auth_headers(auth: AuthContext) -> Dict[str, str]:
     """Return HTTP headers corresponding to the provided auth token."""
 
     if auth.method is AuthMethod.API_KEY:
-        return {"X-API-Key": auth.token}
+        return {"Authorization": f"API {auth.token}"}
     return {"Authorization": f"Bearer {auth.token}"}
 
 
@@ -48,8 +48,8 @@ async def execute_data_api_pipeline(
     *,
     timeout: Optional[float] = None,
     client: Optional[httpx.AsyncClient] = None,
-) -> Any:
-    """Execute an aggregate pipeline against the Data API and return JSON."""
+) -> Tuple[Any, Dict[str, Any]]:
+    """Execute an aggregate pipeline against the Data API and return JSON + debug info."""
 
     stages_payload = _ensure_mql_is_array_of_dicts(mql)
     settings = get_settings()
@@ -67,7 +67,13 @@ async def execute_data_api_pipeline(
             timeout=timeout_seconds,
         )
         response.raise_for_status()
-        return response.json()
+        debug = {
+            "url": url,
+            "status_code": response.status_code,
+            "request_body": {"stages": stages_payload},
+            "response_preview": response.text[:500],
+        }
+        return response.json(), debug
     finally:
         if own_client:
             await request_client.aclose()
@@ -80,7 +86,7 @@ def run_data_api_pipeline(
     headers: Dict[str, str],
     *,
     timeout: Optional[float] = None,
-) -> Any:
+) -> Tuple[Any, Dict[str, Any]]:
     """Convenience sync wrapper that runs :func:`execute_data_api_pipeline`."""
 
     return asyncio.run(

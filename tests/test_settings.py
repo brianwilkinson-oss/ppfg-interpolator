@@ -14,8 +14,8 @@ def test_settings_defaults(monkeypatch):
     assert cfg.timelog_statuses == ["online", "maintenance", "offline"]
     assert cfg.data_api_root_url == "https://data.example.com"
     assert cfg.data_api_timeout_seconds == 30
-    assert cfg.timelog_provider == "timelog"
-    assert cfg.timelog_dataset == "entries"
+    assert cfg.timelog_provider == "corva"
+    assert cfg.timelog_dataset == "drilling.timelog.data"
 
 
 def test_settings_env_override(monkeypatch):

@@ -42,6 +42,7 @@ class ToolContext:
 
     auth: AuthContext
     output_format: OutputFormat
+    verbose: bool = False
     invoked_at: datetime = field(default_factory=datetime.utcnow)
 
 

@@ -20,8 +20,8 @@ _DEFAULT_STATUSES = ["online", "maintenance", "offline"]
 _DEFAULT_STEP_MINUTES = 60
 _DEFAULT_DATA_API_ROOT_URL = "https://data.example.com"
 _DEFAULT_DATA_API_TIMEOUT = 30.0
-_DEFAULT_TIMELOG_PROVIDER = "timelog"
-_DEFAULT_TIMELOG_DATASET = "entries"
+_DEFAULT_TIMELOG_PROVIDER = "corva"
+_DEFAULT_TIMELOG_DATASET = "drilling.timelog.data"
 
 
 def _parse_statuses(raw: str | None) -> List[str]:
