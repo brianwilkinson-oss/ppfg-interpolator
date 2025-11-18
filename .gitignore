@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+
+# Dependency / package managers
+*.lock
+pip-wheel-metadata/
+
+# IDE & editors
+.idea/
+.vscode/
+
+# Test / coverage artifacts
+.pytest_cache/
+.coverage*
+htmlcov/
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# Local overrides
+.env

@@ -27,6 +27,8 @@ def test_timelog_auto_window_default(monkeypatch):
             "demo",
             "--asset-ids",
             "101,202",
+            "--company-id",
+            "12",
             "--start-time",
             "auto_2h",
             "--end-time",
@@ -42,6 +44,7 @@ def test_timelog_auto_window_default(monkeypatch):
     assert len(pipeline) == 4
     match_stage = pipeline[0]["$match"]
     assert match_stage["asset_id"]["$in"] == [101, 202]
+    assert match_stage["company_id"] == 12
     range_filter = match_stage["data.start_time"]
     assert isinstance(range_filter["$gte"], int)
     assert isinstance(range_filter["$lte"], int)
@@ -71,6 +74,8 @@ def test_timelog_verbose_includes_metadata(monkeypatch):
             "demo-jwt",
             "--asset-ids",
             "303",
+            "--company-id",
+            "99",
             "--start-time",
             "auto_1h",
             "--end-time",
@@ -89,6 +94,7 @@ def test_timelog_verbose_includes_metadata(monkeypatch):
     assert output["query"]["provider"] == "corva"
     assert output["query"]["dataset"] == "drilling.timelog.data"
     assert output["query"]["limit"] == 1000
+    assert output["query"]["company_id"] == 99
     pipeline = output["result"]["mql"]
     assert pipeline[0]["$match"]["asset_id"] == 303
     assert output["result"]["headers"]["Authorization"] == "Bearer demo-jwt"

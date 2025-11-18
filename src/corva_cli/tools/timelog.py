@@ -22,6 +22,7 @@ def _to_unix_seconds(dt: datetime) -> int:
 
 def _build_timelog_pipeline(
     assets: List[int],
+    company_id: Optional[int],
     start_dt: Optional[datetime],
     end_dt: Optional[datetime],
     statuses: List[str],
@@ -36,6 +37,8 @@ def _build_timelog_pipeline(
         asset_filter = {"$in": assets}
 
     window_filter: Dict[str, Any] = {"asset_id": asset_filter}
+    if company_id is not None:
+        window_filter["company_id"] = company_id
     if start_dt and end_dt:
         start_epoch = _to_unix_seconds(start_dt)
         end_epoch = _to_unix_seconds(end_dt)
@@ -84,6 +87,13 @@ def _build_timelog_pipeline(
             help="Comma-separated integer asset IDs",
         ),
         ParameterSpec(
+            "company_id",
+            type=int,
+            help="Single company identifier",
+            required=False,
+            default=None,
+        ),
+        ParameterSpec(
             "start_time",
             help="Window start in auto_* syntax (e.g. auto_2h30m)",
             required=False,
@@ -127,6 +137,7 @@ def _build_timelog_pipeline(
 def get_timelog_data(
     context: ToolContext,
     asset_ids: str,
+    company_id: Optional[int] = None,
     start_time: Optional[str] = None,
     end_time: Optional[str] = None,
     step_minutes: Optional[int] = None,
@@ -166,6 +177,7 @@ def get_timelog_data(
     headers = utils.build_auth_headers(context.auth)
     pipeline = _build_timelog_pipeline(
         assets,
+        company_id,
         start_dt,
         end_dt,
         status_choices,
@@ -186,6 +198,7 @@ def get_timelog_data(
     if context.verbose:
         query_payload = {
             "assets": assets,
+            "company_id": company_id,
             "step_minutes": effective_step,
             "statuses": status_choices,
             "limit": effective_limit,

@@ -25,4 +25,4 @@ def test_format_markdown_list_of_dicts_flattens():
     rendered = format_result(result, OutputFormat.MARKDOWN)
     assert "| foo | nested.id | extra |" in rendered
     assert "`bar`" in rendered
-    assert "`2`" in rendered
+    assert "| `baz` | 2 | `x` |" in rendered

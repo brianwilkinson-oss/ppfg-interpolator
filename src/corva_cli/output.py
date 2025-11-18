@@ -30,6 +30,14 @@ def _flatten_dict(data: Dict[str, Any], prefix: str = "") -> Dict[str, Any]:
     return flat
 
 
+def _format_cell(value: Any) -> str:
+    if isinstance(value, (int, float)):
+        return str(value)
+    if value is None:
+        return ""
+    return f"`{value}`"
+
+
 def _list_dicts_to_table(items: List[Dict[str, Any]]) -> str:
     flattened_items = [_flatten_dict(item) for item in items]
     keys: List[str] = []
@@ -43,7 +51,7 @@ def _list_dicts_to_table(items: List[Dict[str, Any]]) -> str:
     divider = "| " + " | ".join(["---"] * len(keys)) + " |"
     rows = []
     for item in flattened_items:
-        row = "| " + " | ".join(f"`{item.get(key, '')}`" for key in keys) + " |"
+        row = "| " + " | ".join(_format_cell(item.get(key)) for key in keys) + " |"
         rows.append(row)
     return "\n".join([header, divider, *rows])
 

@@ -14,12 +14,13 @@ Example:
 uv run corva timelog \
   --api-key YOUR_TOKEN \
   --asset-ids 101,202 \
+  --company-id 42 \
   --start-time auto_2h30m \
   --end-time auto_0d \
   --output markdown
 ```
 
-The `auto_*` syntax subtracts durations from "now", so `auto_0d` equals the current UTC timestamp, `auto_2h30m` subtracts 2.5 hours, etc. Multiple units can be chained in any order. Omit both `--start-time` and `--end-time` to fall back to a simple limit (default `1000` documents) using `--limit`. By default the CLI prints only the raw API response; add `--verbose` to include query/debug metadata.
+The `auto_*` syntax subtracts durations from "now", so `auto_0d` equals the current UTC timestamp, `auto_2h30m` subtracts 2.5 hours, etc. Multiple units can be chained in any order. Omit both `--start-time` and `--end-time` to fall back to a simple limit (default `1000` documents) using `--limit`. Scope requests to a single company via `--company-id`. By default the CLI prints only the raw API response; add `--verbose` to include query/debug metadata.
 
 ### Settings & Overrides
 
@@ -37,6 +38,7 @@ Drop a `.env` file (see `.env.example`) or set environment variables to override
 uv run corva timelog \
   --api-key YOUR_TOKEN \
   --asset-ids 303 \
+  --company-id 99 \
   --start-time auto_6h \
   --end-time auto_0d \
   --step-minutes 30 \
