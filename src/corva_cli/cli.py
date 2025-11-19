@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import inspect
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
@@ -12,9 +13,10 @@ import typer
 from corva_cli import __version__
 from corva_cli.auth import AuthError, resolve_auth
 from corva_cli.datasets import DatasetMeta, load_corva_company_datasets
-from corva_cli.grouping import GroupConfigError, GroupRunner, load_groups
+from corva_cli.grouping import GroupConfigError, GroupItem, GroupSpec, load_groups
 from corva_cli.output import format_result, preview_plot
-from corva_cli.tools.base import OutputFormat, ParameterSpec, ToolContext
+from corva_cli.tools.base import OutputFormat, ParameterSpec, ToolContext, ToolResult
+from corva_cli.tools.timelog import _dataset_requirement_groups, _ensure_dataset_requirements
 from corva_cli.tools.registry import load_builtin_tools, registry
 from corva_cli.utils import build_auth_headers
 
@@ -136,6 +138,9 @@ def _register_tool_command() -> None:
         app.command(tool.name)(cmd)
 
 
+REGISTERED_GROUP_COMMANDS: Set[str] = set()
+
+
 def _parse_group_file(path: Path):
     try:
         return load_groups(path)
@@ -174,9 +179,9 @@ def _dataset_meta_lookup() -> Tuple[Dict[str, DatasetMeta], Dict[str, DatasetMet
     return by_full_name, by_dataset
 
 
-def _map_dataset_names_to_commands(dataset_names: Iterable[str]) -> Tuple[List[str], List[str]]:
+def _map_dataset_names_to_commands(dataset_names: Iterable[str]) -> Tuple[List[Tuple[str, DatasetMeta]], List[str]]:
     by_full_name, by_dataset = _dataset_meta_lookup()
-    commands: List[str] = []
+    commands: List[Tuple[str, DatasetMeta]] = []
     missing: List[str] = []
     seen: Set[str] = set()
     for dataset_name in dataset_names:
@@ -189,9 +194,69 @@ def _map_dataset_names_to_commands(dataset_names: Iterable[str]) -> Tuple[List[s
             continue
         command_name = f"dataset-{meta.slug}"
         if command_name not in seen:
-            commands.append(command_name)
+            commands.append((command_name, meta))
             seen.add(command_name)
     return commands, missing
+
+
+def _build_shared_params(
+    asset_ids: Optional[str],
+    company_id: Optional[int],
+    start_time: Optional[str],
+    end_time: Optional[str],
+    depth_start: Optional[float],
+    depth_end: Optional[float],
+    limit: Optional[int],
+    skip: Optional[int],
+) -> Dict[str, Any]:
+    params: Dict[str, Any] = {}
+    if asset_ids is not None:
+        params["asset_ids"] = asset_ids
+    if company_id is not None:
+        params["company_id"] = company_id
+    if start_time is not None:
+        params["start_time"] = start_time
+    if end_time is not None:
+        params["end_time"] = end_time
+    if depth_start is not None:
+        params["depth_start"] = depth_start
+    if depth_end is not None:
+        params["depth_end"] = depth_end
+    if limit is not None:
+        params["limit"] = limit
+    if skip is not None:
+        params["skip"] = skip
+    return params
+
+
+def _collect_requirement_errors(
+    command_entries: List[Tuple[str, DatasetMeta]],
+    shared_params: Dict[str, Any],
+) -> List[str]:
+    errors: List[str] = []
+    asset_ids = shared_params.get("asset_ids")
+    company_id = shared_params.get("company_id")
+    start_time = shared_params.get("start_time")
+    end_time = shared_params.get("end_time")
+    depth_start = shared_params.get("depth_start")
+    depth_end = shared_params.get("depth_end")
+
+    for command_name, meta in command_entries:
+        requirement_groups = _dataset_requirement_groups(meta)
+        try:
+            _ensure_dataset_requirements(
+                meta,
+                requirement_groups,
+                asset_ids,
+                company_id,
+                start_time,
+                end_time,
+                depth_start,
+                depth_end,
+            )
+        except ValueError as exc:
+            errors.append(f"{command_name}: {exc}")
+    return errors
 
 
 def _load_or_init_groups_file(path: Path) -> Dict[str, Any]:
@@ -215,6 +280,121 @@ def _write_groups_file(path: Path, data: Dict[str, Any]) -> None:
     path.write_text(json.dumps(data, indent=2) + "\n")
 
 
+def _command_name_for_group(name: str) -> str:
+    slug = re.sub(r"[^0-9a-zA-Z_-]+", "-", name).strip("-").lower()
+    return slug or "generated-group"
+
+
+def _execute_group_spec(
+    spec: GroupSpec,
+    auth_ctx,
+    output: OutputFormat,
+    show_plot: bool,
+    verbose: bool,
+    runtime_overrides: Dict[str, Any],
+) -> ToolResult:
+    combined_payload: Dict[str, Any] = {}
+    combined_metadata: Dict[str, Any] = {}
+
+    def _run_item(item: GroupItem) -> ToolResult:
+        tool = registry.get(item.name)
+        effective_params = dict(item.params)
+        effective_params.update(runtime_overrides)
+        context = ToolContext(auth=auth_ctx, output_format=output, verbose=verbose)
+        return tool.callback(context, **effective_params)
+
+    tools = spec.tools
+    if spec.ordered:
+        ordered_items = tools
+    else:
+        ordered_items = tools  # Simplified sequential execution
+
+    for item in ordered_items:
+        result = _run_item(item)
+        combined_payload[item.name] = result.payload
+        if result.metadata is not None:
+            combined_metadata[item.name] = result.metadata
+
+    payload: Dict[str, Any] = {
+        "group": spec.name,
+        "results": combined_payload,
+    }
+    if verbose:
+        payload["debug"] = {"metadata": combined_metadata}
+
+    result = ToolResult(payload=payload, metadata={"tools": len(spec.tools)})
+    typer.echo(format_result(result, output))
+    if show_plot:
+        preview = preview_plot(result)
+        if preview:
+            typer.echo(preview)
+    return result
+
+
+def _register_generated_group_commands() -> None:
+    path = DEFAULT_GROUPS_FILE
+    if not path.exists():
+        return
+    try:
+        groups = load_groups(path)
+    except GroupConfigError as exc:  # pragma: no cover - user file issue
+        typer.secho(f"Skipping generated groups: {exc}", fg=typer.colors.YELLOW)
+        return
+
+    for group_name, spec in groups.items():
+        command_name = _command_name_for_group(group_name)
+        if command_name in REGISTERED_GROUP_COMMANDS:
+            continue
+
+        def command_factory(current_spec: GroupSpec, display_name: str):
+            def generated_group_command(
+                api_key: Optional[str] = typer.Option(None, envvar="CORVA_API_KEY"),
+                jwt: Optional[str] = typer.Option(None, envvar="CORVA_JWT"),
+                output: OutputFormat = typer.Option(OutputFormat.JSON, case_sensitive=False),
+                show_plot: bool = typer.Option(False, help="Attempt a plot preview"),
+                verbose: bool = typer.Option(False, "--verbose", help="Include query/debug metadata"),
+                asset_ids: Optional[str] = typer.Option(None, "--asset-ids", help="Override shared asset ids."),
+                company_id: Optional[int] = typer.Option(None, "--company-id", help="Override shared company id."),
+                start_time: Optional[str] = typer.Option(None, "--start-time", help="Override shared window start."),
+                end_time: Optional[str] = typer.Option(None, "--end-time", help="Override shared window end."),
+                depth_start: Optional[float] = typer.Option(None, "--depth-start", help="Override depth start."),
+                depth_end: Optional[float] = typer.Option(None, "--depth-end", help="Override depth end."),
+                limit: Optional[int] = typer.Option(None, "--limit", help="Override limit."),
+                skip: Optional[int] = typer.Option(None, "--skip", help="Override skip."),
+            ):
+                try:
+                    auth_ctx = resolve_auth(api_key, jwt)
+                except AuthError as exc:
+                    raise typer.BadParameter(str(exc)) from exc
+
+                overrides = _build_shared_params(
+                    asset_ids,
+                    company_id,
+                    start_time,
+                    end_time,
+                    depth_start,
+                    depth_end,
+                    limit,
+                    skip,
+                )
+                _execute_group_spec(
+                    current_spec,
+                    auth_ctx,
+                    output,
+                    show_plot,
+                    verbose,
+                    overrides,
+                )
+
+            generated_group_command.__name__ = f"group_{command_name}"
+            generated_group_command.__doc__ = f"Generated group '{display_name}'."
+            return generated_group_command
+
+        cmd = command_factory(spec, group_name)
+        app.command(command_name)(cmd)
+        REGISTERED_GROUP_COMMANDS.add(command_name)
+
+
 @group_app.command("run")
 def run_group(
     groups_file: Path = typer.Argument(..., help="Path to group definition JSON"),
@@ -224,6 +404,14 @@ def run_group(
     output: OutputFormat = typer.Option(OutputFormat.JSON, case_sensitive=False),
     show_plot: bool = typer.Option(False, help="Attempt a plot preview"),
     verbose: bool = typer.Option(False, "--verbose", help="Include query/debug metadata"),
+    asset_ids: Optional[str] = typer.Option(None, "--asset-ids", help="Override shared asset ids."),
+    company_id: Optional[int] = typer.Option(None, "--company-id", help="Override shared company id."),
+    start_time: Optional[str] = typer.Option(None, "--start-time", help="Override shared window start."),
+    end_time: Optional[str] = typer.Option(None, "--end-time", help="Override shared window end."),
+    depth_start: Optional[float] = typer.Option(None, "--depth-start", help="Override depth start."),
+    depth_end: Optional[float] = typer.Option(None, "--depth-end", help="Override depth end."),
+    limit: Optional[int] = typer.Option(None, "--limit", help="Override limit."),
+    skip: Optional[int] = typer.Option(None, "--skip", help="Override skip."),
 ) -> None:
     groups = _parse_group_file(groups_file)
     if name not in groups:
@@ -231,20 +419,26 @@ def run_group(
         raise typer.Exit(code=1)
 
     auth_ctx = resolve_auth(api_key, jwt)
+    runtime_overrides = _build_shared_params(
+        asset_ids,
+        company_id,
+        start_time,
+        end_time,
+        depth_start,
+        depth_end,
+        limit,
+        skip,
+    )
 
-    def executor(tool_name: str, params: Dict[str, Any]):
-        tool = registry.get(tool_name)
-        context = ToolContext(auth=auth_ctx, output_format=output, verbose=verbose)
-        result = tool.callback(context, **params)
-        typer.echo(format_result(result, output))
-        if show_plot:
-            preview = preview_plot(result)
-            if preview:
-                typer.echo(preview)
-        return result
-
-    runner = GroupRunner(executor)
-    runner.run(groups[name])
+    spec = groups[name]
+    _execute_group_spec(
+        spec,
+        auth_ctx,
+        output,
+        show_plot,
+        verbose,
+        runtime_overrides,
+    )
 
 
 @group_app.command("create")
@@ -259,6 +453,14 @@ def create_group(
     ),
     token: Optional[str] = typer.Option(None, "--token", "-t", help="Corva API token"),
     jwt: Optional[str] = typer.Option(None, "--jwt", "-j", help="JWT credential"),
+    asset_ids: Optional[str] = typer.Option(None, "--asset-ids", help="Shared comma-separated asset IDs."),
+    company_id: Optional[int] = typer.Option(None, "--company-id", help="Shared company id."),
+    start_time: Optional[str] = typer.Option(None, "--start-time", help="Shared start time (auto_* syntax)."),
+    end_time: Optional[str] = typer.Option(None, "--end-time", help="Shared end time (auto_* syntax)."),
+    depth_start: Optional[float] = typer.Option(None, "--depth-start", help="Shared depth start."),
+    depth_end: Optional[float] = typer.Option(None, "--depth-end", help="Shared depth end."),
+    limit: Optional[int] = typer.Option(None, "--limit", help="Shared limit override."),
+    skip: Optional[int] = typer.Option(None, "--skip", help="Shared skip override."),
 ) -> None:
     """Create/update a group using datasets assigned to an app."""
 
@@ -279,14 +481,40 @@ def create_group(
         typer.secho(f"No datasets returned for app {app_id}.", fg=typer.colors.RED)
         raise typer.Exit(code=1)
 
-    commands, missing = _map_dataset_names_to_commands(dataset_names)
-    if not commands:
+    command_entries, missing = _map_dataset_names_to_commands(dataset_names)
+    if not command_entries:
         typer.secho(
             "None of the app datasets matched known CLI dataset commands. "
             "Update docs/dataset.json or request different app permissions.",
             fg=typer.colors.RED,
         )
         raise typer.Exit(code=1)
+
+    shared_params = _build_shared_params(
+        asset_ids,
+        company_id,
+        start_time,
+        end_time,
+        depth_start,
+        depth_end,
+        limit,
+        skip,
+    )
+    if not shared_params:
+        typer.secho(
+            "No shared dataset parameters were provided. Generated group will rely on command defaults.",
+            fg=typer.colors.YELLOW,
+        )
+
+    requirement_errors = _collect_requirement_errors(command_entries, shared_params)
+    if requirement_errors:
+        typer.secho(
+            "Shared parameters may not satisfy every dataset requirement. "
+            "Missing filters will need to be supplied when running the group:",
+            fg=typer.colors.YELLOW,
+        )
+        for error in requirement_errors:
+            typer.secho(f"- {error}", fg=typer.colors.YELLOW)
 
     try:
         groups_doc = _load_or_init_groups_file(groups_file)
@@ -300,14 +528,17 @@ def create_group(
     group_entry = {
         "name": group_name,
         "ordered": True,
-        "tools": [{"name": command} for command in commands],
+        "tools": [
+            {"name": command, "params": dict(shared_params)}
+            for command, _ in command_entries
+        ],
     }
     existing_groups.append(group_entry)
     groups_doc["groups"] = existing_groups
     _write_groups_file(groups_file, groups_doc)
 
     typer.secho(
-        f"Group '{group_name}' with {len(commands)} dataset command(s) saved to {groups_file}",
+        f"Group '{group_name}' with {len(command_entries)} dataset command(s) saved to {groups_file}",
         fg=typer.colors.GREEN,
     )
     if missing:
@@ -316,8 +547,9 @@ def create_group(
             fg=typer.colors.YELLOW,
         )
     typer.echo(
-        f"Run it via: uv run corva group run {groups_file} --name {group_name} "
-        "and supply --token/--jwt again."
+        "Run it directly via: "
+        f"uv run corva {_command_name_for_group(group_name)} --token/--jwt ... "
+        "or rerun group create to refresh."
     )
 
 
@@ -329,6 +561,7 @@ def main(ctx: typer.Context, version: bool = typer.Option(False, "--version", he
 
 
 _register_tool_command()
+_register_generated_group_commands()
 
 
 __all__ = ["app"]

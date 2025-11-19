@@ -1,0 +1,204 @@
+{
+  "groups": [
+    {
+      "name": "rig-activity",
+      "ordered": true,
+      "tools": [
+        {
+          "name": "dataset-activities",
+          "params": {}
+        },
+        {
+          "name": "dataset-wits-summary-1m",
+          "params": {}
+        },
+        {
+          "name": "dataset-wits",
+          "params": {}
+        },
+        {
+          "name": "dataset-interventions-wits-summary-6h-metadata",
+          "params": {}
+        },
+        {
+          "name": "dataset-wits-summary-30m",
+          "params": {}
+        },
+        {
+          "name": "dataset-drillout-wits-summary-1m",
+          "params": {}
+        },
+        {
+          "name": "dataset-wits-summary-30m-metadata",
+          "params": {}
+        },
+        {
+          "name": "dataset-interventions-wits-summary-30m-metadata",
+          "params": {}
+        },
+        {
+          "name": "dataset-drillout-activities",
+          "params": {}
+        },
+        {
+          "name": "dataset-interventions-wits",
+          "params": {}
+        },
+        {
+          "name": "dataset-drillout-wits",
+          "params": {}
+        },
+        {
+          "name": "dataset-drillout-wits-summary-6h-metadata",
+          "params": {}
+        },
+        {
+          "name": "dataset-interventions-wits-summary-30m",
+          "params": {}
+        },
+        {
+          "name": "dataset-activities-summary-2tours",
+          "params": {}
+        },
+        {
+          "name": "dataset-wits-summary-6h",
+          "params": {}
+        },
+        {
+          "name": "dataset-drillout-activities-summary-2tours",
+          "params": {}
+        },
+        {
+          "name": "dataset-activities-summary-continuous",
+          "params": {}
+        },
+        {
+          "name": "dataset-wits-summary-6h-metadata",
+          "params": {}
+        },
+        {
+          "name": "dataset-interventions-wits-summary-1m-metadata",
+          "params": {}
+        },
+        {
+          "name": "dataset-drillout-wits-summary-6h",
+          "params": {}
+        },
+        {
+          "name": "dataset-drillout-wits-summary-30m",
+          "params": {}
+        },
+        {
+          "name": "dataset-drillout-activities-summary-continuous",
+          "params": {}
+        },
+        {
+          "name": "dataset-drillout-wits-summary-1m-metadata",
+          "params": {}
+        },
+        {
+          "name": "dataset-interventions-activities",
+          "params": {}
+        },
+        {
+          "name": "dataset-wits-summary-1m-metadata",
+          "params": {}
+        },
+        {
+          "name": "dataset-drillout-wits-summary-30m-metadata",
+          "params": {}
+        },
+        {
+          "name": "dataset-interventions-wits-summary-1m",
+          "params": {}
+        },
+        {
+          "name": "dataset-interventions-wits-summary-6h",
+          "params": {}
+        }
+      ]
+    },
+    {
+      "name": "rig-operations",
+      "ordered": true,
+      "tools": [
+        {
+          "name": "dataset-data-well-sections",
+          "params": {}
+        },
+        {
+          "name": "dataset-data-drillstring",
+          "params": {}
+        },
+        {
+          "name": "dataset-activity-groups",
+          "params": {}
+        },
+        {
+          "name": "dataset-drillout-activities",
+          "params": {}
+        },
+        {
+          "name": "dataset-drillout-activity-groups",
+          "params": {}
+        },
+        {
+          "name": "dataset-data-casing",
+          "params": {}
+        },
+        {
+          "name": "dataset-activities",
+          "params": {}
+        },
+        {
+          "name": "dataset-metrics",
+          "params": {}
+        },
+        {
+          "name": "dataset-operations",
+          "params": {}
+        },
+        {
+          "name": "dataset-drillout-data-drillstring",
+          "params": {}
+        },
+        {
+          "name": "dataset-drillout-wits",
+          "params": {}
+        },
+        {
+          "name": "dataset-drillout-operations",
+          "params": {}
+        },
+        {
+          "name": "dataset-assets",
+          "params": {}
+        },
+        {
+          "name": "dataset-wits",
+          "params": {}
+        },
+        {
+          "name": "dataset-interventions-wits",
+          "params": {}
+        },
+        {
+          "name": "dataset-interventions-activities",
+          "params": {}
+        },
+        {
+          "name": "dataset-interventions-activity-groups",
+          "params": {}
+        },
+        {
+          "name": "dataset-interventions-operations",
+          "params": {}
+        },
+        {
+          "name": "dataset-interventions-data-drillstring",
+          "params": {}
+        }
+      ]
+    }
+  ]
+}

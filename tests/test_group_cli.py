@@ -1,9 +1,10 @@
 import json
 from pathlib import Path
+from uuid import uuid4
 
 from typer.testing import CliRunner
 
-from corva_cli.cli import app
+from corva_cli.cli import app, _register_generated_group_commands
 
 runner = CliRunner()
 
@@ -41,7 +42,7 @@ def test_group_create_generates_config(tmp_path, monkeypatch):
         [
             "group",
             "create",
-            "--token",
+            "--jwt",
             "demo",
             "--app-id",
             "7",
@@ -49,6 +50,14 @@ def test_group_create_generates_config(tmp_path, monkeypatch):
             "demo-group",
             "--groups-file",
             str(groups_path),
+            "--asset-ids",
+            "101,202",
+            "--start-time",
+            "auto_1h",
+            "--end-time",
+            "auto_0d",
+            "--company-id",
+            "3",
         ],
     )
 
@@ -56,7 +65,17 @@ def test_group_create_generates_config(tmp_path, monkeypatch):
     assert called["params"] == {"app_ids[]": 7}
     data = json.loads(groups_path.read_text())
     assert data["groups"][0]["name"] == "demo-group"
-    assert data["groups"][0]["tools"] == [{"name": "dataset-activities"}]
+    assert data["groups"][0]["tools"] == [
+        {
+            "name": "dataset-activities",
+            "params": {
+                "asset_ids": "101,202",
+                "company_id": 3,
+                "start_time": "auto_1h",
+                "end_time": "auto_0d",
+            },
+        }
+    ]
 
 
 def test_group_create_errors_when_no_datasets_match(tmp_path, monkeypatch):
@@ -84,3 +103,104 @@ def test_group_create_errors_when_no_datasets_match(tmp_path, monkeypatch):
 
     assert result.exit_code != 0
     assert not groups_path.exists()
+
+
+def test_group_run_accepts_overrides(tmp_path, monkeypatch):
+    groups_path = tmp_path / "groups.json"
+    groups_path.write_text(
+        json.dumps(
+            {
+                "groups": [
+                    {
+                        "name": "demo",
+                        "ordered": True,
+                        "tools": [
+                            {"name": "dataset-activities", "params": {}},
+                        ],
+                    }
+                ]
+            }
+        )
+    )
+
+    async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
+        assert dataset_name == "activities"
+        match_stage = mql[0]["$match"]
+        assert match_stage["asset_id"] == 101
+        assert "timestamp" in match_stage
+        return ({"rows": []}, {"status_code": 200})
+
+    monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
+
+    result = runner.invoke(
+        app,
+        [
+            "group",
+            "run",
+            str(groups_path),
+            "--name",
+            "demo",
+            "--jwt",
+            "demo",
+            "--asset-ids",
+            "101",
+            "--start-time",
+            "auto_1h",
+            "--end-time",
+            "auto_0d",
+        ],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    payload = json.loads(result.stdout)
+    assert payload["group"] == "demo"
+    assert payload["results"]["dataset-activities"]["rows"] == []
+
+
+def test_generated_group_command_available(tmp_path, monkeypatch):
+    unique_name = f"demo-{uuid4().hex[:6]}"
+    groups_path = tmp_path / "groups.json"
+    groups_path.write_text(
+        json.dumps(
+            {
+                "groups": [
+                    {
+                        "name": unique_name,
+                        "ordered": True,
+                        "tools": [
+                            {"name": "dataset-activities", "params": {}},
+                        ],
+                    }
+                ]
+            }
+        )
+    )
+
+    monkeypatch.setattr("corva_cli.cli.DEFAULT_GROUPS_FILE", groups_path)
+    monkeypatch.setattr("corva_cli.cli.REGISTERED_GROUP_COMMANDS", set())
+    _register_generated_group_commands()
+
+    async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
+        assert dataset_name == "activities"
+        return ({"rows": []}, {"status_code": 200})
+
+    monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
+
+    result = runner.invoke(
+        app,
+        [
+            unique_name,
+            "--jwt",
+            "demo",
+            "--asset-ids",
+            "101",
+            "--start-time",
+            "auto_1h",
+            "--end-time",
+            "auto_0d",
+        ],
+    )
+    assert result.exit_code == 0, result.stdout
+    payload = json.loads(result.stdout)
+    assert payload["group"] == unique_name
+    assert payload["results"]["dataset-activities"]["rows"] == []

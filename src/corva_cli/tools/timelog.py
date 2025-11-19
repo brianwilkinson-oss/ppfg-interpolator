@@ -766,7 +766,7 @@ def _register_dataset_tools() -> None:
         ):
             def dataset_tool(
                 context: ToolContext,
-                asset_ids: str,
+                asset_ids: str = "",
                 company_id: Optional[int] = None,
                 start_time: Optional[str] = None,
                 end_time: Optional[str] = None,

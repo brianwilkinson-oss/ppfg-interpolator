@@ -69,14 +69,25 @@ uv run corva group create \
   --token YOUR_API_TOKEN \
   --app-id 1234 \
   --group-name my-app-datasets \
-  --groups-file groups/generated_groups.json
+  --groups-file groups/generated_groups.json \
+  --asset-ids 101,202 \
+  --company-id 3 \
+  --start-time auto_1h \
+  --end-time auto_0d
 ```
 
 The command fetches datasets assigned to the app, maps them to available `dataset-<slug>` commands, and appends a group entry to the target JSON file. Run it later with the standard runner:
 
 ```bash
-uv run corva group run groups/generated_groups.json --name my-app-datasets --token YOUR_API_TOKEN
+uv run corva group run groups/generated_groups.json \
+  --name my-app-datasets \
+  --token YOUR_API_TOKEN \
+  --asset-ids 101,202 \
+  --start-time auto_1h \
+  --end-time auto_0d
 ```
+
+Every generated group also becomes a first-class CLI command that matches the group name (e.g., `uv run corva my-app-datasets --token ...`). Any `--asset-ids`, `--company-id`, `--start-time`, `--end-time`, `--depth-start`, `--depth-end`, `--limit`, or `--skip` values you pass to `group create` are copied into each dataset tool entry, and you can still override them at invocation time for both `group run` and the direct command. The CLI aggregates all dataset responses into a single payload shaped like `{"group": "my-app-datasets", "results": {"dataset-foo": {...}}}` so it mirrors the structured output of `dvd`.
 
 If an app references datasets that are missing from `docs/dataset.json`, the generator lists them so you can refresh the local catalog.
 
