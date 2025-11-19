@@ -1,5 +1,7 @@
 # Byte-compiled / optimized / DLL files
+# Python artifacts
 __pycache__/
+**/__pycache__/
 *.py[cod]
 
 # Virtual environments

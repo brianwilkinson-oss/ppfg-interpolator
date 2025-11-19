@@ -1,0 +1,3557 @@
+{
+  "assets": [],
+  "timelog": [
+    {
+      "_id": "691dc8908962aa9e931c9266",
+      "company_id": 52,
+      "asset_id": 65352382,
+      "version": 1,
+      "provider": "corva",
+      "collection": "drilling.timelog.data",
+      "data": {
+        "end_time": 1763409600,
+        "start_time": 1763407800,
+        "duration": 0.5,
+        "primary_code": "INT",
+        "sub_code_1": "PRE DRL",
+        "sub_code_2": "NIPPLE UP BOPE",
+        "sub_code_3": "NU_BOPE",
+        "sub_code_5": "false",
+        "comment": "Nipple up BOP.",
+        "idrec": "FB5B2356733E4805B44212AC209D709A"
+      },
+      "timestamp": 1763559569,
+      "metadata": {
+        "source": {
+          "method": "Fusion API"
+        }
+      },
+      "timestamp_iso": "2025-11-19T13:39:29.000Z"
+    },
+    {
+      "_id": "691dc8908962aa9e931c9265",
+      "company_id": 52,
+      "asset_id": 65352382,
+      "version": 1,
+      "provider": "corva",
+      "collection": "drilling.timelog.data",
+      "data": {
+        "end_time": 1763407800,
+        "start_time": 1763404200,
+        "duration": 1,
+        "primary_code": "MOB",
+        "sub_code_1": "RIG UP",
+        "sub_code_2": "SKID BETWEEN WELLS",
+        "sub_code_3": "SKID",
+        "sub_code_5": "false",
+        "comment": "Skid Rig F/ the Corral 305H to the Corral 308H and center over well.",
+        "idrec": "FB5B2356733E4805B44212AC209D709A"
+      },
+      "timestamp": 1763559568,
+      "metadata": {
+        "source": {
+          "method": "Fusion API"
+        }
+      },
+      "timestamp_iso": "2025-11-19T13:39:28.000Z"
+    }
+  ],
+  "datasets": {
+    "activities": [
+      {
+        "_id": "691e355bd7d821d92a4b26e6",
+        "version": 1,
+        "provider": "corva",
+        "collection": "activities",
+        "timestamp": 1763588306,
+        "asset_id": 65352382,
+        "company_id": 52,
+        "data": {
+          "start_time": 1763587412,
+          "end_time": 1763588306,
+          "operation_time": 894,
+          "activity_name": "Slide Drilling",
+          "hole_depth_change": 5.88,
+          "bit_depth_change": 5.99,
+          "hole_depth": 7754.85,
+          "bit_depth": 7754.74,
+          "shift_time": {
+            "day": 894,
+            "night": 0
+          }
+        },
+        "timestamp_iso": "2025-11-19T21:38:26.000Z"
+      },
+      {
+        "_id": "691e35580698aede09fa84e8",
+        "version": 1,
+        "provider": "corva",
+        "collection": "activities",
+        "timestamp": 1763587412,
+        "asset_id": 65352382,
+        "company_id": 52,
+        "data": {
+          "start_time": 1763587408,
+          "end_time": 1763587412,
+          "operation_time": 4,
+          "activity_name": "Circulating",
+          "hole_depth_change": 0,
+          "bit_depth_change": 0.04,
+          "hole_depth": 7754.85,
+          "bit_depth": 7754.7,
+          "shift_time": {
+            "day": 4,
+            "night": 0
+          }
+        },
+        "timestamp_iso": "2025-11-19T21:23:32.000Z"
+      }
+    ],
+    "wits.summary-1m": [
+      {
+        "_id": "691ce7b84a0d18d6aa7d7cf4",
+        "version": 1,
+        "provider": "corva",
+        "collection": "wits.summary-1m",
+        "timestamp": 1763502000,
+        "asset_id": 65352382,
+        "data": {
+          "timestamp_ms": 1763501971,
+          "entry_at": 1763502000,
+          "time": "2025-11-18T15:39:30.000-06:00",
+          "rsua": 0,
+          "bittonbot": 100682.15625,
+          "chkp": 4.9634,
+          "tvolcact": -14.84104,
+          "ropmax": 48.33466,
+          "tvolact": 549.17303,
+          "wobx": 127.6498,
+          "p01v": 95.49407,
+          "p02v": 95.03454,
+          "p03v": 85.6208,
+          "p04v": 74.03197,
+          "p05v": 68.86339,
+          "p06v": 60.66631,
+          "p07v": 29.1059,
+          "p08v": 4.29688,
+          "p09v": 16.85793,
+          "p10v": 51.16103,
+          "psc1": 172432.29688,
+          "psc2": 162268.70313,
+          "psc3": 169902.40625,
+          "ropa5": 44.82407,
+          "stkc": 12128.40039,
+          "tripgl": -0.33898,
+          "rsda": 0.70606,
+          "btbot": 1,
+          "ttva": 7.49088,
+          "deptvert": 4994.47119,
+          "deptretm": 0,
+          "statusis": 0,
+          "adropactual": 40,
+          "adroplmtval": 40,
+          "stickslip": 226.25464,
+          "chposa": 0.06,
+          "deptsvym": 5305.11035,
+          "svyincu": 25.65,
+          "svyazu": 30.14,
+          "ropi": 42.36346,
+          "overpull": 0,
+          "pitglcoman": 48.26586,
+          "srvlimtf": 10,
+          "lagdeptgas": 0,
+          "deptgrm": 5305.11035,
+          "slideautoon": 1,
+          "stickslip1": 207.63857,
+          "stickslip2": 219.80801,
+          "stickslip3": 243.95476,
+          "reviton": 0,
+          "revitkf": 1499,
+          "revitcf": 1605,
+          "ropt": 48.35,
+          "mse": 333.63782,
+          "svytvd": 4897.49023,
+          "mpdchkpress": -0.12775,
+          "mpdchkctrlmod": 100,
+          "mpdflwin": 639.55652,
+          "mpdflwout": 0,
+          "gastotml": 192.89999,
+          "mpdpresssetpnt": 149.9286,
+          "mwdlatshk": 6,
+          "mwd_srvtldepwits": 5197,
+          "procautoon": 1,
+          "ztenabled": 0,
+          "ztzvalue": 4000,
+          "ztpipetrq": 1696.84607,
+          "ztstikslip": 332.51181,
+          "plchrtbt": 6,
+          "ztzgainpct": 25,
+          "bit_depth": 5305.12207,
+          "block_height": 49.577,
+          "hole_depth": 5305.12207,
+          "diff_press": 25.77415,
+          "hook_load": 127.5505,
+          "rop": 43.29621,
+          "rotary_rpm": 3.33968,
+          "standpipe_pressure": 2619.63989,
+          "rotary_torque": 1.01303,
+          "mud_flow_in": 638.76917,
+          "mud_flow_out_percent": 72.49223,
+          "weight_on_bit": 37.69403,
+          "gamma_ray": 61.05,
+          "heartbeat": 6,
+          "ad_wob_max": 40,
+          "pump_spm_1": 0,
+          "pump_spm_2": 109.8901,
+          "pump_spm_3": 109.8901,
+          "rop_opt_rop": 166,
+          "spp_at_tare": 2592.87207,
+          "ad_rop_on_off": 0,
+          "ad_wob_actual": 37.69181,
+          "downhole_temp": 134.60001,
+          "rocker_status": 1,
+          "pump_spm_total": 219.7802,
+          "rop_in_control": 1,
+          "wob_in_control": 0,
+          "ad_rop_setpoint": 40,
+          "ad_wob_setpoint": 40,
+          "diff_in_control": 0,
+          "downlink_status": 0,
+          "ad_system_on_off": 1,
+          "hookload_at_tare": 165.21941,
+          "active_pit_volume": 752.13641,
+          "gravity_tool_face": 196.88,
+          "magnetic_tool_face": 45.54,
+          "rop_opt_rotary_rpm": 65,
+          "trip_tank_volume_1": 4.09635,
+          "trip_tank_volume_2": 3.39453,
+          "corva_pd_in_control": 0,
+          "ad_diff_pressure_max": 900,
+          "rop_opt_weight_on_bit": 40,
+          "ad_diff_press_setpoint": 130,
+          "continuous_inclination": 25.91,
+          "mwd_continuous_azimuth": 29.51,
+          "status_for_autodriller": 1,
+          "top_drive_torque_limit": 16,
+          "ad_diff_pressure_actual": 23.5188,
+          "ad_diff_pressure_on_off": 1,
+          "rop_opt_differential_pressure": 900,
+          "true_vertical_depth": 4994.95,
+          "state": "Slide Drilling"
+        },
+        "company_id": 52,
+        "timestamp_iso": "2025-11-18T21:40:00.000Z"
+      },
+      {
+        "_id": "691ce77d3c5b827667986975",
+        "version": 1,
+        "provider": "corva",
+        "collection": "wits.summary-1m",
+        "timestamp": 1763501940,
+        "asset_id": 65352382,
+        "data": {
+          "timestamp_ms": 1763501911,
+          "entry_at": 1763501940,
+          "time": "2025-11-18T15:38:30.000-06:00",
+          "rsua": 0,
+          "bittonbot": 100622.32031,
+          "chkp": 5.32098,
+          "tvolcact": -24.12939,
+          "ropmax": 58.08765,
+          "tvolact": 539.8847,
+          "wobx": 127.3586,
+          "p01v": 94.24678,
+          "p02v": 93.44151,
+          "p03v": 84.25536,
+          "p04v": 72.73654,
+          "p05v": 67.62923,
+          "p06v": 58.29427,
+          "p07v": 28.67043,
+          "p08v": 4.29427,
+          "p09v": 16.8478,
+          "p10v": 55.89012,
+          "psc1": 172432.29688,
+          "psc2": 162157.79688,
+          "psc3": 169791.70313,
+          "ropa5": 63.88618,
+          "stkc": 11906.7002,
+          "tripgl": -0.34057,
+          "rsda": 0.86667,
+          "btbot": 1,
+          "ttva": 7.48929,
+          "deptvert": 4993.77783,
+          "deptretm": 0,
+          "statusis": 0,
+          "adropactual": 49.58381,
+          "adroplmtval": 50,
+          "stickslip": 172.16115,
+          "chposa": 0.06,
+          "deptsvym": 5304.34277,
+          "svyincu": 25.65,
+          "svyazu": 30.14,
+          "ropi": 52,
+          "overpull": 0,
+          "pitglcoman": 38.97698,
+          "srvlimtf": 10,
+          "lagdeptgas": 0,
+          "deptgrm": 5304.34277,
+          "slideautoon": 1,
+          "stickslip1": 154.55307,
+          "stickslip2": 171.56369,
+          "stickslip3": 177.43185,
+          "reviton": 0,
+          "revitkf": 1499,
+          "revitcf": 1605,
+          "ropt": 53.70024,
+          "mse": 55.65391,
+          "svytvd": 4897.49023,
+          "mpdchkpress": -0.12189,
+          "mpdchkctrlmod": 100,
+          "mpdflwin": 639.54138,
+          "mpdflwout": 0,
+          "gastotml": 194.10001,
+          "mpdpresssetpnt": 149.9286,
+          "mwdlatshk": 6,
+          "mwd_srvtldepwits": 5197,
+          "procautoon": 1,
+          "ztenabled": 0,
+          "ztzvalue": 4000,
+          "ztpipetrq": 2130.1853,
+          "ztstikslip": 254.95866,
+          "plchrtbt": 4,
+          "ztzgainpct": 25,
+          "bit_depth": 5304.34277,
+          "block_height": 50.34472,
+          "hole_depth": 5304.34277,
+          "diff_press": 30.24092,
+          "hook_load": 127.7437,
+          "rop": 50.81061,
+          "rotary_rpm": -1.30752,
+          "standpipe_pressure": 2623.11304,
+          "rotary_torque": 1.72627,
+          "mud_flow_in": 638.76917,
+          "mud_flow_out_percent": 72.49223,
+          "weight_on_bit": 37.43969,
+          "gamma_ray": 57.68,
+          "heartbeat": 4,
+          "ad_wob_max": 40,
+          "pump_spm_1": 0,
+          "pump_spm_2": 109.8901,
+          "pump_spm_3": 109.8901,
+          "rop_opt_rop": 174,
+          "spp_at_tare": 2592.87207,
+          "ad_rop_on_off": 0,
+          "ad_wob_actual": 37.48505,
+          "downhole_temp": 134.60001,
+          "rocker_status": 1,
+          "pump_spm_total": 219.7802,
+          "rop_in_control": 1,
+          "wob_in_control": 0,
+          "ad_rop_setpoint": 50,
+          "ad_wob_setpoint": 39,
+          "diff_in_control": 0,
+          "downlink_status": 0,
+          "ad_system_on_off": 1,
+          "hookload_at_tare": 165.21941,
+          "active_pit_volume": 754.14252,
+          "gravity_tool_face": 191.25,
+          "magnetic_tool_face": 45.54,
+          "rop_opt_rotary_rpm": 65,
+          "trip_tank_volume_1": 4.09635,
+          "trip_tank_volume_2": 3.39294,
+          "corva_pd_in_control": 0,
+          "ad_diff_pressure_max": 900,
+          "rop_opt_weight_on_bit": 40,
+          "ad_diff_press_setpoint": 130,
+          "continuous_inclination": 25.91,
+          "mwd_continuous_azimuth": 29.51,
+          "status_for_autodriller": 1,
+          "top_drive_torque_limit": 16,
+          "ad_diff_pressure_actual": 30.01763,
+          "ad_diff_pressure_on_off": 1,
+          "rop_opt_differential_pressure": 900,
+          "true_vertical_depth": 4994.25,
+          "state": "Slide Drilling"
+        },
+        "company_id": 52,
+        "timestamp_iso": "2025-11-18T21:39:00.000Z"
+      }
+    ],
+    "wits": [
+      {
+        "_id": "691ce761b2c93060ee9d2fee",
+        "version": 1,
+        "provider": "corva",
+        "collection": "wits",
+        "timestamp": 1763501915,
+        "timestamp_read": 1763501920,
+        "asset_id": 65352382,
+        "company_id": 52,
+        "app": "corva.witsml-source",
+        "metadata": {
+          "drillstring": "6918ae3be22294c9d008f5c0",
+          "casing": null,
+          "mud": "691c87993100d1ea5954073e",
+          "cuttings": null,
+          "surface-equipment": "6918ae0468e94b0af9237514",
+          "actual_survey": "691ce4ef340b00d645ff5bfe",
+          "plan_survey": "6918ae0468e94b0af92374e2",
+          "rig_id": null
+        },
+        "data": {
+          "timestamp_ms": 1763501915,
+          "entry_at": 1763501915,
+          "time": "2025-11-18T15:38:35.000-06:00",
+          "rsua": 0,
+          "bittonbot": 100625.85938,
+          "chkp": 4.60582,
+          "tvolcact": -24.3626,
+          "ropmax": 51.92857,
+          "tvolact": 539.65149,
+          "wobx": 126.3975,
+          "p01v": 94.43497,
+          "p02v": 93.66471,
+          "p03v": 84.36039,
+          "p04v": 72.39956,
+          "p05v": 67.8393,
+          "p06v": 58.02731,
+          "p07v": 28.6679,
+          "p08v": 4.28906,
+          "p09v": 16.84578,
+          "p10v": 55.72736,
+          "psc1": 172432.29688,
+          "psc2": 162166.29688,
+          "psc3": 169800.09375,
+          "ropa5": 63.88618,
+          "stkc": 11923.2002,
+          "tripgl": -0.34057,
+          "rsda": 0.80597,
+          "btbot": 1,
+          "ttva": 7.48929,
+          "deptvert": 4993.8291,
+          "deptretm": 0,
+          "statusis": 0,
+          "adropactual": 48.07228,
+          "adroplmtval": 50,
+          "stickslip": 170.95711,
+          "chposa": 0.06,
+          "deptsvym": 5304.39893,
+          "svyincu": 25.65,
+          "svyazu": 30.14,
+          "ropi": 48.35821,
+          "overpull": 0,
+          "pitglcoman": 38.53855,
+          "srvlimtf": 10,
+          "lagdeptgas": 0,
+          "deptgrm": 5304.39893,
+          "slideautoon": 1,
+          "stickslip1": 167.1219,
+          "stickslip2": 170.00011,
+          "stickslip3": 196.86716,
+          "reviton": 0,
+          "revitkf": 1499,
+          "revitcf": 1605,
+          "ropt": 53.39687,
+          "mse": -675.9245,
+          "svytvd": 4897.49023,
+          "mpdchkpress": -0.09901,
+          "mpdchkctrlmod": 100,
+          "mpdflwin": 639.55878,
+          "mpdflwout": 0,
+          "gastotml": 193.3,
+          "mpdpresssetpnt": 149.9286,
+          "mwdlatshk": 6,
+          "mwd_srvtldepwits": 5197,
+          "procautoon": 1,
+          "ztenabled": 0,
+          "ztzvalue": 4000,
+          "ztpipetrq": 3322.91431,
+          "ztstikslip": 229.90973,
+          "plchrtbt": 3,
+          "ztzgainpct": 25,
+          "bit_depth": 5304.39893,
+          "block_height": 50.27406,
+          "hole_depth": 5304.39893,
+          "diff_press": 19.62131,
+          "hook_load": 126.9111,
+          "rop": 50.81061,
+          "rotary_rpm": -2.50751,
+          "standpipe_pressure": 2616.56299,
+          "rotary_torque": 1.37721,
+          "mud_flow_in": 638.76917,
+          "mud_flow_out_percent": 73.36467,
+          "weight_on_bit": 38.05334,
+          "gamma_ray": 51.98,
+          "heartbeat": 4,
+          "ad_wob_max": 40,
+          "pump_spm_1": 0,
+          "pump_spm_2": 109.8901,
+          "pump_spm_3": 109.8901,
+          "rop_opt_rop": 174,
+          "spp_at_tare": 2592.87207,
+          "ad_rop_on_off": 0,
+          "ad_wob_actual": 38.05322,
+          "downhole_temp": 134.60001,
+          "rocker_status": 1,
+          "pump_spm_total": 219.7802,
+          "rop_in_control": 0,
+          "wob_in_control": 1,
+          "ad_rop_setpoint": 50,
+          "ad_wob_setpoint": 39,
+          "diff_in_control": 0,
+          "downlink_status": 0,
+          "ad_system_on_off": 1,
+          "hookload_at_tare": 165.21941,
+          "active_pit_volume": 752.80249,
+          "gravity_tool_face": 191.25,
+          "magnetic_tool_face": 45.54,
+          "rop_opt_rotary_rpm": 65,
+          "trip_tank_volume_1": 4.09635,
+          "trip_tank_volume_2": 3.39294,
+          "corva_pd_in_control": 0,
+          "ad_diff_pressure_max": 900,
+          "rop_opt_weight_on_bit": 40,
+          "ad_diff_press_setpoint": 130,
+          "continuous_inclination": 25.91,
+          "mwd_continuous_azimuth": 29.51,
+          "status_for_autodriller": 1,
+          "top_drive_torque_limit": 16,
+          "ad_diff_pressure_actual": 9.06617,
+          "ad_diff_pressure_on_off": 1,
+          "rop_opt_differential_pressure": 900,
+          "true_vertical_depth": 4994.3,
+          "state": "Slide Drilling"
+        },
+        "timestamp_iso": "2025-11-18T21:38:35.000Z"
+      },
+      {
+        "_id": "691ce75ef23559a5c3189f6c",
+        "version": 1,
+        "provider": "corva",
+        "collection": "wits",
+        "timestamp": 1763501914,
+        "timestamp_read": 1763501918,
+        "asset_id": 65352382,
+        "company_id": 52,
+        "app": "corva.witsml-source",
+        "metadata": {
+          "drillstring": "6918ae3be22294c9d008f5c0",
+          "casing": null,
+          "mud": "691c87993100d1ea5954073e",
+          "cuttings": null,
+          "surface-equipment": "6918ae0468e94b0af9237514",
+          "actual_survey": "691ce4ef340b00d645ff5bfe",
+          "plan_survey": "6918ae0468e94b0af92374e2",
+          "rig_id": null
+        },
+        "data": {
+          "timestamp_ms": 1763501914,
+          "entry_at": 1763501914,
+          "time": "2025-11-18T15:38:34.000-06:00",
+          "rsua": 0,
+          "bittonbot": 100624.85938,
+          "chkp": 5.32098,
+          "tvolcact": -24.78412,
+          "ropmax": 51.92857,
+          "tvolact": 539.22998,
+          "wobx": 127.1838,
+          "p01v": 94.35181,
+          "p02v": 93.63408,
+          "p03v": 84.34726,
+          "p04v": 71.98817,
+          "p05v": 67.83055,
+          "p06v": 58.16298,
+          "p07v": 28.65777,
+          "p08v": 4.28906,
+          "p09v": 16.84578,
+          "p10v": 55.63694,
+          "psc1": 172432.29688,
+          "psc2": 162164.40625,
+          "psc3": 169798.20313,
+          "ropa5": 63.88618,
+          "stkc": 11919.59961,
+          "tripgl": -0.34057,
+          "rsda": 0.86839,
+          "btbot": 1,
+          "ttva": 7.48929,
+          "deptvert": 4993.81592,
+          "deptretm": 0,
+          "statusis": 0,
+          "adropactual": 48.07228,
+          "adroplmtval": 50,
+          "stickslip": 162.57114,
+          "chposa": 0.06,
+          "deptsvym": 5304.38525,
+          "svyincu": 25.65,
+          "svyazu": 30.14,
+          "ropi": 52.10338,
+          "overpull": 0,
+          "pitglcoman": 38.67589,
+          "srvlimtf": 10,
+          "lagdeptgas": 0,
+          "deptgrm": 5304.38525,
+          "slideautoon": 1,
+          "stickslip1": 148.22774,
+          "stickslip2": 164.83144,
+          "stickslip3": 188.24963,
+          "reviton": 0,
+          "revitkf": 1499,
+          "revitcf": 1605,
+          "ropt": 53.70024,
+          "mse": -2443.02075,
+          "svytvd": 4897.49023,
+          "mpdchkpress": -0.11488,
+          "mpdchkctrlmod": 100,
+          "mpdflwin": 639.9118,
+          "mpdflwout": 0,
+          "gastotml": 194.10001,
+          "mpdpresssetpnt": 149.9286,
+          "mwdlatshk": 6,
+          "mwd_srvtldepwits": 5197,
+          "procautoon": 1,
+          "ztenabled": 0,
+          "ztzvalue": 4000,
+          "ztpipetrq": 1912.79919,
+          "ztstikslip": 229.33374,
+          "plchrtbt": 2,
+          "ztzgainpct": 25,
+          "bit_depth": 5304.38525,
+          "block_height": 50.28862,
+          "hole_depth": 5304.38525,
+          "diff_press": 36.87683,
+          "hook_load": 127.2674,
+          "rop": 50.81061,
+          "rotary_rpm": -8.24648,
+          "standpipe_pressure": 2588.49902,
+          "rotary_torque": 1.137,
+          "mud_flow_in": 639.3551,
+          "mud_flow_out_percent": 72.49223,
+          "weight_on_bit": 38.18675,
+          "gamma_ray": 51.98,
+          "heartbeat": 3,
+          "ad_wob_max": 40,
+          "pump_spm_1": 0,
+          "pump_spm_2": 109.8901,
+          "pump_spm_3": 109.8901,
+          "rop_opt_rop": 174,
+          "spp_at_tare": 2592.87207,
+          "ad_rop_on_off": 0,
+          "ad_wob_actual": 38.05334,
+          "downhole_temp": 134.60001,
+          "rocker_status": 1,
+          "pump_spm_total": 219.9818,
+          "rop_in_control": 1,
+          "wob_in_control": 0,
+          "ad_rop_setpoint": 50,
+          "ad_wob_setpoint": 39,
+          "diff_in_control": 0,
+          "downlink_status": 0,
+          "ad_system_on_off": 1,
+          "hookload_at_tare": 165.21941,
+          "active_pit_volume": 752.35309,
+          "gravity_tool_face": 191.25,
+          "magnetic_tool_face": 45.54,
+          "rop_opt_rotary_rpm": 65,
+          "trip_tank_volume_1": 4.09635,
+          "trip_tank_volume_2": 3.39294,
+          "corva_pd_in_control": 0,
+          "ad_diff_pressure_max": 900,
+          "rop_opt_weight_on_bit": 40,
+          "ad_diff_press_setpoint": 130,
+          "continuous_inclination": 25.91,
+          "mwd_continuous_azimuth": 29.51,
+          "status_for_autodriller": 1,
+          "top_drive_torque_limit": 16,
+          "ad_diff_pressure_actual": 19.62131,
+          "ad_diff_pressure_on_off": 1,
+          "rop_opt_differential_pressure": 900,
+          "true_vertical_depth": 4994.29,
+          "state": "Slide Drilling"
+        },
+        "timestamp_iso": "2025-11-18T21:38:34.000Z"
+      }
+    ],
+    "interventions.wits.summary-6h.metadata": [],
+    "wits.summary-30m": [
+      {
+        "_id": "691cf3bc517b8b8f602529fe",
+        "version": 1,
+        "provider": "corva",
+        "collection": "wits.summary-30m",
+        "timestamp": 1763505000,
+        "asset_id": 65352382,
+        "data": {
+          "timestamp_ms": 1763504101,
+          "entry_at": 1763505000,
+          "time": "2025-11-18T16:15:00.000-06:00",
+          "rsua": 0,
+          "bittonbot": 102532.33594,
+          "chkp": 4.24824,
+          "tvolcact": 5.00054,
+          "ropmax": 234.24286,
+          "tvolact": 569.52887,
+          "wobx": 130.5331,
+          "p01v": 100.3913,
+          "p02v": 99.82237,
+          "p03v": 89.94473,
+          "p04v": 77.41934,
+          "p05v": 69.6424,
+          "p06v": 63.70794,
+          "p07v": 29.79456,
+          "p08v": 4.29427,
+          "p09v": 16.85388,
+          "p10v": 43.03205,
+          "psc1": 172432.29688,
+          "psc2": 165810,
+          "psc3": 173433.59375,
+          "ropa5": 0,
+          "stkc": 3285.30005,
+          "tripgl": -0.37717,
+          "rsda": 3.53946,
+          "btbot": 1,
+          "ttva": 7.45269,
+          "deptvert": 5086.71826,
+          "deptretm": 0,
+          "statusis": 0,
+          "adropactual": 199.9068,
+          "adroplmtval": 300,
+          "stickslip": 17.71923,
+          "chposa": 0.05,
+          "deptsvym": 5377.63086,
+          "svyincu": 25.6,
+          "svyazu": 31.73,
+          "ropi": 173.52286,
+          "overpull": 0,
+          "pitglcoman": 68.70137,
+          "srvlimtf": 10,
+          "lagdeptgas": 0,
+          "deptgrm": 5405.75732,
+          "slideautoon": 0,
+          "stickslip1": 11.94421,
+          "stickslip2": 16.21124,
+          "stickslip3": 20.46878,
+          "reviton": 0,
+          "revitkf": 1499,
+          "revitcf": 1605,
+          "ropt": 169.44522,
+          "svytvd": 4983.14014,
+          "mpdchkpress": -0.12844,
+          "mpdchkctrlmod": 100,
+          "mpdflwin": 638.44312,
+          "mpdflwout": 0,
+          "gastotml": 319.60001,
+          "mpdpresssetpnt": 149.9286,
+          "mwdlatshk": 6,
+          "mwd_srvtldepwits": 5292,
+          "procautoon": 1,
+          "ztenabled": 1,
+          "ztzvalue": 4000,
+          "ztpipetrq": 14125.24805,
+          "ztstikslip": 15.20752,
+          "plchrtbt": 12,
+          "ztzgainpct": 25,
+          "bit_depth": 5377.50293,
+          "block_height": 45.68748,
+          "hole_depth": 5405.82178,
+          "diff_press": 237.05611,
+          "hook_load": 130.2614,
+          "rop": 191.3214,
+          "rotary_rpm": 62.10834,
+          "standpipe_pressure": 2827.39795,
+          "rotary_torque": 11.56646,
+          "mud_flow_in": 637.60138,
+          "mud_flow_out_percent": 71.21743,
+          "weight_on_bit": 17.00432,
+          "gamma_ray": 57.68,
+          "heartbeat": 12,
+          "ad_wob_max": 50,
+          "pump_spm_1": 0,
+          "pump_spm_2": 109.6892,
+          "pump_spm_3": 109.6892,
+          "rop_opt_rop": 283,
+          "spp_at_tare": 2592.87207,
+          "ad_rop_on_off": 0,
+          "ad_wob_actual": 34.95577,
+          "downhole_temp": 134.60001,
+          "rocker_status": 0,
+          "pump_spm_total": 219.3784,
+          "rop_in_control": 0,
+          "wob_in_control": 0,
+          "ad_rop_setpoint": 300,
+          "ad_wob_setpoint": 38.5,
+          "diff_in_control": 0,
+          "downlink_status": 0,
+          "ad_system_on_off": 1,
+          "hookload_at_tare": 165.21941,
+          "active_pit_volume": 753.78882,
+          "gravity_tool_face": 320.63,
+          "magnetic_tool_face": 45.54,
+          "rop_opt_rotary_rpm": 65,
+          "trip_tank_volume_1": 4.04702,
+          "trip_tank_volume_2": 3.40726,
+          "corva_pd_in_control": 0,
+          "ad_diff_pressure_max": 1100,
+          "rop_opt_weight_on_bit": 39.1,
+          "ad_diff_press_setpoint": 900,
+          "continuous_inclination": 23.87,
+          "mwd_continuous_azimuth": 31.47,
+          "status_for_autodriller": 1,
+          "top_drive_torque_limit": 16,
+          "ad_diff_pressure_actual": 237.35539,
+          "ad_diff_pressure_on_off": 1,
+          "rop_opt_differential_pressure": 900,
+          "true_vertical_depth": 5085.73,
+          "state": "Rotary Drilling",
+          "mse": 24940.99609,
+          "activity_times": {
+            "in slips": 396,
+            "run in hole": 19,
+            "static off bottom": 11,
+            "pull out of hole": 208,
+            "circulating": 31,
+            "washing down": 7,
+            "washing up": 12,
+            "rotary drilling": 1092,
+            "reaming down": 19,
+            "rotary off bottom": 4,
+            "reaming up": 1
+          }
+        },
+        "company_id": 52,
+        "timestamp_iso": "2025-11-18T22:30:00.000Z"
+      },
+      {
+        "_id": "691cec6aad03dc643035d92e",
+        "version": 1,
+        "provider": "corva",
+        "collection": "wits.summary-30m",
+        "timestamp": 1763503200,
+        "asset_id": 65352382,
+        "data": {
+          "timestamp_ms": 1763502301,
+          "entry_at": 1763503200,
+          "time": "2025-11-18T15:45:00.000-06:00",
+          "rsua": 0,
+          "bittonbot": 101012.13281,
+          "chkp": 4.9634,
+          "tvolcact": 1.54052,
+          "ropmax": 93.65737,
+          "tvolact": 565.55463,
+          "wobx": 136.0957,
+          "p01v": 100.6408,
+          "p02v": 100.0412,
+          "p03v": 89.59462,
+          "p04v": 76.33836,
+          "p05v": 68.24194,
+          "p06v": 60.75383,
+          "p07v": 29.15654,
+          "p08v": 4.29688,
+          "p09v": 16.83767,
+          "p10v": 43.24906,
+          "psc1": 172432.29688,
+          "psc2": 162872.90625,
+          "psc3": 170505.29688,
+          "ropa5": 64.19429,
+          "stkc": 13335,
+          "tripgl": -0.34693,
+          "rsda": 1.27694,
+          "btbot": 1,
+          "ttva": 7.48293,
+          "deptvert": 4999.15039,
+          "deptretm": 0,
+          "statusis": 0,
+          "adropactual": 70,
+          "adroplmtval": 80,
+          "stickslip": 124.4128,
+          "chposa": 0.06,
+          "deptsvym": 5310.3584,
+          "svyincu": 25.65,
+          "svyazu": 30.14,
+          "ropi": 75.76119,
+          "overpull": 0,
+          "pitglcoman": 64.86185,
+          "srvlimtf": 10,
+          "lagdeptgas": 0,
+          "deptgrm": 5310.3584,
+          "slideautoon": 1,
+          "stickslip1": 93.106,
+          "stickslip2": 114.66289,
+          "stickslip3": 137.47618,
+          "reviton": 0,
+          "revitkf": 1499,
+          "revitcf": 1605,
+          "ropt": 59.06492,
+          "mse": 3994.09326,
+          "svytvd": 4897.49023,
+          "mpdchkpress": -0.12612,
+          "mpdchkctrlmod": 100,
+          "mpdflwin": 639.53021,
+          "mpdflwout": 0,
+          "gastotml": 247.10001,
+          "mpdpresssetpnt": 149.9286,
+          "mwdlatshk": 6,
+          "mwd_srvtldepwits": 5197,
+          "procautoon": 1,
+          "ztenabled": 0,
+          "ztzvalue": 4000,
+          "ztpipetrq": 5974.77197,
+          "ztstikslip": 177.65022,
+          "plchrtbt": 5,
+          "ztzgainpct": 25,
+          "bit_depth": 5310.37061,
+          "block_height": 44.32908,
+          "hole_depth": 5310.37061,
+          "diff_press": 61.50731,
+          "hook_load": 136.0114,
+          "rop": 73.89066,
+          "rotary_rpm": 7.48159,
+          "standpipe_pressure": 2654.92212,
+          "rotary_torque": 3.26666,
+          "mud_flow_in": 638.76917,
+          "mud_flow_out_percent": 72.5002,
+          "weight_on_bit": 29.20624,
+          "gamma_ray": 57.68,
+          "heartbeat": 5,
+          "ad_wob_max": 40,
+          "pump_spm_1": 0,
+          "pump_spm_2": 109.8901,
+          "pump_spm_3": 109.8901,
+          "rop_opt_rop": 188,
+          "spp_at_tare": 2592.87207,
+          "ad_rop_on_off": 0,
+          "ad_wob_actual": 29.20515,
+          "downhole_temp": 134.60001,
+          "rocker_status": 1,
+          "pump_spm_total": 219.7802,
+          "rop_in_control": 1,
+          "wob_in_control": 0,
+          "ad_rop_setpoint": 80,
+          "ad_wob_setpoint": 33,
+          "diff_in_control": 0,
+          "downlink_status": 0,
+          "ad_system_on_off": 1,
+          "hookload_at_tare": 165.21941,
+          "active_pit_volume": 751.70605,
+          "gravity_tool_face": 135,
+          "magnetic_tool_face": 45.54,
+          "rop_opt_rotary_rpm": 65,
+          "trip_tank_volume_1": 4.08044,
+          "trip_tank_volume_2": 3.4009,
+          "corva_pd_in_control": 0,
+          "ad_diff_pressure_max": 900,
+          "rop_opt_weight_on_bit": 40,
+          "ad_diff_press_setpoint": 150,
+          "continuous_inclination": 25.91,
+          "mwd_continuous_azimuth": 29.51,
+          "status_for_autodriller": 1,
+          "top_drive_torque_limit": 16,
+          "ad_diff_pressure_actual": 61.30458,
+          "ad_diff_pressure_on_off": 1,
+          "rop_opt_differential_pressure": 900,
+          "true_vertical_depth": 4999.68,
+          "state": "Slide Drilling",
+          "activity_times": {
+            "rotary drilling": 593,
+            "reaming down": 15,
+            "rotary off bottom": 4,
+            "circulating": 21,
+            "washing up": 8,
+            "slide drilling": 1159
+          }
+        },
+        "company_id": 52,
+        "timestamp_iso": "2025-11-18T22:00:00.000Z"
+      }
+    ],
+    "drillout.wits.summary-1m": [],
+    "wits.summary-30m.metadata": [],
+    "interventions.wits.summary-30m.metadata": [],
+    "drillout.activities": [],
+    "interventions.wits": [],
+    "drillout.wits": [],
+    "drillout.wits.summary-6h.metadata": [],
+    "interventions.wits.summary-30m": [],
+    "activities.summary-2tours": [
+      {
+        "_id": "691d0890c65be0fb5693a4ce",
+        "version": 1,
+        "provider": "corva",
+        "collection": "activities.summary-2tours",
+        "timestamp": 1763510400,
+        "asset_id": 65352382,
+        "data": {
+          "activities": [
+            {
+              "name": "Rotary Drilling",
+              "day": 19535,
+              "night": 17165
+            },
+            {
+              "name": "Pull out of Hole",
+              "day": 774,
+              "night": 136
+            },
+            {
+              "name": "Static Off Bottom",
+              "day": 650,
+              "night": 442
+            },
+            {
+              "name": "Run in Hole",
+              "day": 179,
+              "night": 156
+            },
+            {
+              "name": "In Slips",
+              "day": 9655,
+              "night": 2660
+            },
+            {
+              "name": "Dry Reaming Up",
+              "night": 6
+            },
+            {
+              "name": "Dry Reaming Down",
+              "night": 3
+            },
+            {
+              "name": "Washing Up",
+              "day": 361,
+              "night": 264
+            },
+            {
+              "name": "Circulating",
+              "day": 1455,
+              "night": 3181
+            },
+            {
+              "name": "Washing Down",
+              "day": 752,
+              "night": 874
+            },
+            {
+              "name": "Rotary Off Bottom",
+              "day": 582,
+              "night": 484
+            },
+            {
+              "name": "Reaming Down",
+              "day": 1142,
+              "night": 835
+            },
+            {
+              "name": "Reaming Up",
+              "day": 16,
+              "night": 48
+            },
+            {
+              "name": "Slide Drilling",
+              "day": 7945,
+              "night": 16927
+            },
+            {
+              "name": "Circ. & Rot. On Bottom",
+              "day": 10,
+              "night": 5
+            },
+            {
+              "name": "Unclassified",
+              "day": 6,
+              "night": 4
+            },
+            {
+              "name": "Static On Bottom",
+              "day": 1,
+              "night": 1
+            },
+            {
+              "name": "Circulating On Bottom",
+              "day": 137,
+              "night": 9
+            }
+          ],
+          "start_timestamp": 1763424000,
+          "end_timestamp": 1763510400
+        },
+        "company_id": 52,
+        "timestamp_iso": "2025-11-19T00:00:00.000Z"
+      },
+      {
+        "_id": "691d16a24a10b617692541d2",
+        "version": 1,
+        "provider": "corva",
+        "collection": "activities.summary-2tours",
+        "timestamp": 1763510400,
+        "asset_id": 65352382,
+        "data": {
+          "activities": [
+            {
+              "name": "Rotary Drilling",
+              "day": 19535,
+              "night": 17165
+            },
+            {
+              "name": "Pull out of Hole",
+              "day": 774,
+              "night": 136
+            },
+            {
+              "name": "Static Off Bottom",
+              "day": 650,
+              "night": 442
+            },
+            {
+              "name": "Run in Hole",
+              "day": 179,
+              "night": 156
+            },
+            {
+              "name": "In Slips",
+              "day": 9655,
+              "night": 2660
+            },
+            {
+              "name": "Dry Reaming Up",
+              "night": 6
+            },
+            {
+              "name": "Dry Reaming Down",
+              "night": 3
+            },
+            {
+              "name": "Washing Up",
+              "day": 361,
+              "night": 264
+            },
+            {
+              "name": "Circulating",
+              "day": 1455,
+              "night": 3181
+            },
+            {
+              "name": "Washing Down",
+              "day": 752,
+              "night": 874
+            },
+            {
+              "name": "Rotary Off Bottom",
+              "day": 582,
+              "night": 484
+            },
+            {
+              "name": "Reaming Down",
+              "day": 1142,
+              "night": 835
+            },
+            {
+              "name": "Reaming Up",
+              "day": 16,
+              "night": 48
+            },
+            {
+              "name": "Slide Drilling",
+              "day": 7945,
+              "night": 16927
+            },
+            {
+              "name": "Circ. & Rot. On Bottom",
+              "day": 10,
+              "night": 5
+            },
+            {
+              "name": "Unclassified",
+              "day": 6,
+              "night": 4
+            },
+            {
+              "name": "Static On Bottom",
+              "day": 1,
+              "night": 1
+            },
+            {
+              "name": "Circulating On Bottom",
+              "day": 137,
+              "night": 9
+            }
+          ],
+          "start_timestamp": 1763424000,
+          "end_timestamp": 1763510400
+        },
+        "company_id": 52,
+        "timestamp_iso": "2025-11-19T00:00:00.000Z"
+      }
+    ],
+    "wits.summary-6h": [
+      {
+        "_id": "691d5ceee0cc6ed8ac302647",
+        "version": 1,
+        "provider": "corva",
+        "collection": "wits.summary-6h",
+        "timestamp": 1763532000,
+        "asset_id": 65352382,
+        "data": {
+          "timestamp_ms": 1763531000,
+          "entry_at": 1763532000,
+          "time": "2025-11-18T23:43:19.000-06:00",
+          "rsua": 0,
+          "bittonbot": 102962.49219,
+          "chkp": 19.26654,
+          "tvolcact": 9.63791,
+          "ropmax": 0,
+          "tvolact": 665.79724,
+          "wobx": 65.64513,
+          "p01v": 109.7919,
+          "p02v": 108.3346,
+          "p03v": 101.0434,
+          "p04v": 88.81561,
+          "p05v": 89.49834,
+          "p06v": 87.97095,
+          "p07v": 43.89938,
+          "p08v": 4.35938,
+          "p09v": 17.37645,
+          "p10v": 64.55259,
+          "psc1": 172944.90625,
+          "psc2": 168427.90625,
+          "psc3": 175047.09375,
+          "ropa5": 0,
+          "stkc": 3037.80005,
+          "tripgl": 0.44719,
+          "rsda": 0,
+          "btbot": 0,
+          "ttva": 12.10286,
+          "deptvert": 5125.25244,
+          "deptretm": 0,
+          "statusis": 1,
+          "adropactual": 0,
+          "adroplmtval": 300,
+          "stickslip": 2283.99268,
+          "chposa": 0.02,
+          "deptsvym": 4415.84277,
+          "svyincu": 25.6,
+          "svyazu": 31.73,
+          "ropi": 0,
+          "overpull": 0,
+          "pitglcoman": 165.10995,
+          "srvlimtf": 10,
+          "lagdeptgas": 0,
+          "deptgrm": 5448.20068,
+          "slideautoon": 0,
+          "stickslip1": 904.52832,
+          "stickslip2": 1848.17847,
+          "stickslip3": 2468.44971,
+          "reviton": 0,
+          "revitkf": 1499,
+          "revitcf": 1605,
+          "ropt": 0,
+          "svytvd": 4983.14014,
+          "mpdchkpress": 0.57639,
+          "mpdchkctrlmod": 100,
+          "mpdflwin": 0,
+          "mpdflwout": 0,
+          "gastotml": 24.3,
+          "mpdpresssetpnt": 149.9286,
+          "mwdlatshk": 6,
+          "mwd_srvtldepwits": 5292,
+          "procautoon": 0,
+          "ztenabled": 0,
+          "ztzvalue": 4000,
+          "ztpipetrq": 81078.35156,
+          "ztstikslip": 1.94676,
+          "plchrtbt": 32,
+          "ztzgainpct": 25,
+          "bit_depth": 4415.84277,
+          "block_height": 89.607,
+          "hole_depth": 5448.20068,
+          "diff_press": -2592.87207,
+          "hook_load": 65.28063,
+          "rop": 0,
+          "rotary_rpm": 0,
+          "standpipe_pressure": 0,
+          "rotary_torque": 0,
+          "mud_flow_in": 0,
+          "mud_flow_out_percent": 25.50394,
+          "weight_on_bit": 0,
+          "gamma_ray": 45.18,
+          "heartbeat": 32,
+          "ad_wob_max": 50,
+          "pump_spm_1": 0,
+          "pump_spm_2": 0,
+          "pump_spm_3": 0,
+          "rop_opt_rop": 150,
+          "spp_at_tare": 2592.87207,
+          "ad_rop_on_off": 0,
+          "ad_wob_actual": 99.90836,
+          "downhole_temp": 129.2,
+          "rocker_status": 0,
+          "pump_spm_total": 0,
+          "rop_in_control": 0,
+          "wob_in_control": 0,
+          "ad_rop_setpoint": 300,
+          "ad_wob_setpoint": 38.4,
+          "diff_in_control": 0,
+          "downlink_status": 0,
+          "ad_system_on_off": 0,
+          "hookload_at_tare": 165.21941,
+          "active_pit_volume": 905.10199,
+          "gravity_tool_face": 320.63,
+          "magnetic_tool_face": 45.54,
+          "rop_opt_rotary_rpm": 65,
+          "trip_tank_volume_1": 12.10286,
+          "trip_tank_volume_2": 8.77676,
+          "corva_pd_in_control": 0,
+          "ad_diff_pressure_max": 1100,
+          "rop_opt_weight_on_bit": 39.1,
+          "ad_diff_press_setpoint": 900,
+          "continuous_inclination": 23.87,
+          "mwd_continuous_azimuth": 30.94,
+          "status_for_autodriller": 0,
+          "top_drive_torque_limit": 16,
+          "ad_diff_pressure_actual": -2592.87207,
+          "ad_diff_pressure_on_off": 1,
+          "rop_opt_differential_pressure": 900,
+          "true_vertical_depth": 5124.01,
+          "state": "In Slips",
+          "activity_times": {
+            "in slips": 1214,
+            "run in hole": 704,
+            "static off bottom": 47,
+            "pull out of hole": 35
+          }
+        },
+        "company_id": 52,
+        "timestamp_iso": "2025-11-19T06:00:00.000Z"
+      },
+      {
+        "_id": "691d08903afd69075d52db59",
+        "version": 1,
+        "provider": "corva",
+        "collection": "wits.summary-6h",
+        "timestamp": 1763510400,
+        "asset_id": 65352382,
+        "data": {
+          "timestamp_ms": 1763509401,
+          "entry_at": 1763510400,
+          "time": "2025-11-18T17:43:20.000-06:00",
+          "rsua": 0,
+          "bittonbot": 102962.49219,
+          "chkp": 6.39371,
+          "tvolcact": -13.54663,
+          "ropmax": 0,
+          "tvolact": 571.4585,
+          "wobx": 65.87812,
+          "p01v": 94.89887,
+          "p02v": 93.60345,
+          "p03v": 87.23134,
+          "p04v": 77.68631,
+          "p05v": 76.18081,
+          "p06v": 74.37772,
+          "p07v": 35.06583,
+          "p08v": 4.30208,
+          "p09v": 16.92882,
+          "p10v": 42.78791,
+          "psc1": 172432.29688,
+          "psc2": 168427.90625,
+          "psc3": 175047.09375,
+          "ropa5": 0,
+          "stkc": 2525.19995,
+          "tripgl": 0.25941,
+          "rsda": 0,
+          "btbot": 0,
+          "ttva": 44.68273,
+          "deptvert": 5125.25244,
+          "deptretm": 0,
+          "statusis": 1,
+          "adropactual": 0,
+          "adroplmtval": 300,
+          "chposa": 0.05,
+          "deptsvym": 5162.54297,
+          "svyincu": 25.6,
+          "svyazu": 31.73,
+          "ropi": 0,
+          "overpull": 0,
+          "pitglcoman": 70.39615,
+          "srvlimtf": 10,
+          "lagdeptgas": 0,
+          "deptgrm": 5448.20068,
+          "slideautoon": 0,
+          "reviton": 0,
+          "revitkf": 1499,
+          "revitcf": 1605,
+          "ropt": 0,
+          "svytvd": 4983.14014,
+          "mpdchkpress": 0.04788,
+          "mpdchkctrlmod": 100,
+          "mpdflwin": 0,
+          "mpdflwout": 0,
+          "gastotml": 37.3,
+          "mpdpresssetpnt": 149.9286,
+          "mwdlatshk": 6,
+          "mwd_srvtldepwits": 5292,
+          "procautoon": 0,
+          "ztenabled": 0,
+          "ztzvalue": 4000,
+          "ztpipetrq": 80968.89063,
+          "ztstikslip": 1.67516,
+          "plchrtbt": 31,
+          "ztzgainpct": 25,
+          "bit_depth": 5162.54297,
+          "block_height": 49.32299,
+          "hole_depth": 5448.20068,
+          "diff_press": -2592.87207,
+          "hook_load": 65.78851,
+          "rop": 0,
+          "rotary_rpm": 0,
+          "standpipe_pressure": 0,
+          "rotary_torque": 0,
+          "mud_flow_in": 0,
+          "mud_flow_out_percent": 21.87077,
+          "weight_on_bit": 0,
+          "gamma_ray": 45.18,
+          "heartbeat": 31,
+          "ad_wob_max": 50,
+          "pump_spm_1": 0,
+          "pump_spm_2": 0,
+          "pump_spm_3": 0,
+          "rop_opt_rop": 150,
+          "spp_at_tare": 2592.87207,
+          "ad_rop_on_off": 0,
+          "ad_wob_actual": 99.39694,
+          "downhole_temp": 129.2,
+          "rocker_status": 0,
+          "pump_spm_total": 0,
+          "rop_in_control": 0,
+          "wob_in_control": 0,
+          "ad_rop_setpoint": 300,
+          "ad_wob_setpoint": 38.4,
+          "diff_in_control": 0,
+          "downlink_status": 0,
+          "ad_system_on_off": 0,
+          "hookload_at_tare": 165.21941,
+          "active_pit_volume": 788.47571,
+          "gravity_tool_face": 320.63,
+          "magnetic_tool_face": 45.54,
+          "rop_opt_rotary_rpm": 65,
+          "trip_tank_volume_1": 19.56829,
+          "trip_tank_volume_2": 25.11444,
+          "corva_pd_in_control": 0,
+          "ad_diff_pressure_max": 1100,
+          "rop_opt_weight_on_bit": 39.1,
+          "ad_diff_press_setpoint": 900,
+          "continuous_inclination": 23.87,
+          "mwd_continuous_azimuth": 30.94,
+          "status_for_autodriller": 0,
+          "top_drive_torque_limit": 16,
+          "ad_diff_pressure_actual": -2592.87207,
+          "ad_diff_pressure_on_off": 1,
+          "rop_opt_differential_pressure": 900,
+          "true_vertical_depth": 5124.01,
+          "state": "In Slips",
+          "stickslip3": 70.48711,
+          "stickslip": 33.50969,
+          "stickslip2": 0,
+          "stickslip1": 0,
+          "activity_times": {
+            "static off bottom": 156,
+            "pull out of hole": 483,
+            "in slips": 1335,
+            "run in hole": 26
+          }
+        },
+        "company_id": 52,
+        "timestamp_iso": "2025-11-19T00:00:00.000Z"
+      }
+    ],
+    "drillout.activities.summary-2tours": [],
+    "activities.summary-continuous": [
+      {
+        "_id": "691ce7ba20792969a727d344",
+        "version": 1,
+        "provider": "corva",
+        "collection": "activities.summary-continuous",
+        "timestamp": 1763502000,
+        "asset_id": 65352382,
+        "data": {
+          "activities": [
+            {
+              "name": "In Slips",
+              "day": 5717,
+              "night": 2660
+            },
+            {
+              "name": "Pull out of Hole",
+              "day": 89,
+              "night": 136
+            },
+            {
+              "name": "Run in Hole",
+              "day": 308,
+              "night": 156
+            },
+            {
+              "name": "Static Off Bottom",
+              "day": 1227,
+              "night": 442
+            },
+            {
+              "name": "Circulating",
+              "day": 1906,
+              "night": 3181
+            },
+            {
+              "name": "Washing Down",
+              "day": 837,
+              "night": 874
+            },
+            {
+              "name": "Washing Up",
+              "day": 405,
+              "night": 264
+            },
+            {
+              "name": "Rotary Off Bottom",
+              "day": 819,
+              "night": 484
+            },
+            {
+              "name": "Reaming Down",
+              "day": 2483,
+              "night": 835
+            },
+            {
+              "name": "Reaming Up",
+              "day": 87,
+              "night": 48
+            },
+            {
+              "name": "Circ. & Rot. On Bottom",
+              "day": 11,
+              "night": 5
+            },
+            {
+              "name": "Rotary Drilling",
+              "day": 20400,
+              "night": 17165
+            },
+            {
+              "name": "Dry Rotary Off Bottom",
+              "day": 2
+            },
+            {
+              "name": "Circulating On Bottom",
+              "day": 142,
+              "night": 9
+            },
+            {
+              "name": "Slide Drilling",
+              "day": 8760,
+              "night": 16927
+            },
+            {
+              "name": "Dry Reaming Up",
+              "night": 6
+            },
+            {
+              "name": "Dry Reaming Down",
+              "night": 3
+            },
+            {
+              "name": "Unclassified",
+              "day": 6,
+              "night": 4
+            },
+            {
+              "name": "Static On Bottom",
+              "day": 1,
+              "night": 1
+            }
+          ],
+          "start_timestamp": 1763415600,
+          "end_timestamp": 1763502000
+        },
+        "company_id": 52,
+        "timestamp_iso": "2025-11-18T21:40:00.000Z"
+      },
+      {
+        "_id": "691ce7bb972ba5d538138136",
+        "version": 1,
+        "provider": "corva",
+        "collection": "activities.summary-continuous",
+        "timestamp": 1763502000,
+        "asset_id": 65352382,
+        "data": {
+          "activities": [
+            {
+              "name": "In Slips",
+              "day": 5717,
+              "night": 2660
+            },
+            {
+              "name": "Pull out of Hole",
+              "day": 89,
+              "night": 136
+            },
+            {
+              "name": "Run in Hole",
+              "day": 308,
+              "night": 156
+            },
+            {
+              "name": "Static Off Bottom",
+              "day": 1227,
+              "night": 442
+            },
+            {
+              "name": "Circulating",
+              "day": 1906,
+              "night": 3181
+            },
+            {
+              "name": "Washing Down",
+              "day": 837,
+              "night": 874
+            },
+            {
+              "name": "Washing Up",
+              "day": 405,
+              "night": 264
+            },
+            {
+              "name": "Rotary Off Bottom",
+              "day": 819,
+              "night": 484
+            },
+            {
+              "name": "Reaming Down",
+              "day": 2483,
+              "night": 835
+            },
+            {
+              "name": "Reaming Up",
+              "day": 87,
+              "night": 48
+            },
+            {
+              "name": "Circ. & Rot. On Bottom",
+              "day": 11,
+              "night": 5
+            },
+            {
+              "name": "Rotary Drilling",
+              "day": 20400,
+              "night": 17165
+            },
+            {
+              "name": "Dry Rotary Off Bottom",
+              "day": 2
+            },
+            {
+              "name": "Circulating On Bottom",
+              "day": 142,
+              "night": 9
+            },
+            {
+              "name": "Slide Drilling",
+              "day": 8760,
+              "night": 16927
+            },
+            {
+              "name": "Dry Reaming Up",
+              "night": 6
+            },
+            {
+              "name": "Dry Reaming Down",
+              "night": 3
+            },
+            {
+              "name": "Unclassified",
+              "day": 6,
+              "night": 4
+            },
+            {
+              "name": "Static On Bottom",
+              "day": 1,
+              "night": 1
+            }
+          ],
+          "start_timestamp": 1763415600,
+          "end_timestamp": 1763502000
+        },
+        "company_id": 52,
+        "timestamp_iso": "2025-11-18T21:40:00.000Z"
+      }
+    ],
+    "wits.summary-6h.metadata": [
+      {
+        "_id": "691bb71407d4ca3c1bce521b",
+        "version": 1,
+        "provider": "corva",
+        "collection": "wits.summary-6h.metadata",
+        "timestamp": 1763553600,
+        "asset_id": 65352382,
+        "data": {
+          "channels": [
+            {
+              "mapping": "rop",
+              "mnemonic": "ROPA",
+              "target_unit": "ft/h",
+              "source_unit": "ft/h",
+              "bucket": "Velocity"
+            },
+            {
+              "mapping": "ma_temp",
+              "mnemonic": "MATEMP",
+              "source_unit": "F",
+              "bucket": "Length"
+            },
+            {
+              "mapping": "ma_3_rpm",
+              "mnemonic": "MA3",
+              "source_unit": "rpm",
+              "bucket": "Angular Velocity"
+            },
+            {
+              "mapping": "ma_6_rpm",
+              "mnemonic": "MA6",
+              "source_unit": "rpm",
+              "bucket": "Angular Velocity"
+            },
+            {
+              "mapping": "ma_state",
+              "mnemonic": "MASTATE",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "bit_depth",
+              "mnemonic": "DEPTBITM",
+              "target_unit": "ft",
+              "source_unit": "ft",
+              "bucket": "Length"
+            },
+            {
+              "mapping": "gamma_ray",
+              "mnemonic": "MG1C",
+              "source_unit": "API units",
+              "bucket": "Gamma Radiation"
+            },
+            {
+              "mapping": "heartbeat",
+              "mnemonic": "ROPOPTHRTBT",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "hook_load",
+              "mnemonic": "HKLA",
+              "target_unit": "klbf",
+              "source_unit": "klbf",
+              "bucket": "Force"
+            },
+            {
+              "mapping": "rss_whirl",
+              "mnemonic": "RSSWHIRL",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "total_gas",
+              "mnemonic": "GASTOT",
+              "target_unit": "%EMA",
+              "source_unit": "Units",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ad_wob_max",
+              "mnemonic": "ADWOBLIMIT",
+              "target_unit": "klbf",
+              "source_unit": "klbf",
+              "bucket": "Force"
+            },
+            {
+              "mapping": "diff_press",
+              "mnemonic": "DIFFPRES",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "hole_depth",
+              "mnemonic": "DEPTMEAS",
+              "target_unit": "ft",
+              "source_unit": "ft",
+              "bucket": "Length"
+            },
+            {
+              "mapping": "pump_spm_1",
+              "mnemonic": "SPM1",
+              "target_unit": "strokes/min",
+              "source_unit": "SPM",
+              "bucket": "Strokes Rate"
+            },
+            {
+              "mapping": "pump_spm_2",
+              "mnemonic": "SPM2",
+              "target_unit": "strokes/min",
+              "source_unit": "SPM",
+              "bucket": "Strokes Rate"
+            },
+            {
+              "mapping": "pump_spm_3",
+              "mnemonic": "SPM3",
+              "target_unit": "strokes/min",
+              "source_unit": "SPM",
+              "bucket": "Strokes Rate"
+            },
+            {
+              "mapping": "rotary_rpm",
+              "mnemonic": "RPMTD",
+              "target_unit": "rpm",
+              "source_unit": "rpm",
+              "bucket": "Angular Velocity"
+            },
+            {
+              "mapping": "adropactual",
+              "mnemonic": "ADROPACTUAL",
+              "target_unit": "ft/h",
+              "source_unit": "ft/h",
+              "bucket": "Velocity"
+            },
+            {
+              "mapping": "mud_density",
+              "mnemonic": "MADEND",
+              "target_unit": "ppg",
+              "source_unit": "ppg",
+              "bucket": "Density"
+            },
+            {
+              "mapping": "mud_flow_in",
+              "mnemonic": "MFIA",
+              "target_unit": "gal/min",
+              "source_unit": "galUS/min",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "rop_opt_rop",
+              "mnemonic": "ROPOPTROTP",
+              "target_unit": "ft/h",
+              "source_unit": "ft/h",
+              "bucket": "Velocity"
+            },
+            {
+              "mapping": "spp_at_tare",
+              "mnemonic": "SPPATTARE",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "block_height",
+              "mnemonic": "BLKPOS",
+              "target_unit": "ft",
+              "source_unit": "ft",
+              "bucket": "Length"
+            },
+            {
+              "mapping": "ma_flow_rate",
+              "mnemonic": "MAFR",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ad_rop_on_off",
+              "mnemonic": "ADROPCCSTATUS",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ad_wob_actual",
+              "mnemonic": "ADWOBACTUAL",
+              "target_unit": "klbf",
+              "source_unit": "klbf",
+              "bucket": "Force"
+            },
+            {
+              "mapping": "downhole_temp",
+              "mnemonic": "MWDTOOLTEMP",
+              "target_unit": "F",
+              "source_unit": "degF",
+              "bucket": "Temperature"
+            },
+            {
+              "mapping": "ma_temp_w/dec",
+              "mnemonic": "MATEMPPD",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "rocker_status",
+              "mnemonic": "ROCKITON",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "rotary_torque",
+              "mnemonic": "TORQTDFL",
+              "target_unit": "ft-klbf",
+              "source_unit": "lbf.ft",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "weight_on_bit",
+              "mnemonic": "WOBA",
+              "target_unit": "klbf",
+              "source_unit": "klbf",
+              "bucket": "Force"
+            },
+            {
+              "mapping": "ma_yield_point",
+              "mnemonic": "MAYP",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mud_density_in",
+              "mnemonic": "MADEN",
+              "source_unit": "ppg",
+              "bucket": "Density"
+            },
+            {
+              "mapping": "pump_spm_total",
+              "mnemonic": "SPMTOT",
+              "target_unit": "strokes/min",
+              "source_unit": "SPM",
+              "bucket": "Strokes Rate"
+            },
+            {
+              "mapping": "rop_in_control",
+              "mnemonic": "ADROPCTRLACT",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "rss_stick_slip",
+              "mnemonic": "RSSSTICKSLIP",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "wob_in_control",
+              "mnemonic": "ADWOBCTRLACT",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ad_rop_setpoint",
+              "mnemonic": "ADROPSPVAL",
+              "target_unit": "ft/h",
+              "source_unit": "ft/h",
+              "bucket": "Velocity"
+            },
+            {
+              "mapping": "ad_wob_setpoint",
+              "mnemonic": "ADWOBSPVAL",
+              "target_unit": "klbf",
+              "source_unit": "klbf",
+              "bucket": "Force"
+            },
+            {
+              "mapping": "diff_in_control",
+              "mnemonic": "ADDPCTRLACT",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "downlink_status",
+              "mnemonic": "DLINKSTATUS",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ad_system_on_off",
+              "mnemonic": "ADSYSSTATUS",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "hookload_at_tare",
+              "mnemonic": "HLKAATTARE",
+              "target_unit": "klbf",
+              "source_unit": "klbf",
+              "bucket": "Force"
+            },
+            {
+              "mapping": "ma_pressure_drop",
+              "mnemonic": "MAPD",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "ma_suction_press",
+              "mnemonic": "MASP",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "active_pit_volume",
+              "mnemonic": "TVOLTOT",
+              "target_unit": "bbl",
+              "source_unit": "bbl",
+              "bucket": "Volume"
+            },
+            {
+              "mapping": "gravity_tool_face",
+              "mnemonic": "SVYGTF",
+              "source_unit": "deg",
+              "bucket": "Angle"
+            },
+            {
+              "mapping": "mwd_axial_rms_avg",
+              "mnemonic": "MWDVIBAX",
+              "source_unit": "gRMS",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ma_flow_rate_w/dec",
+              "mnemonic": "MAFRD",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "magnetic_tool_face",
+              "mnemonic": "SVYMTF",
+              "source_unit": "dega",
+              "bucket": "Angle"
+            },
+            {
+              "mapping": "rop_opt_rotary_rpm",
+              "mnemonic": "ROPOPTROTRPM",
+              "target_unit": "rpm",
+              "source_unit": "rpm",
+              "bucket": "Angular Velocity"
+            },
+            {
+              "mapping": "standpipe_pressure",
+              "mnemonic": "SPPA",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "trip_tank_volume_1",
+              "mnemonic": "TTVOL1",
+              "target_unit": "bbl",
+              "source_unit": "bbl",
+              "bucket": "Volume"
+            },
+            {
+              "mapping": "trip_tank_volume_2",
+              "mnemonic": "TRIPTANK2VOL",
+              "target_unit": "bbl",
+              "source_unit": "bbl",
+              "bucket": "Volume"
+            },
+            {
+              "mapping": "corva_pd_in_control",
+              "mnemonic": "ROPOPTINCTRL",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mwd_lateral_rms_avg",
+              "mnemonic": "MWDVIBLAT",
+              "source_unit": "gRMS",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ad_diff_pressure_max",
+              "mnemonic": "ADDPLIMIT",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "ma_plastic_viscosity",
+              "mnemonic": "MAPV",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ma_pump_output_press",
+              "mnemonic": "MAPOP",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "mud_flow_out_percent",
+              "mnemonic": "MFOP",
+              "target_unit": "%",
+              "source_unit": "%",
+              "bucket": "Proportion"
+            },
+            {
+              "mapping": "rss_axial_peak_shock",
+              "mnemonic": "RSSVIBAX",
+              "source_unit": "g",
+              "bucket": "Mass"
+            },
+            {
+              "mapping": "rss_target_tool_face",
+              "mnemonic": "RSS_TGTTF",
+              "target_unit": "deg",
+              "source_unit": "deg",
+              "bucket": "Angle",
+              "backup_channels": [
+                {
+                  "source_unit": "deg",
+                  "column": "RSSTGTTOOLFACE"
+                }
+              ]
+            },
+            {
+              "mapping": "annular_back_pressure",
+              "mnemonic": "MBHPINT",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "rop_opt_weight_on_bit",
+              "mnemonic": "ROPOPTWONB",
+              "target_unit": "klbf",
+              "source_unit": "klbf",
+              "bucket": "Force"
+            },
+            {
+              "mapping": "rss_gravity_tool_face",
+              "mnemonic": "RSSTOOLFACE",
+              "target_unit": "deg",
+              "source_unit": "deg",
+              "bucket": "Angle"
+            },
+            {
+              "mapping": "rss_lower_torquer_rpm",
+              "mnemonic": "RSSLOWTORQRPM",
+              "source_unit": "rpm",
+              "bucket": "Angular Velocity"
+            },
+            {
+              "mapping": "rss_upper_torquer_rpm",
+              "mnemonic": "RSSUPPTORQRPM",
+              "source_unit": "rpm",
+              "bucket": "Angular Velocity"
+            },
+            {
+              "mapping": "ad_diff_press_setpoint",
+              "mnemonic": "ADDIFFPRESSPVAL",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "continuous_inclination",
+              "mnemonic": "CONTINC",
+              "target_unit": "deg",
+              "source_unit": "dega",
+              "bucket": "Angle"
+            },
+            {
+              "mapping": "ma_suction_press_w/dec",
+              "mnemonic": "MASPD",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "mwd_continuous_azimuth",
+              "mnemonic": "MWDCONTAZI",
+              "target_unit": "deg",
+              "source_unit": "deg",
+              "bucket": "Angle"
+            },
+            {
+              "mapping": "rss_continuous_azimuth",
+              "mnemonic": "RSSAZI",
+              "target_unit": "deg",
+              "source_unit": "deg",
+              "bucket": "Angle"
+            },
+            {
+              "mapping": "status_for_autodriller",
+              "mnemonic": "ADSTATUS",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "top_drive_torque_limit",
+              "mnemonic": "TOPDRTORQLMT",
+              "source_unit": "lbf.ft",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ad_diff_pressure_actual",
+              "mnemonic": "ADDPACTUAL",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "ad_diff_pressure_on_off",
+              "mnemonic": "ADDPENABLED",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "auto_driller_torque_limit",
+              "mnemonic": "ADROTORQLMT",
+              "target_unit": "klbf",
+              "source_unit": "ft-klbf",
+              "bucket": "Torque"
+            },
+            {
+              "mapping": "ma_pump_output_press_w/dec",
+              "mnemonic": "MAPOPD",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "rss_continuous_inclination",
+              "mnemonic": "RSSINC",
+              "target_unit": "deg",
+              "source_unit": "deg",
+              "bucket": "Angle"
+            },
+            {
+              "mapping": "rop_opt_differential_pressure",
+              "mnemonic": "ROPOPTDIFFPRESS",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "timestamp_ms",
+              "mnemonic": "timestamp_ms",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "entry_at",
+              "mnemonic": "entry_at",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "time",
+              "mnemonic": "time",
+              "bucket": "Other",
+              "is_text": true
+            },
+            {
+              "mapping": "rsua",
+              "mnemonic": "rsua",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "bittonbot",
+              "mnemonic": "bittonbot",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "chkp",
+              "mnemonic": "chkp",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "tvolcact",
+              "mnemonic": "tvolcact",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ropmax",
+              "mnemonic": "ropmax",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "tvolact",
+              "mnemonic": "tvolact",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "wobx",
+              "mnemonic": "wobx",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p01v",
+              "mnemonic": "p01v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p02v",
+              "mnemonic": "p02v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p03v",
+              "mnemonic": "p03v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p04v",
+              "mnemonic": "p04v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p05v",
+              "mnemonic": "p05v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p06v",
+              "mnemonic": "p06v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p07v",
+              "mnemonic": "p07v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p08v",
+              "mnemonic": "p08v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p09v",
+              "mnemonic": "p09v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p10v",
+              "mnemonic": "p10v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "psc1",
+              "mnemonic": "psc1",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "psc2",
+              "mnemonic": "psc2",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "psc3",
+              "mnemonic": "psc3",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ropa5",
+              "mnemonic": "ropa5",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "stkc",
+              "mnemonic": "stkc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "tripgl",
+              "mnemonic": "tripgl",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "rsda",
+              "mnemonic": "rsda",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "btbot",
+              "mnemonic": "btbot",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ttva",
+              "mnemonic": "ttva",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "deptvert",
+              "mnemonic": "deptvert",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "deptretm",
+              "mnemonic": "deptretm",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "statusis",
+              "mnemonic": "statusis",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "adroplmtval",
+              "mnemonic": "adroplmtval",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "stickslip",
+              "mnemonic": "stickslip",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "chposa",
+              "mnemonic": "chposa",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "deptsvym",
+              "mnemonic": "deptsvym",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "svyincu",
+              "mnemonic": "svyincu",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "svyazu",
+              "mnemonic": "svyazu",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ropi",
+              "mnemonic": "ropi",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "overpull",
+              "mnemonic": "overpull",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "pitglcoman",
+              "mnemonic": "pitglcoman",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "srvlimtf",
+              "mnemonic": "srvlimtf",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "lagdeptgas",
+              "mnemonic": "lagdeptgas",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "deptgrm",
+              "mnemonic": "deptgrm",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "slideautoon",
+              "mnemonic": "slideautoon",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "stickslip1",
+              "mnemonic": "stickslip1",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "stickslip2",
+              "mnemonic": "stickslip2",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "stickslip3",
+              "mnemonic": "stickslip3",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "reviton",
+              "mnemonic": "reviton",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "revitkf",
+              "mnemonic": "revitkf",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "revitcf",
+              "mnemonic": "revitcf",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ropt",
+              "mnemonic": "ropt",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mse",
+              "mnemonic": "mse",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mpdchkpress",
+              "mnemonic": "mpdchkpress",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mpdchkctrlmod",
+              "mnemonic": "mpdchkctrlmod",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mpdflwin",
+              "mnemonic": "mpdflwin",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mpdflwout",
+              "mnemonic": "mpdflwout",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "gastotml",
+              "mnemonic": "gastotml",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mpdpresssetpnt",
+              "mnemonic": "mpdpresssetpnt",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mwdlatshk",
+              "mnemonic": "mwdlatshk",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mwd_srvtldepwits",
+              "mnemonic": "mwd_srvtldepwits",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "procautoon",
+              "mnemonic": "procautoon",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ztenabled",
+              "mnemonic": "ztenabled",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ztzvalue",
+              "mnemonic": "ztzvalue",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ztpipetrq",
+              "mnemonic": "ztpipetrq",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ztstikslip",
+              "mnemonic": "ztstikslip",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "plchrtbt",
+              "mnemonic": "plchrtbt",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ztzgainpct",
+              "mnemonic": "ztzgainpct",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "true_vertical_depth",
+              "mnemonic": "true_vertical_depth",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "state",
+              "mnemonic": "state",
+              "bucket": "Other",
+              "is_text": true
+            },
+            {
+              "mapping": "activity_times",
+              "mnemonic": "activity_times",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "svytvd",
+              "mnemonic": "svytvd",
+              "bucket": "Other"
+            }
+          ],
+          "empty_channels": [
+            "rsua",
+            "deptretm",
+            "overpull",
+            "lagdeptgas",
+            "reviton",
+            "mpdflwout",
+            "ad_rop_on_off",
+            "wob_in_control",
+            "diff_in_control",
+            "downlink_status"
+          ]
+        },
+        "company_id": 52,
+        "app": "corva.wits-summary",
+        "timestamp_iso": "2025-11-19T12:00:00.000Z"
+      }
+    ],
+    "interventions.wits.summary-1m.metadata": [],
+    "drillout.wits.summary-6h": [],
+    "drillout.wits.summary-30m": [],
+    "drillout.activities.summary-continuous": [],
+    "drillout.wits.summary-1m.metadata": [],
+    "interventions.activities": [],
+    "wits.summary-1m.metadata": [
+      {
+        "_id": "691b89b26c6a5ab9c22502f8",
+        "version": 1,
+        "provider": "corva",
+        "collection": "wits.summary-1m.metadata",
+        "timestamp": 1763559600,
+        "asset_id": 65352382,
+        "data": {
+          "channels": [
+            {
+              "mapping": "rop",
+              "mnemonic": "ROPA",
+              "target_unit": "ft/h",
+              "source_unit": "ft/h",
+              "bucket": "Velocity"
+            },
+            {
+              "mapping": "ma_temp",
+              "mnemonic": "MATEMP",
+              "source_unit": "F",
+              "bucket": "Length"
+            },
+            {
+              "mapping": "ma_3_rpm",
+              "mnemonic": "MA3",
+              "source_unit": "rpm",
+              "bucket": "Angular Velocity"
+            },
+            {
+              "mapping": "ma_6_rpm",
+              "mnemonic": "MA6",
+              "source_unit": "rpm",
+              "bucket": "Angular Velocity"
+            },
+            {
+              "mapping": "ma_state",
+              "mnemonic": "MASTATE",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "bit_depth",
+              "mnemonic": "DEPTBITM",
+              "target_unit": "ft",
+              "source_unit": "ft",
+              "bucket": "Length"
+            },
+            {
+              "mapping": "gamma_ray",
+              "mnemonic": "MG1C",
+              "source_unit": "API",
+              "bucket": "Gamma Radiation"
+            },
+            {
+              "mapping": "heartbeat",
+              "mnemonic": "ROPOPTHRTBT",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "hook_load",
+              "mnemonic": "HKLA",
+              "target_unit": "klbf",
+              "source_unit": "klbf",
+              "bucket": "Force"
+            },
+            {
+              "mapping": "rss_whirl",
+              "mnemonic": "RSSWHIRL",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "total_gas",
+              "mnemonic": "GASTOT",
+              "target_unit": "%EMA",
+              "source_unit": "Units",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ad_wob_max",
+              "mnemonic": "ADWOBLIMIT",
+              "target_unit": "klbf",
+              "source_unit": "klbf",
+              "bucket": "Force"
+            },
+            {
+              "mapping": "diff_press",
+              "mnemonic": "DIFFPRES",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "hole_depth",
+              "mnemonic": "DEPTMEAS",
+              "target_unit": "ft",
+              "source_unit": "ft",
+              "bucket": "Length"
+            },
+            {
+              "mapping": "pump_spm_1",
+              "mnemonic": "SPM1",
+              "target_unit": "strokes/min",
+              "source_unit": "SPM",
+              "bucket": "Strokes Rate"
+            },
+            {
+              "mapping": "pump_spm_2",
+              "mnemonic": "SPM2",
+              "target_unit": "strokes/min",
+              "source_unit": "SPM",
+              "bucket": "Strokes Rate"
+            },
+            {
+              "mapping": "pump_spm_3",
+              "mnemonic": "SPM3",
+              "target_unit": "strokes/min",
+              "source_unit": "SPM",
+              "bucket": "Strokes Rate"
+            },
+            {
+              "mapping": "rotary_rpm",
+              "mnemonic": "RPMTD",
+              "target_unit": "rpm",
+              "source_unit": "rpm",
+              "bucket": "Angular Velocity"
+            },
+            {
+              "mapping": "adropactual",
+              "mnemonic": "ADROPACTUAL",
+              "target_unit": "ft/h",
+              "source_unit": "ft/h",
+              "bucket": "Velocity"
+            },
+            {
+              "mapping": "mud_density",
+              "mnemonic": "MADEND",
+              "target_unit": "ppg",
+              "source_unit": "ppg",
+              "bucket": "Density"
+            },
+            {
+              "mapping": "mud_flow_in",
+              "mnemonic": "MFIA",
+              "target_unit": "gal/min",
+              "source_unit": "galUS/min",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "rop_opt_rop",
+              "mnemonic": "ROPOPTROTP",
+              "target_unit": "ft/h",
+              "source_unit": "ft/h",
+              "bucket": "Velocity"
+            },
+            {
+              "mapping": "spp_at_tare",
+              "mnemonic": "SPPATTARE",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "block_height",
+              "mnemonic": "BLKPOS",
+              "target_unit": "ft",
+              "source_unit": "ft",
+              "bucket": "Length"
+            },
+            {
+              "mapping": "ma_flow_rate",
+              "mnemonic": "MAFR",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ad_rop_on_off",
+              "mnemonic": "ADROPCCSTATUS",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ad_wob_actual",
+              "mnemonic": "ADWOBACTUAL",
+              "target_unit": "klbf",
+              "source_unit": "klbf",
+              "bucket": "Force"
+            },
+            {
+              "mapping": "downhole_temp",
+              "mnemonic": "MWDTOOLTEMP",
+              "target_unit": "F",
+              "source_unit": "F",
+              "bucket": "Length"
+            },
+            {
+              "mapping": "ma_temp_w/dec",
+              "mnemonic": "MATEMPPD",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "rocker_status",
+              "mnemonic": "ROCKITON",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "rotary_torque",
+              "mnemonic": "TORQTDFL",
+              "target_unit": "ft-klbf",
+              "source_unit": "lbf.ft",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "weight_on_bit",
+              "mnemonic": "WOBA",
+              "target_unit": "klbf",
+              "source_unit": "klbf",
+              "bucket": "Force"
+            },
+            {
+              "mapping": "ma_yield_point",
+              "mnemonic": "MAYP",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mud_density_in",
+              "mnemonic": "MADEN",
+              "source_unit": "ppg",
+              "bucket": "Density"
+            },
+            {
+              "mapping": "pump_spm_total",
+              "mnemonic": "SPMTOT",
+              "target_unit": "strokes/min",
+              "source_unit": "SPM",
+              "bucket": "Strokes Rate"
+            },
+            {
+              "mapping": "rop_in_control",
+              "mnemonic": "ADROPCTRLACT",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "rss_stick_slip",
+              "mnemonic": "RSSSTICKSLIP",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "wob_in_control",
+              "mnemonic": "ADWOBCTRLACT",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ad_rop_setpoint",
+              "mnemonic": "ADROPSPVAL",
+              "target_unit": "ft/h",
+              "source_unit": "ft/h",
+              "bucket": "Velocity"
+            },
+            {
+              "mapping": "ad_wob_setpoint",
+              "mnemonic": "ADWOBSPVAL",
+              "target_unit": "klbf",
+              "source_unit": "klbf",
+              "bucket": "Force"
+            },
+            {
+              "mapping": "diff_in_control",
+              "mnemonic": "ADDPCTRLACT",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "downlink_status",
+              "mnemonic": "DLINKSTATUS",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ad_system_on_off",
+              "mnemonic": "ADSYSSTATUS",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "hookload_at_tare",
+              "mnemonic": "HLKAATTARE",
+              "target_unit": "klbf",
+              "source_unit": "klbf",
+              "bucket": "Force"
+            },
+            {
+              "mapping": "ma_pressure_drop",
+              "mnemonic": "MAPD",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "ma_suction_press",
+              "mnemonic": "MASP",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "active_pit_volume",
+              "mnemonic": "TVOLTOT",
+              "target_unit": "bbl",
+              "source_unit": "bbl",
+              "bucket": "Volume"
+            },
+            {
+              "mapping": "gravity_tool_face",
+              "mnemonic": "SVYGTF",
+              "source_unit": "deg",
+              "bucket": "Angle"
+            },
+            {
+              "mapping": "mwd_axial_rms_avg",
+              "mnemonic": "MWDVIBAX",
+              "source_unit": "gRMS",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ma_flow_rate_w/dec",
+              "mnemonic": "MAFRD",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "magnetic_tool_face",
+              "mnemonic": "SVYMTF",
+              "source_unit": "deg",
+              "bucket": "Angle"
+            },
+            {
+              "mapping": "rop_opt_rotary_rpm",
+              "mnemonic": "ROPOPTROTRPM",
+              "target_unit": "rpm",
+              "source_unit": "rpm",
+              "bucket": "Angular Velocity"
+            },
+            {
+              "mapping": "standpipe_pressure",
+              "mnemonic": "SPPA",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "trip_tank_volume_1",
+              "mnemonic": "TTVOL1",
+              "target_unit": "bbl",
+              "source_unit": "bbl",
+              "bucket": "Volume"
+            },
+            {
+              "mapping": "trip_tank_volume_2",
+              "mnemonic": "TRIPTANK2VOL",
+              "target_unit": "bbl",
+              "source_unit": "bbl",
+              "bucket": "Volume"
+            },
+            {
+              "mapping": "corva_pd_in_control",
+              "mnemonic": "ROPOPTINCTRL",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mwd_lateral_rms_avg",
+              "mnemonic": "MWDVIBLAT",
+              "source_unit": "gRMS",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ad_diff_pressure_max",
+              "mnemonic": "ADDPLIMIT",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "ma_plastic_viscosity",
+              "mnemonic": "MAPV",
+              "source_unit": "unitless",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ma_pump_output_press",
+              "mnemonic": "MAPOP",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "mud_flow_out_percent",
+              "mnemonic": "MFOP",
+              "target_unit": "%",
+              "source_unit": "%",
+              "bucket": "Proportion"
+            },
+            {
+              "mapping": "rss_axial_peak_shock",
+              "mnemonic": "RSSVIBAX",
+              "source_unit": "g",
+              "bucket": "Mass"
+            },
+            {
+              "mapping": "rss_target_tool_face",
+              "mnemonic": "RSS_TGTTF",
+              "target_unit": "deg",
+              "source_unit": "deg",
+              "bucket": "Angle",
+              "backup_channels": [
+                {
+                  "source_unit": "deg",
+                  "column": "RSSTGTTOOLFACE"
+                }
+              ]
+            },
+            {
+              "mapping": "annular_back_pressure",
+              "mnemonic": "MBHPINT",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "rop_opt_weight_on_bit",
+              "mnemonic": "ROPOPTWONB",
+              "target_unit": "klbf",
+              "source_unit": "klbf",
+              "bucket": "Force"
+            },
+            {
+              "mapping": "rss_gravity_tool_face",
+              "mnemonic": "RSSTOOLFACE",
+              "target_unit": "deg",
+              "source_unit": "deg",
+              "bucket": "Angle"
+            },
+            {
+              "mapping": "rss_lower_torquer_rpm",
+              "mnemonic": "RSSLOWTORQRPM",
+              "source_unit": "rpm",
+              "bucket": "Angular Velocity"
+            },
+            {
+              "mapping": "rss_upper_torquer_rpm",
+              "mnemonic": "RSSUPPTORQRPM",
+              "source_unit": "rpm",
+              "bucket": "Angular Velocity"
+            },
+            {
+              "mapping": "ad_diff_press_setpoint",
+              "mnemonic": "ADDIFFPRESSPVAL",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "continuous_inclination",
+              "mnemonic": "CONTINC",
+              "target_unit": "deg",
+              "source_unit": "deg",
+              "bucket": "Angle"
+            },
+            {
+              "mapping": "ma_suction_press_w/dec",
+              "mnemonic": "MASPD",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "mwd_continuous_azimuth",
+              "mnemonic": "MWDCONTAZI",
+              "target_unit": "deg",
+              "source_unit": "deg",
+              "bucket": "Angle"
+            },
+            {
+              "mapping": "rss_continuous_azimuth",
+              "mnemonic": "RSSAZI",
+              "target_unit": "deg",
+              "source_unit": "deg",
+              "bucket": "Angle"
+            },
+            {
+              "mapping": "status_for_autodriller",
+              "mnemonic": "ADSTATUS",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "top_drive_torque_limit",
+              "mnemonic": "TOPDRTORQLMT",
+              "source_unit": "lbf.ft",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ad_diff_pressure_actual",
+              "mnemonic": "ADDPACTUAL",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "ad_diff_pressure_on_off",
+              "mnemonic": "ADDPENABLED",
+              "target_unit": "unitless",
+              "source_unit": "Euc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "auto_driller_torque_limit",
+              "mnemonic": "ADROTORQLMT",
+              "target_unit": "klbf",
+              "source_unit": "ft-klbf",
+              "bucket": "Torque"
+            },
+            {
+              "mapping": "ma_pump_output_press_w/dec",
+              "mnemonic": "MAPOPD",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "rss_continuous_inclination",
+              "mnemonic": "RSSINC",
+              "target_unit": "deg",
+              "source_unit": "deg",
+              "bucket": "Angle"
+            },
+            {
+              "mapping": "rop_opt_differential_pressure",
+              "mnemonic": "ROPOPTDIFFPRESS",
+              "target_unit": "psi",
+              "source_unit": "psi",
+              "bucket": "Pressure"
+            },
+            {
+              "mapping": "timestamp_ms",
+              "mnemonic": "timestamp_ms",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "entry_at",
+              "mnemonic": "entry_at",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "time",
+              "mnemonic": "time",
+              "bucket": "Other",
+              "is_text": true
+            },
+            {
+              "mapping": "rsua",
+              "mnemonic": "rsua",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "bittonbot",
+              "mnemonic": "bittonbot",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "chkp",
+              "mnemonic": "chkp",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "tvolcact",
+              "mnemonic": "tvolcact",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ropmax",
+              "mnemonic": "ropmax",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "tvolact",
+              "mnemonic": "tvolact",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "wobx",
+              "mnemonic": "wobx",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p01v",
+              "mnemonic": "p01v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p02v",
+              "mnemonic": "p02v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p03v",
+              "mnemonic": "p03v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p04v",
+              "mnemonic": "p04v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p05v",
+              "mnemonic": "p05v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p06v",
+              "mnemonic": "p06v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p07v",
+              "mnemonic": "p07v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p08v",
+              "mnemonic": "p08v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p09v",
+              "mnemonic": "p09v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "p10v",
+              "mnemonic": "p10v",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "psc1",
+              "mnemonic": "psc1",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "psc2",
+              "mnemonic": "psc2",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "psc3",
+              "mnemonic": "psc3",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ropa5",
+              "mnemonic": "ropa5",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "stkc",
+              "mnemonic": "stkc",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "tripgl",
+              "mnemonic": "tripgl",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "rsda",
+              "mnemonic": "rsda",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "btbot",
+              "mnemonic": "btbot",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ttva",
+              "mnemonic": "ttva",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "deptretm",
+              "mnemonic": "deptretm",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "statusis",
+              "mnemonic": "statusis",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "adroplmtval",
+              "mnemonic": "adroplmtval",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "chposa",
+              "mnemonic": "chposa",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "deptsvym",
+              "mnemonic": "deptsvym",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ropi",
+              "mnemonic": "ropi",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "overpull",
+              "mnemonic": "overpull",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "pitglcoman",
+              "mnemonic": "pitglcoman",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "srvlimtf",
+              "mnemonic": "srvlimtf",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "lagdeptgas",
+              "mnemonic": "lagdeptgas",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "deptgrm",
+              "mnemonic": "deptgrm",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "slideautoon",
+              "mnemonic": "slideautoon",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "reviton",
+              "mnemonic": "reviton",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "revitkf",
+              "mnemonic": "revitkf",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "revitcf",
+              "mnemonic": "revitcf",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ropt",
+              "mnemonic": "ropt",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mpdchkpress",
+              "mnemonic": "mpdchkpress",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mpdchkctrlmod",
+              "mnemonic": "mpdchkctrlmod",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mpdflwin",
+              "mnemonic": "mpdflwin",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mpdflwout",
+              "mnemonic": "mpdflwout",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "gastotml",
+              "mnemonic": "gastotml",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mpdpresssetpnt",
+              "mnemonic": "mpdpresssetpnt",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "procautoon",
+              "mnemonic": "procautoon",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ztenabled",
+              "mnemonic": "ztenabled",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ztzvalue",
+              "mnemonic": "ztzvalue",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ztpipetrq",
+              "mnemonic": "ztpipetrq",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ztstikslip",
+              "mnemonic": "ztstikslip",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "plchrtbt",
+              "mnemonic": "plchrtbt",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "ztzgainpct",
+              "mnemonic": "ztzgainpct",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "true_vertical_depth",
+              "mnemonic": "true_vertical_depth",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "state",
+              "mnemonic": "state",
+              "bucket": "Other",
+              "is_text": true
+            },
+            {
+              "mapping": "stickslip",
+              "mnemonic": "stickslip",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "stickslip1",
+              "mnemonic": "stickslip1",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "stickslip2",
+              "mnemonic": "stickslip2",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "stickslip3",
+              "mnemonic": "stickslip3",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mwdlatshk",
+              "mnemonic": "mwdlatshk",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mse",
+              "mnemonic": "mse",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "deptvert",
+              "mnemonic": "deptvert",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "svyincu",
+              "mnemonic": "svyincu",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "svyazu",
+              "mnemonic": "svyazu",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "mwd_srvtldepwits",
+              "mnemonic": "mwd_srvtldepwits",
+              "bucket": "Other"
+            },
+            {
+              "mapping": "svytvd",
+              "mnemonic": "svytvd",
+              "bucket": "Other"
+            }
+          ],
+          "empty_channels": [
+            "deptretm",
+            "lagdeptgas",
+            "reviton",
+            "mpdflwout",
+            "downlink_status"
+          ]
+        },
+        "company_id": 52,
+        "app": "corva.wits-summary",
+        "timestamp_iso": "2025-11-19T13:40:00.000Z"
+      }
+    ],
+    "drillout.wits.summary-30m.metadata": [],
+    "interventions.wits.summary-1m": [],
+    "interventions.wits.summary-6h": []
+  }
+}

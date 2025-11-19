@@ -3,6 +3,7 @@ import json
 from typer.testing import CliRunner
 
 from corva_cli.cli import app
+from corva_cli.tools.timelog import DVD_DATASET_NAMES
 
 runner = CliRunner()
 
@@ -45,13 +46,14 @@ def test_timelog_auto_window_default(monkeypatch):
     match_stage = pipeline[0]["$match"]
     assert match_stage["asset_id"]["$in"] == [101, 202]
     assert match_stage["company_id"] == 12
-    range_filter = match_stage["data.start_time"]
+    assert "timestamp" in match_stage
+    range_filter = match_stage["timestamp"]
     assert isinstance(range_filter["$gte"], int)
     assert isinstance(range_filter["$lte"], int)
     assert pipeline[1] == {"$limit": 1000}
-    assert pipeline[2] == {"$sort": {"data.start_time": -1}}
+    assert pipeline[2] == {"$sort": {"timestamp": -1}}
     add_fields = pipeline[3]["$addFields"]
-    assert "data.start_time_iso" in add_fields
+    assert "timestamp_iso" in add_fields
     assert captured["headers"]["Authorization"] == "API demo"
     # Default output omits metadata
     assert "api_debug" not in result.stdout
@@ -97,6 +99,7 @@ def test_timelog_verbose_includes_metadata(monkeypatch):
     assert output["query"]["company_id"] == 99
     pipeline = output["result"]["mql"]
     assert pipeline[0]["$match"]["asset_id"] == 303
+    assert "timestamp" in pipeline[0]["$match"]
     assert output["result"]["headers"]["Authorization"] == "Bearer demo-jwt"
 
 
@@ -214,10 +217,47 @@ def test_assets_requires_company_when_no_assets(monkeypatch):
 
 
 def test_dvd_returns_both_payloads(monkeypatch):
+    calls = []
+
     async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
-        if dataset_name == "assets":
-            return (["asset-entry"], {"status_code": 200})
-        return (["timelog-entry"], {"status_code": 200})
+        calls.append(dataset_name)
+        return ([dataset_name], {"status_code": 200})
+
+    monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
+
+    result = runner.invoke(
+        app,
+        [
+            "dvd",
+            "--api-key",
+            "demo",
+            "--asset-ids",
+            "909",
+            "--company-id",
+            "77",
+            "--start-time",
+            "auto_1h",
+            "--end-time",
+            "auto_0d",
+        ],
+    )
+    assert result.exit_code == 0, result.stdout
+    payload = json.loads(result.stdout)
+    assert payload["assets"] == ["assets"]
+    assert payload["timelog"] == ["drilling.timelog.data"]
+    assert set(payload["datasets"].keys()) == set(DVD_DATASET_NAMES)
+    assert payload["datasets"]["activities"] == ["activities"]
+    assert calls[0] == "assets"
+    assert calls[1] == "drilling.timelog.data"
+    assert set(calls[2:]) == set(DVD_DATASET_NAMES)
+
+
+def test_dvd_requires_time_window(monkeypatch):
+    calls = []
+
+    async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
+        calls.append(dataset_name)
+        return ([dataset_name], {"status_code": 200})
 
     monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
 
@@ -233,10 +273,9 @@ def test_dvd_returns_both_payloads(monkeypatch):
             "77",
         ],
     )
-    assert result.exit_code == 0, result.stdout
-    payload = json.loads(result.stdout)
-    assert payload["assets"] == ["asset-entry"]
-    assert payload["timelog"] == ["timelog-entry"]
+    assert result.exit_code != 0
+    assert "--start-time/--end-time" in result.stdout
+    assert calls == ["assets", "drilling.timelog.data"]
 
 
 def test_dataset_time_command(monkeypatch):
@@ -267,7 +306,61 @@ def test_dataset_time_command(monkeypatch):
     assert "rows" in payload
 
 
-def test_dataset_depth_allows_optional_depth(monkeypatch):
+def test_dataset_wits_summary_uses_timestamp(monkeypatch):
+    captured = {}
+
+    async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
+        captured["mql"] = mql
+        return ({"rows": []}, {"status_code": 200})
+
+    monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
+
+    result = runner.invoke(
+        app,
+        [
+            "dataset-wits-summary-1m",
+            "--api-key",
+            "demo",
+            "--asset-ids",
+            "321",
+            "--company-id",
+            "3",
+            "--start-time",
+            "auto_1h",
+            "--end-time",
+            "auto_0d",
+        ],
+    )
+    assert result.exit_code == 0, result.stdout
+    match_stage = captured["mql"][0]["$match"]
+    assert "timestamp" in match_stage
+
+
+def test_dataset_time_requires_window(monkeypatch):
+    calls = []
+
+    async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
+        calls.append(dataset_name)
+        return ({}, {})
+
+    monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
+
+    result = runner.invoke(
+        app,
+        [
+            "dataset-activities",
+            "--api-key",
+            "demo",
+            "--asset-ids",
+            "123",
+        ],
+    )
+    assert result.exit_code != 0
+    assert "--start-time/--end-time" in result.stdout
+    assert calls == []
+
+
+def test_dataset_depth_requires_depth_filters(monkeypatch):
     calls = []
 
     async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
@@ -286,8 +379,39 @@ def test_dataset_depth_allows_optional_depth(monkeypatch):
             "123",
         ],
     )
+    assert result.exit_code != 0
+    assert "--depth-start/--depth-end" in result.stdout
+    assert calls == []
+
+
+def test_dataset_depth_uses_depth_filters(monkeypatch):
+    captured = {}
+
+    async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
+        captured["dataset"] = dataset_name
+        captured["mql"] = mql
+        return ({}, {})
+
+    monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
+
+    result = runner.invoke(
+        app,
+        [
+            "dataset-directional-tool-face",
+            "--api-key",
+            "demo",
+            "--asset-ids",
+            "123",
+            "--depth-start",
+            "1000",
+            "--depth-end",
+            "1200",
+        ],
+    )
     assert result.exit_code == 0, result.stdout
-    assert calls[-1] == "directional.tool_face"
+    assert captured["dataset"] == "directional.tool_face"
+    match_stage = captured["mql"][0]["$match"]
+    assert "measured_depth" in match_stage
 
 
 def test_dataset_time_optional_limit_only(monkeypatch):

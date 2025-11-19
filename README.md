@@ -8,7 +8,7 @@ CLI scaffold for Corva-style pluggable tools using Python 3.14, Typer, and optio
 | --- | --- |
 | `timelog` | Resolves `auto_*` windows (or uses a record limit) and proxies an aggregate pipeline to the Corva Data API for timelog entries. |
 | `assets` | Shares the same interface but queries the `assets` dataset for asset metadata. |
-| `dvd` | Group command that runs both `assets` and `timelog` with the same arguments (verbose shows both payloads). |
+| `dvd` | Group command that runs `assets`, `timelog`, and the curated dataset commands listed below (verbose shows metadata for each). |
 | `dataset-<name>` | Auto-generated per Corva company 3 dataset (e.g., `dataset-activities`, `dataset-directional-tool-face`). These commands accept `--asset-ids`, `--company-id`, `--start-time/--end-time`, `--depth-start/--depth-end`, or `--limit`/`--skip` in any combination. (Some datasets may still require specific filters in the future.) |
 
 Example:
@@ -22,6 +22,63 @@ uv run corva timelog \
   --end-time auto_0d \
   --output markdown
 ```
+
+### DVD dataset coverage
+
+The `dvd` command returns a payload shaped like `{"assets": ..., "timelog": ..., "datasets": {...}}`. The `datasets` map contains outputs for every curated dataset command (each also available individually via `dataset-<slug>`):
+
+- `activities`
+- `wits.summary-1m`
+- `wits`
+- `interventions.wits.summary-6h.metadata`
+- `wits.summary-30m`
+- `drillout.wits.summary-1m`
+- `wits.summary-30m.metadata`
+- `interventions.wits.summary-30m.metadata`
+- `drillout.activities`
+- `interventions.wits`
+- `drillout.wits`
+- `drillout.wits.summary-6h.metadata`
+- `interventions.wits.summary-30m`
+- `activities.summary-2tours`
+- `wits.summary-6h`
+- `drillout.activities.summary-2tours`
+- `activities.summary-continuous`
+- `wits.summary-6h.metadata`
+- `interventions.wits.summary-1m.metadata`
+- `drillout.wits.summary-6h`
+- `drillout.wits.summary-30m`
+- `drillout.activities.summary-continuous`
+- `drillout.wits.summary-1m.metadata`
+- `interventions.activities`
+- `wits.summary-1m.metadata`
+- `drillout.wits.summary-30m.metadata`
+- `interventions.wits.summary-1m`
+- `interventions.wits.summary-6h`
+
+#### Dataset filter requirements
+
+Each dataset command inspects the index metadata stored in `docs/dataset.json` and enforces whichever filter combinations are supported by indexes on `asset_id`, `company_id`, `timestamp`/`start_time`, or `depth`. When you invoke a dataset (or the `dvd` group), the CLI lists the acceptable combinations (for example, `--asset-ids + --start-time/--end-time` or simply `--company-id`) and raises an error until you provide enough parameters to satisfy one of them. Depth-oriented datasets therefore require both `--depth-start` and `--depth-end`, while time-series datasets typically expect a time window together with asset identifiers.
+
+### Auto-generate groups
+
+Corva apps already know which datasets they depend on. Generate a reusable group that calls every matching dataset command in one shot:
+
+```bash
+uv run corva group create \
+  --token YOUR_API_TOKEN \
+  --app-id 1234 \
+  --group-name my-app-datasets \
+  --groups-file groups/generated_groups.json
+```
+
+The command fetches datasets assigned to the app, maps them to available `dataset-<slug>` commands, and appends a group entry to the target JSON file. Run it later with the standard runner:
+
+```bash
+uv run corva group run groups/generated_groups.json --name my-app-datasets --token YOUR_API_TOKEN
+```
+
+If an app references datasets that are missing from `docs/dataset.json`, the generator lists them so you can refresh the local catalog.
 
 The `auto_*` syntax subtracts durations from "now", so `auto_0d` equals the current UTC timestamp, `auto_2h30m` subtracts 2.5 hours, etc. Multiple units can be chained in any order. Omit both `--start-time` and `--end-time` to fall back to a simple limit (default `1000` documents) using `--limit`. Scope requests to a single company via `--company-id`. By default the CLI prints only the raw API response; add `--verbose` to include query/debug metadata.
 

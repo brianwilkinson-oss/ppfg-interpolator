@@ -26,7 +26,7 @@ dev = [
 corva = "corva_cli.cli:app"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/corva_cli"]
+packages = ["src/corva_cli", "scripts"]
 
 [tool.pytest.ini_options]
 addopts = "-ra"

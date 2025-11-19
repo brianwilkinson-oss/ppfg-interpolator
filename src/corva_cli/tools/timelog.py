@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import asyncio
 from datetime import datetime, timezone
+from functools import lru_cache
 import inspect
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, FrozenSet, Iterable, List, Optional, Set, Tuple
 
 import typer
 
@@ -34,7 +35,11 @@ def _build_timelog_pipeline(
     step_minutes: int,
     limit: int,
     skip: int,
+    time_field: Optional[str] = None,
+    depth_field: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
+    effective_time_field = time_field or "data.start_time"
+    effective_depth_field = depth_field or "data.depth"
     window_filter: Dict[str, Any] = {}
     if assets:
         asset_filter: Any
@@ -48,42 +53,41 @@ def _build_timelog_pipeline(
     if start_dt and end_dt:
         start_epoch = _to_unix_seconds(start_dt)
         end_epoch = _to_unix_seconds(end_dt)
-        window_filter["data.start_time"] = {"$gte": start_epoch, "$lte": end_epoch}
+        window_filter[effective_time_field] = {"$gte": start_epoch, "$lte": end_epoch}
     if depth_range:
         depth_start, depth_end = depth_range
-        window_filter["data.depth"] = {"$gte": depth_start, "$lte": depth_end}
+        window_filter[effective_depth_field] = {"$gte": depth_start, "$lte": depth_end}
 
     stages: List[Dict[str, Any]] = [{"$match": window_filter}]
     if skip > 0:
         stages.append({"$skip": skip})
     stages.append({"$limit": limit})
-    stages.append({"$sort": {"data.start_time": -1}})
-    stages.append(
-        {
-            "$addFields": {
-                "data.start_time_iso": {
-                    "$dateToString": {
-                        "date": {
-                            "$toDate": {
-                                "$multiply": ["$data.start_time", 1000],
-                            }
-                        },
-                        "format": "%Y-%m-%dT%H:%M:%S.000Z",
+    stages.append({"$sort": {effective_time_field: -1}})
+    iso_field_name = f"{effective_time_field}_iso"
+    add_fields: Dict[str, Any] = {
+        iso_field_name: {
+            "$dateToString": {
+                "date": {
+                    "$toDate": {
+                        "$multiply": [f"${effective_time_field}", 1000],
                     }
                 },
-                "data.end_time_iso": {
-                    "$dateToString": {
-                        "date": {
-                            "$toDate": {
-                                "$multiply": ["$data.end_time", 1000],
-                            }
-                        },
-                        "format": "%Y-%m-%dT%H:%M:%S.000Z",
-                    }
-                },
+                "format": "%Y-%m-%dT%H:%M:%S.000Z",
             }
         }
-    )
+    }
+    if effective_time_field.endswith("start_time"):
+        add_fields["data.end_time_iso"] = {
+            "$dateToString": {
+                "date": {
+                    "$toDate": {
+                        "$multiply": ["$data.end_time", 1000],
+                    }
+                },
+                "format": "%Y-%m-%dT%H:%M:%S.000Z",
+            }
+        }
+    stages.append({"$addFields": add_fields})
     return stages
 
 
@@ -196,6 +200,203 @@ ASSETS_PARAMETERS = [
 ]
 
 
+DVD_DATASET_NAMES: Tuple[str, ...] = (
+    "activities",
+    "wits.summary-1m",
+    "wits",
+    "interventions.wits.summary-6h.metadata",
+    "wits.summary-30m",
+    "drillout.wits.summary-1m",
+    "wits.summary-30m.metadata",
+    "interventions.wits.summary-30m.metadata",
+    "drillout.activities",
+    "interventions.wits",
+    "drillout.wits",
+    "drillout.wits.summary-6h.metadata",
+    "interventions.wits.summary-30m",
+    "activities.summary-2tours",
+    "wits.summary-6h",
+    "drillout.activities.summary-2tours",
+    "activities.summary-continuous",
+    "wits.summary-6h.metadata",
+    "interventions.wits.summary-1m.metadata",
+    "drillout.wits.summary-6h",
+    "drillout.wits.summary-30m",
+    "drillout.activities.summary-continuous",
+    "drillout.wits.summary-1m.metadata",
+    "interventions.activities",
+    "wits.summary-1m.metadata",
+    "drillout.wits.summary-30m.metadata",
+    "interventions.wits.summary-1m",
+    "interventions.wits.summary-6h",
+)
+
+
+def _dvd_dataset_metas() -> List[DatasetMeta]:
+    metas_by_dataset = {meta.dataset: meta for meta in load_corva_company_datasets()}
+    missing = [name for name in DVD_DATASET_NAMES if name not in metas_by_dataset]
+    if missing:
+        missing_list = ", ".join(missing)
+        raise ValueError(
+            f"Missing dataset metadata for dvd datasets: {missing_list}. "
+            "Update docs/dataset.json or adjust DVD_DATASET_NAMES."
+        )
+    return [metas_by_dataset[name] for name in DVD_DATASET_NAMES]
+
+
+@lru_cache()
+def _get_dataset_meta_by_name(dataset_name: str) -> Optional[DatasetMeta]:
+    metas = load_corva_company_datasets()
+    for meta in metas:
+        if meta.dataset == dataset_name:
+            return meta
+    return None
+
+
+RequirementToken = str
+
+
+TOKEN_ASSET_IDS: RequirementToken = "asset_ids"
+TOKEN_COMPANY_ID: RequirementToken = "company_id"
+TOKEN_TIME_WINDOW: RequirementToken = "time_window"
+TOKEN_DEPTH_RANGE: RequirementToken = "depth_range"
+
+
+_INDEX_FIELD_TOKEN_MAP: Dict[str, Set[RequirementToken]] = {
+    "asset_id": {TOKEN_ASSET_IDS},
+    "company_id": {TOKEN_COMPANY_ID},
+    "timestamp": {TOKEN_TIME_WINDOW},
+    "start_time": {TOKEN_TIME_WINDOW},
+    "end_time": {TOKEN_TIME_WINDOW},
+    "depth": {TOKEN_DEPTH_RANGE},
+}
+
+_TOKEN_LABELS: Dict[RequirementToken, str] = {
+    TOKEN_ASSET_IDS: "--asset-ids",
+    TOKEN_COMPANY_ID: "--company-id",
+    TOKEN_TIME_WINDOW: "--start-time/--end-time",
+    TOKEN_DEPTH_RANGE: "--depth-start/--depth-end",
+}
+
+_TOKEN_SORT_ORDER: Dict[RequirementToken, int] = {
+    TOKEN_ASSET_IDS: 0,
+    TOKEN_COMPANY_ID: 1,
+    TOKEN_TIME_WINDOW: 2,
+    TOKEN_DEPTH_RANGE: 3,
+}
+
+
+def _normalize_index_field_name(field_name: str) -> Optional[str]:
+    lowered = field_name.lower()
+    tail = lowered.split(".")[-1]
+    if tail in {"asset_id", "company_id", "timestamp", "start_time", "end_time"}:
+        return tail
+    if "depth" in tail or "depth" in lowered:
+        return "depth"
+    return None
+
+
+def _iter_index_fields(meta: DatasetMeta) -> Iterable[str]:
+    for index_fields in meta.indexes:
+        for field_name in index_fields:
+            yield field_name
+
+
+def _resolve_time_field(meta: DatasetMeta) -> Optional[str]:
+    fields = list(_iter_index_fields(meta))
+    for field_name in fields:
+        if "timestamp" in field_name.lower():
+            return field_name
+    for field_name in fields:
+        if "start_time" in field_name.lower():
+            return field_name
+    for field_name in fields:
+        if "time" in field_name.lower():
+            return field_name
+    return None
+
+
+def _resolve_depth_field(meta: DatasetMeta) -> Optional[str]:
+    fields = list(_iter_index_fields(meta))
+    priority = ["measured_depth", "hole_depth", "bit_depth", "depth"]
+    for keyword in priority:
+        for field_name in fields:
+            if keyword in field_name.lower():
+                return field_name
+    return None
+
+
+def _dataset_requirement_groups(meta: DatasetMeta) -> List[FrozenSet[RequirementToken]]:
+    groups: List[FrozenSet[RequirementToken]] = []
+    for index_fields in meta.indexes:
+        tokens: Set[RequirementToken] = set()
+        for field_name in index_fields:
+            normalized = _normalize_index_field_name(field_name)
+            if not normalized:
+                continue
+            tokens.update(_INDEX_FIELD_TOKEN_MAP.get(normalized, set()))
+        if tokens:
+            groups.append(frozenset(tokens))
+    deduped: List[FrozenSet[RequirementToken]] = []
+    seen: Set[FrozenSet[RequirementToken]] = set()
+    for group in groups:
+        if group not in seen:
+            seen.add(group)
+            deduped.append(group)
+    return deduped
+
+
+def _has_asset_ids(asset_ids: Optional[str]) -> bool:
+    if not asset_ids:
+        return False
+    return any(part.strip() for part in asset_ids.split(","))
+
+
+def _format_requirement_group(group: FrozenSet[RequirementToken]) -> str:
+    ordered_tokens = sorted(group, key=lambda token: _TOKEN_SORT_ORDER.get(token, 99))
+    return " + ".join(_TOKEN_LABELS[token] for token in ordered_tokens)
+
+
+def _group_satisfied(
+    group: FrozenSet[RequirementToken],
+    asset_ids: Optional[str],
+    company_id: Optional[int],
+    start_time: Optional[str],
+    end_time: Optional[str],
+    depth_start: Optional[float],
+    depth_end: Optional[float],
+) -> bool:
+    for token in group:
+        if token == TOKEN_ASSET_IDS and not _has_asset_ids(asset_ids):
+            return False
+        if token == TOKEN_COMPANY_ID and company_id is None:
+            return False
+        if token == TOKEN_TIME_WINDOW and (not start_time or not end_time):
+            return False
+        if token == TOKEN_DEPTH_RANGE and (depth_start is None or depth_end is None):
+            return False
+    return True
+
+
+def _ensure_dataset_requirements(
+    meta: DatasetMeta,
+    requirement_groups: List[FrozenSet[RequirementToken]],
+    asset_ids: Optional[str],
+    company_id: Optional[int],
+    start_time: Optional[str],
+    end_time: Optional[str],
+    depth_start: Optional[float],
+    depth_end: Optional[float],
+) -> None:
+    if not requirement_groups:
+        return
+    for group in requirement_groups:
+        if _group_satisfied(group, asset_ids, company_id, start_time, end_time, depth_start, depth_end):
+            return
+    options = ", ".join(_format_requirement_group(group) for group in requirement_groups)
+    raise ValueError(f"{meta.friendly_name} requires filters matching one of: {options}.")
+
+
 def _run_dataset_query(
     dataset_name: Optional[str],
     context: ToolContext,
@@ -211,6 +412,8 @@ def _run_dataset_query(
     depth_start: Optional[float] = None,
     depth_end: Optional[float] = None,
     provider_override: Optional[str] = None,
+    time_field: Optional[str] = None,
+    depth_field: Optional[str] = None,
 ) -> ToolResult:
     asset_ids = asset_ids or ""
     raw_assets = [asset.strip() for asset in asset_ids.split(",") if asset.strip()]
@@ -227,6 +430,15 @@ def _run_dataset_query(
     settings = get_settings()
     dataset = dataset_name or settings.timelog_dataset
     provider = provider_override or settings.timelog_provider
+    effective_time_field = time_field
+    effective_depth_field = depth_field
+    if effective_time_field is None or effective_depth_field is None:
+        meta = _get_dataset_meta_by_name(dataset)
+        if meta:
+            if effective_time_field is None:
+                effective_time_field = _resolve_time_field(meta)
+            if effective_depth_field is None:
+                effective_depth_field = _resolve_depth_field(meta)
     effective_step = max(step_minutes or settings.timelog_step_minutes, 1)
     effective_limit = max(limit or 1000, 1)
     effective_skip = max(skip or 0, 0)
@@ -262,6 +474,8 @@ def _run_dataset_query(
         effective_step,
         effective_limit,
         effective_skip,
+        time_field=effective_time_field,
+        depth_field=effective_depth_field,
     )
 
     (api_result, api_debug) = asyncio.run(
@@ -365,7 +579,7 @@ def get_assets(
 
 @registry.tool(
     name="dvd",
-    description="Convenience group that runs both assets and timelog queries.",
+    description="Convenience group that runs assets, timelog, and key dataset queries.",
     parameters=TIMELOG_PARAMETERS,
 )
 def run_dvd(
@@ -402,16 +616,57 @@ def run_dvd(
         skip=skip,
     )
 
+    dataset_payloads: Dict[str, Any] = {}
+    dataset_metadata: Dict[str, Any] = {}
+    dataset_command_names: List[str] = []
+    for meta in _dvd_dataset_metas():
+        requirement_groups = _dataset_requirement_groups(meta)
+        time_field = _resolve_time_field(meta)
+        depth_field = _resolve_depth_field(meta)
+        _ensure_dataset_requirements(
+            meta,
+            requirement_groups,
+            asset_ids,
+            company_id,
+            start_time,
+            end_time,
+            depth_start=None,
+            depth_end=None,
+        )
+        dataset_result = _run_dataset_query(
+            meta.dataset,
+            context,
+            asset_ids,
+            company_id,
+            start_time,
+            end_time,
+            step_minutes=step_minutes,
+            statuses=statuses,
+            limit=limit,
+            skip=skip,
+            require_assets=False,
+            provider_override=meta.provider,
+            time_field=time_field,
+            depth_field=depth_field,
+        )
+        dataset_payloads[meta.dataset] = dataset_result.payload
+        dataset_metadata[meta.dataset] = dataset_result.metadata
+        dataset_slug = meta.slug or f"{meta.company_id}-{meta.dataset}"
+        dataset_command_names.append(f"dataset-{dataset_slug}")
+
     payload: Dict[str, Any] = {
         "assets": assets_result.payload,
         "timelog": timelog_result.payload,
+        "datasets": dataset_payloads,
     }
     if context.verbose:
         payload["debug"] = {
             "assets_metadata": assets_result.metadata,
             "timelog_metadata": timelog_result.metadata,
+            "datasets_metadata": dataset_metadata,
         }
-    return ToolResult(payload=payload, metadata={"commands": ["assets", "timelog"]})
+    command_list = ["assets", "timelog", *dataset_command_names]
+    return ToolResult(payload=payload, metadata={"commands": command_list})
 
 
 # ---------------------------------------------------------------------------
@@ -499,7 +754,16 @@ def _register_dataset_tools() -> None:
         used.add(command_name)
         params = _build_dataset_parameters(meta)
 
-        def make_callback(dataset: DatasetMeta):
+        requirement_groups = _dataset_requirement_groups(meta)
+        time_field = _resolve_time_field(meta)
+        depth_field = _resolve_depth_field(meta)
+
+        def make_callback(
+            dataset: DatasetMeta,
+            requirement_groups: List[FrozenSet[RequirementToken]],
+            time_field: Optional[str],
+            depth_field: Optional[str],
+        ):
             def dataset_tool(
                 context: ToolContext,
                 asset_ids: str,
@@ -511,6 +775,16 @@ def _register_dataset_tools() -> None:
                 limit: Optional[int] = 1000,
                 skip: Optional[int] = 0,
             ) -> ToolResult:
+                _ensure_dataset_requirements(
+                    dataset,
+                    requirement_groups,
+                    asset_ids,
+                    company_id,
+                    start_time,
+                    end_time,
+                    depth_start,
+                    depth_end,
+                )
                 return _run_dataset_query(
                     dataset.dataset,
                     context,
@@ -524,6 +798,8 @@ def _register_dataset_tools() -> None:
                     depth_end=depth_end,
                     provider_override=dataset.provider,
                     require_assets=False,
+                    time_field=time_field,
+                    depth_field=depth_field,
                 )
 
             return dataset_tool
@@ -532,7 +808,7 @@ def _register_dataset_tools() -> None:
             name=command_name,
             description=meta.description or f"Corva dataset {meta.friendly_name}",
             parameters=params,
-        )(make_callback(meta))
+        )(make_callback(meta, requirement_groups, time_field, depth_field))
 
 
 _register_dataset_tools()
