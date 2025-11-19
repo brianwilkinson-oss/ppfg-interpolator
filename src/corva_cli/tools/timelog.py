@@ -3,10 +3,12 @@ from __future__ import annotations
 
 import asyncio
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+import inspect
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import typer
 
+from corva_cli.datasets import DatasetMeta, load_corva_company_datasets
 from corva_cli.settings import get_settings
 from corva_cli.timewindow import resolve_auto_window
 from corva_cli.tools.base import ParameterSpec, ToolContext, ToolResult
@@ -27,6 +29,7 @@ def _build_timelog_pipeline(
     company_id: Optional[int],
     start_dt: Optional[datetime],
     end_dt: Optional[datetime],
+    depth_range: Optional[Tuple[float, float]],
     statuses: List[str],
     step_minutes: int,
     limit: int,
@@ -46,6 +49,9 @@ def _build_timelog_pipeline(
         start_epoch = _to_unix_seconds(start_dt)
         end_epoch = _to_unix_seconds(end_dt)
         window_filter["data.start_time"] = {"$gte": start_epoch, "$lte": end_epoch}
+    if depth_range:
+        depth_start, depth_end = depth_range
+        window_filter["data.depth"] = {"$gte": depth_start, "$lte": depth_end}
 
     stages: List[Dict[str, Any]] = [{"$match": window_filter}]
     if skip > 0:
@@ -138,6 +144,22 @@ ASSET_ID_OPTIONAL = ParameterSpec(
     default="",
 )
 
+DEPTH_START_OPTIONAL = ParameterSpec(
+    "depth_start",
+    type=float,
+    help="Depth range start",
+    required=False,
+    default=None,
+)
+
+DEPTH_END_OPTIONAL = ParameterSpec(
+    "depth_end",
+    type=float,
+    help="Depth range end",
+    required=False,
+    default=None,
+)
+
 
 def _require_company_when_no_assets(ctx, param, value):
     asset_ids = ctx.params.get("asset_ids", "")
@@ -186,6 +208,9 @@ def _run_dataset_query(
     limit: Optional[int] = 1000,
     skip: Optional[int] = 0,
     require_assets: bool = True,
+    depth_start: Optional[float] = None,
+    depth_end: Optional[float] = None,
+    provider_override: Optional[str] = None,
 ) -> ToolResult:
     asset_ids = asset_ids or ""
     raw_assets = [asset.strip() for asset in asset_ids.split(",") if asset.strip()]
@@ -201,6 +226,7 @@ def _run_dataset_query(
 
     settings = get_settings()
     dataset = dataset_name or settings.timelog_dataset
+    provider = provider_override or settings.timelog_provider
     effective_step = max(step_minutes or settings.timelog_step_minutes, 1)
     effective_limit = max(limit or 1000, 1)
     effective_skip = max(skip or 0, 0)
@@ -222,11 +248,16 @@ def _run_dataset_query(
         start_dt, end_dt = resolve_auto_window(start_time, end_time)
         window_duration = (end_dt - start_dt).total_seconds() / 3600
     headers = utils.build_auth_headers(context.auth)
+    depth_range = None
+    if depth_start is not None and depth_end is not None:
+        depth_range = (float(depth_start), float(depth_end))
+
     pipeline = _build_timelog_pipeline(
         assets,
         company_id,
         start_dt,
         end_dt,
+        depth_range,
         status_choices,
         effective_step,
         effective_limit,
@@ -235,7 +266,7 @@ def _run_dataset_query(
 
     (api_result, api_debug) = asyncio.run(
         utils.execute_data_api_pipeline(
-            settings.timelog_provider,
+            provider,
             dataset,
             pipeline,
             headers,
@@ -381,3 +412,141 @@ def run_dvd(
             "timelog_metadata": timelog_result.metadata,
         }
     return ToolResult(payload=payload, metadata={"commands": ["assets", "timelog"]})
+
+
+# ---------------------------------------------------------------------------
+# Dataset-driven commands
+# ---------------------------------------------------------------------------
+
+def _build_dataset_parameters(meta: DatasetMeta) -> List[ParameterSpec]:
+    params: List[ParameterSpec] = [
+        ParameterSpec(
+            "asset_ids",
+            help="Comma-separated integer asset IDs",
+            required=True,
+        ),
+        ParameterSpec(
+            "company_id",
+            type=int,
+            help="Company identifier",
+            required=False,
+            default=None,
+        ),
+    ]
+    if meta.requires_time:
+        params.append(
+            ParameterSpec(
+                "start_time",
+                help="Window start in auto_* syntax (e.g. auto_2h30m)",
+                required=False,
+                default=None,
+            )
+        )
+        params.append(
+            ParameterSpec(
+                "end_time",
+                help="Window end in auto_* syntax (e.g. auto_0d)",
+                required=False,
+                default=None,
+            )
+        )
+    if meta.requires_depth:
+        params.append(
+            ParameterSpec(
+                "depth_start",
+                type=float,
+                help="Depth range start",
+                required=False,
+                default=None,
+            )
+        )
+        params.append(
+            ParameterSpec(
+                "depth_end",
+                type=float,
+                help="Depth range end",
+                required=False,
+                default=None,
+            )
+        )
+    params.append(
+        ParameterSpec(
+            "limit",
+            type=int,
+            help="Max documents returned",
+            required=False,
+            default=1000,
+        )
+    )
+    params.append(
+        ParameterSpec(
+            "skip",
+            type=int,
+            help="Number of documents to skip before collecting results",
+            required=False,
+            default=0,
+        )
+    )
+    return params
+
+
+def _register_dataset_tools() -> None:
+    metas = load_corva_company_datasets()
+    if not metas:
+        return
+    used: Set[str] = set()
+    optional_time_datasets = {"drilling.timelog.data"}
+
+    for meta in metas:
+        slug = meta.slug or meta.name.split("#")[-1]
+        command_name = f"dataset-{slug}"
+        if command_name in used:
+            command_name = f"{command_name}-{meta.company_id}"
+        used.add(command_name)
+        params = _build_dataset_parameters(meta)
+
+        def make_callback(dataset: DatasetMeta):
+            def dataset_tool(
+                context: ToolContext,
+                asset_ids: str,
+                company_id: Optional[int] = None,
+                start_time: Optional[str] = None,
+                end_time: Optional[str] = None,
+                depth_start: Optional[float] = None,
+                depth_end: Optional[float] = None,
+                limit: Optional[int] = 1000,
+                skip: Optional[int] = 0,
+            ) -> ToolResult:
+                requires_time_window = dataset.requires_time and dataset.dataset not in optional_time_datasets
+                if requires_time_window and not (start_time and end_time):
+                    raise typer.BadParameter(
+                        f"Dataset {dataset.friendly_name} requires --start-time and --end-time"
+                    )
+                if dataset.requires_depth and (depth_start is None or depth_end is None):
+                    raise typer.BadParameter(
+                        f"Dataset {dataset.friendly_name} requires --depth-start and --depth-end"
+                    )
+                return _run_dataset_query(
+                    dataset.dataset,
+                    context,
+                    asset_ids,
+                    company_id,
+                    start_time,
+                    end_time,
+                    limit=limit,
+                    skip=skip,
+                    depth_start=depth_start,
+                    depth_end=depth_end,
+                    provider_override=dataset.provider,
+                )
+
+            return dataset_tool
+
+        registry.tool(
+            name=command_name,
+            description=meta.description or f"Corva dataset {meta.friendly_name}",
+            parameters=params,
+        )(make_callback(meta))
+
+
+_register_dataset_tools()

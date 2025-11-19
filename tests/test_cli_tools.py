@@ -237,3 +237,93 @@ def test_dvd_returns_both_payloads(monkeypatch):
     payload = json.loads(result.stdout)
     assert payload["assets"] == ["asset-entry"]
     assert payload["timelog"] == ["timelog-entry"]
+
+
+def test_dataset_time_command(monkeypatch):
+    async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
+        assert dataset_name == "activities"
+        return ({"rows": []}, {"status_code": 200, "request_body": {"stages": mql}})
+
+    monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
+
+    result = runner.invoke(
+        app,
+        [
+            "dataset-activities",
+            "--api-key",
+            "demo",
+            "--asset-ids",
+            "123",
+            "--company-id",
+            "3",
+            "--start-time",
+            "auto_1h",
+            "--end-time",
+            "auto_0d",
+        ],
+    )
+    assert result.exit_code == 0, result.stdout
+    payload = json.loads(result.stdout)
+    assert "rows" in payload
+
+
+def test_dataset_depth_requires_depth(monkeypatch):
+    async def fake_execute(*args, **kwargs):
+        return ({}, {})
+
+    monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
+
+    # Missing depth parameters should trigger error
+    result = runner.invoke(
+        app,
+        [
+            "dataset-directional-tool-face",
+            "--api-key",
+            "demo",
+            "--asset-ids",
+            "123",
+        ],
+    )
+    assert result.exit_code != 0
+    assert "depth-start" in result.stdout.lower()
+
+    # Providing depth parameters succeeds
+    result_ok = runner.invoke(
+        app,
+        [
+            "dataset-directional-tool-face",
+            "--api-key",
+            "demo",
+            "--asset-ids",
+            "123",
+            "--depth-start",
+            "1000",
+            "--depth-end",
+            "1500",
+        ],
+    )
+    assert result_ok.exit_code == 0, result_ok.stdout
+
+
+def test_dataset_time_optional_limit_only(monkeypatch):
+    async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
+        assert dataset_name == "drilling.timelog.data"
+        return ({"rows": []}, {"status_code": 200})
+
+    monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
+
+    result = runner.invoke(
+        app,
+        [
+            "dataset-drilling-timelog-data",
+            "--api-key",
+            "demo",
+            "--asset-ids",
+            "101",
+            "--company-id",
+            "3",
+            "--limit",
+            "5",
+        ],
+    )
+    assert result.exit_code == 0, result.stdout
