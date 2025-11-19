@@ -423,7 +423,8 @@ def _build_dataset_parameters(meta: DatasetMeta) -> List[ParameterSpec]:
         ParameterSpec(
             "asset_ids",
             help="Comma-separated integer asset IDs",
-            required=True,
+            required=False,
+            default="",
         ),
         ParameterSpec(
             "company_id",
@@ -433,42 +434,36 @@ def _build_dataset_parameters(meta: DatasetMeta) -> List[ParameterSpec]:
             default=None,
         ),
     ]
-    if meta.requires_time:
-        params.append(
+    params.extend(
+        [
             ParameterSpec(
                 "start_time",
                 help="Window start in auto_* syntax (e.g. auto_2h30m)",
                 required=False,
                 default=None,
-            )
-        )
-        params.append(
+            ),
             ParameterSpec(
                 "end_time",
                 help="Window end in auto_* syntax (e.g. auto_0d)",
                 required=False,
                 default=None,
-            )
-        )
-    if meta.requires_depth:
-        params.append(
+            ),
             ParameterSpec(
                 "depth_start",
                 type=float,
                 help="Depth range start",
                 required=False,
                 default=None,
-            )
-        )
-        params.append(
+            ),
             ParameterSpec(
                 "depth_end",
                 type=float,
                 help="Depth range end",
                 required=False,
                 default=None,
-            )
-        )
+            ),
+        ]
+    )
     params.append(
         ParameterSpec(
             "limit",
@@ -495,7 +490,6 @@ def _register_dataset_tools() -> None:
     if not metas:
         return
     used: Set[str] = set()
-    optional_time_datasets = {"drilling.timelog.data"}
 
     for meta in metas:
         slug = meta.slug or meta.name.split("#")[-1]
@@ -517,15 +511,6 @@ def _register_dataset_tools() -> None:
                 limit: Optional[int] = 1000,
                 skip: Optional[int] = 0,
             ) -> ToolResult:
-                requires_time_window = dataset.requires_time and dataset.dataset not in optional_time_datasets
-                if requires_time_window and not (start_time and end_time):
-                    raise typer.BadParameter(
-                        f"Dataset {dataset.friendly_name} requires --start-time and --end-time"
-                    )
-                if dataset.requires_depth and (depth_start is None or depth_end is None):
-                    raise typer.BadParameter(
-                        f"Dataset {dataset.friendly_name} requires --depth-start and --depth-end"
-                    )
                 return _run_dataset_query(
                     dataset.dataset,
                     context,
@@ -538,6 +523,7 @@ def _register_dataset_tools() -> None:
                     depth_start=depth_start,
                     depth_end=depth_end,
                     provider_override=dataset.provider,
+                    require_assets=False,
                 )
 
             return dataset_tool

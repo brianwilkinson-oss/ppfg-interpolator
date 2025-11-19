@@ -267,13 +267,15 @@ def test_dataset_time_command(monkeypatch):
     assert "rows" in payload
 
 
-def test_dataset_depth_requires_depth(monkeypatch):
-    async def fake_execute(*args, **kwargs):
+def test_dataset_depth_allows_optional_depth(monkeypatch):
+    calls = []
+
+    async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
+        calls.append(dataset_name)
         return ({}, {})
 
     monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
 
-    # Missing depth parameters should trigger error
     result = runner.invoke(
         app,
         [
@@ -284,25 +286,8 @@ def test_dataset_depth_requires_depth(monkeypatch):
             "123",
         ],
     )
-    assert result.exit_code != 0
-    assert "depth-start" in result.stdout.lower()
-
-    # Providing depth parameters succeeds
-    result_ok = runner.invoke(
-        app,
-        [
-            "dataset-directional-tool-face",
-            "--api-key",
-            "demo",
-            "--asset-ids",
-            "123",
-            "--depth-start",
-            "1000",
-            "--depth-end",
-            "1500",
-        ],
-    )
-    assert result_ok.exit_code == 0, result_ok.stdout
+    assert result.exit_code == 0, result.stdout
+    assert calls[-1] == "directional.tool_face"
 
 
 def test_dataset_time_optional_limit_only(monkeypatch):

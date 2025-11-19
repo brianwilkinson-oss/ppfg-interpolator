@@ -9,7 +9,7 @@ CLI scaffold for Corva-style pluggable tools using Python 3.14, Typer, and optio
 | `timelog` | Resolves `auto_*` windows (or uses a record limit) and proxies an aggregate pipeline to the Corva Data API for timelog entries. |
 | `assets` | Shares the same interface but queries the `assets` dataset for asset metadata. |
 | `dvd` | Group command that runs both `assets` and `timelog` with the same arguments (verbose shows both payloads). |
-| `dataset-<name>` | Auto-generated per Corva company 3 dataset (e.g., `dataset-activities`, `dataset-directional-tool-face`). Time-indexed datasets typically require `--start-time/--end-time`, except for `dataset-drilling-timelog-data` which behaves like `timelog` and can use `--limit` alone. Depth-indexed datasets require `--depth-start/--depth-end`. |
+| `dataset-<name>` | Auto-generated per Corva company 3 dataset (e.g., `dataset-activities`, `dataset-directional-tool-face`). These commands accept `--asset-ids`, `--company-id`, `--start-time/--end-time`, `--depth-start/--depth-end`, or `--limit`/`--skip` in any combination. (Some datasets may still require specific filters in the future.) |
 
 Example:
 
