@@ -211,3 +211,29 @@ def test_assets_requires_company_when_no_assets(monkeypatch):
     )
     assert result.exit_code != 0
     assert "--company-id" in result.stdout.lower()
+
+
+def test_dvd_returns_both_payloads(monkeypatch):
+    async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
+        if dataset_name == "assets":
+            return (["asset-entry"], {"status_code": 200})
+        return (["timelog-entry"], {"status_code": 200})
+
+    monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
+
+    result = runner.invoke(
+        app,
+        [
+            "dvd",
+            "--api-key",
+            "demo",
+            "--asset-ids",
+            "909",
+            "--company-id",
+            "77",
+        ],
+    )
+    assert result.exit_code == 0, result.stdout
+    payload = json.loads(result.stdout)
+    assert payload["assets"] == ["asset-entry"]
+    assert payload["timelog"] == ["timelog-entry"]

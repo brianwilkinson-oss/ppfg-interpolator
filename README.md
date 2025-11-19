@@ -8,6 +8,7 @@ CLI scaffold for Corva-style pluggable tools using Python 3.14, Typer, and optio
 | --- | --- |
 | `timelog` | Resolves `auto_*` windows (or uses a record limit) and proxies an aggregate pipeline to the Corva Data API for timelog entries. |
 | `assets` | Shares the same interface but queries the `assets` dataset for asset metadata. |
+| `dvd` | Group command that runs both `assets` and `timelog` with the same arguments (verbose shows both payloads). |
 
 Example:
 

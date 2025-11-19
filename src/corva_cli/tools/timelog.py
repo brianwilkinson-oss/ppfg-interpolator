@@ -330,3 +330,54 @@ def get_assets(
         skip,
         require_assets=False,
     )
+
+
+@registry.tool(
+    name="dvd",
+    description="Convenience group that runs both assets and timelog queries.",
+    parameters=TIMELOG_PARAMETERS,
+)
+def run_dvd(
+    context: ToolContext,
+    asset_ids: str,
+    company_id: Optional[int] = None,
+    start_time: Optional[str] = None,
+    end_time: Optional[str] = None,
+    step_minutes: Optional[int] = None,
+    statuses: Optional[str] = None,
+    limit: Optional[int] = 1000,
+    skip: Optional[int] = 0,
+) -> ToolResult:
+    assets_result = get_assets(
+        context,
+        asset_ids=asset_ids,
+        company_id=company_id,
+        start_time=start_time,
+        end_time=end_time,
+        step_minutes=step_minutes,
+        statuses=statuses,
+        limit=limit,
+        skip=skip,
+    )
+    timelog_result = get_timelog_data(
+        context,
+        asset_ids=asset_ids,
+        company_id=company_id,
+        start_time=start_time,
+        end_time=end_time,
+        step_minutes=step_minutes,
+        statuses=statuses,
+        limit=limit,
+        skip=skip,
+    )
+
+    payload: Dict[str, Any] = {
+        "assets": assets_result.payload,
+        "timelog": timelog_result.payload,
+    }
+    if context.verbose:
+        payload["debug"] = {
+            "assets_metadata": assets_result.metadata,
+            "timelog_metadata": timelog_result.metadata,
+        }
+    return ToolResult(payload=payload, metadata={"commands": ["assets", "timelog"]})
