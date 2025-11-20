@@ -3,9 +3,33 @@ import json
 from typer.testing import CliRunner
 
 from corva_cli.cli import app
-from corva_cli.tools.timelog import DVD_DATASET_NAMES
+from corva_cli.datasets import DatasetMeta
+from corva_cli.tools.timelog import DVD_DATASET_COMMANDS
 
 runner = CliRunner()
+
+
+def _fake_dvd_metas():
+    entries = []
+    for command in DVD_DATASET_COMMANDS:
+        slug = command[len("dataset-") :]
+        dataset_name = slug.replace("-", ".")
+        entries.append(
+            (
+                command,
+                DatasetMeta(
+                    name=f"corva#{dataset_name}",
+                    friendly_name=slug,
+                    provider="corva",
+                    company_id=3,
+                    data_type="time",
+                    description="",
+                    dataset=dataset_name,
+                    indexes=(("asset_id", "timestamp"),),
+                ),
+            )
+        )
+    return entries
 
 
 def test_timelog_auto_window_default(monkeypatch):
@@ -82,17 +106,11 @@ def test_timelog_verbose_includes_metadata(monkeypatch):
             "auto_1h",
             "--end-time",
             "auto_0d",
-            "--step-minutes",
-            "15",
-            "--statuses",
-            "idle,run",
             "--verbose",
         ],
     )
     assert result.exit_code == 0, result.stdout
     output = json.loads(result.stdout)
-    assert output["query"]["step_minutes"] == 15
-    assert output["query"]["statuses"] == ["idle", "run"]
     assert output["query"]["provider"] == "corva"
     assert output["query"]["dataset"] == "drilling.timelog.data"
     assert output["query"]["limit"] == 1000
@@ -217,6 +235,7 @@ def test_assets_requires_company_when_no_assets(monkeypatch):
 
 
 def test_dvd_returns_both_payloads(monkeypatch):
+    monkeypatch.setattr("corva_cli.tools.timelog._dvd_dataset_metas", _fake_dvd_metas)
     calls = []
 
     async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
@@ -243,16 +262,14 @@ def test_dvd_returns_both_payloads(monkeypatch):
     )
     assert result.exit_code == 0, result.stdout
     payload = json.loads(result.stdout)
-    assert payload["assets"] == ["assets"]
-    assert payload["timelog"] == ["drilling.timelog.data"]
-    assert set(payload["datasets"].keys()) == set(DVD_DATASET_NAMES)
-    assert payload["datasets"]["activities"] == ["activities"]
-    assert calls[0] == "assets"
-    assert calls[1] == "drilling.timelog.data"
-    assert set(calls[2:]) == set(DVD_DATASET_NAMES)
+    assert set(payload["datasets"].keys()) == set(DVD_DATASET_COMMANDS)
+    first_key = DVD_DATASET_COMMANDS[0]
+    assert first_key in payload["datasets"]
+    assert len(calls) == len(DVD_DATASET_COMMANDS)
 
 
 def test_dvd_requires_time_window(monkeypatch):
+    monkeypatch.setattr("corva_cli.tools.timelog._dvd_dataset_metas", _fake_dvd_metas)
     calls = []
 
     async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
@@ -275,7 +292,7 @@ def test_dvd_requires_time_window(monkeypatch):
     )
     assert result.exit_code != 0
     assert "--start-time/--end-time" in result.stdout
-    assert calls == ["assets", "drilling.timelog.data"]
+    assert calls == []
 
 
 def test_dataset_time_command(monkeypatch):

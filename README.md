@@ -25,36 +25,20 @@ uv run corva timelog \
 
 ### DVD dataset coverage
 
-The `dvd` command returns a payload shaped like `{"assets": ..., "timelog": ..., "datasets": {...}}`. The `datasets` map contains outputs for every curated dataset command (each also available individually via `dataset-<slug>`):
+The `dvd` command returns a payload shaped like `{"datasets": {...}}`. The `datasets` map contains outputs for each curated dataset command (also available individually via `dataset-<slug>`):
 
-- `activities`
-- `wits.summary-1m`
-- `wits`
-- `interventions.wits.summary-6h.metadata`
-- `wits.summary-30m`
-- `drillout.wits.summary-1m`
-- `wits.summary-30m.metadata`
-- `interventions.wits.summary-30m.metadata`
-- `drillout.activities`
-- `interventions.wits`
-- `drillout.wits`
-- `drillout.wits.summary-6h.metadata`
-- `interventions.wits.summary-30m`
-- `activities.summary-2tours`
-- `wits.summary-6h`
-- `drillout.activities.summary-2tours`
-- `activities.summary-continuous`
-- `wits.summary-6h.metadata`
-- `interventions.wits.summary-1m.metadata`
-- `drillout.wits.summary-6h`
-- `drillout.wits.summary-30m`
-- `drillout.activities.summary-continuous`
-- `drillout.wits.summary-1m.metadata`
-- `interventions.activities`
-- `wits.summary-1m.metadata`
-- `drillout.wits.summary-30m.metadata`
-- `interventions.wits.summary-1m`
-- `interventions.wits.summary-6h`
+- `data.costs`
+- `data.afe`
+- `data.custom_curves`
+- `data.casing`
+- `data.drillstring`
+- `data.formations`
+- `data.well_sections`
+- `activity-groups`
+- `well.design_optimization`
+- `well.design_optimization.timelog`
+- `composite.curves`
+- `assets`
 
 #### Dataset filter requirements
 
@@ -116,13 +100,10 @@ The script runs `uv sync` and then invokes `pyinstaller` via `uv run`, bundling 
 
 ### Settings & Overrides
 
-Configuration lives in `src/corva_cli/settings.py` with sensible defaults:
+Configuration lives in `src/corva_cli/settings.py` with a small set of overrides:
 
-- `CORVA_TIMELOG_STEP_MINUTES` (default `60`)
-- `CORVA_TIMELOG_STATUSES` (default `online,maintenance,offline`)
-- `CORVA_DATA_API_ROOT_URL` (default `https://data.example.com`)
+- `CORVA_DATA_API_ROOT_URL` (default `https://data.corva.ai`)
 - `CORVA_DATA_API_TIMEOUT_SECONDS` (default `30`)
-- `CORVA_TIMELOG_PROVIDER` / `CORVA_TIMELOG_DATASET` (default `corva` / `drilling.timelog.data`)
 
 Drop a `.env` file (see `.env.example`) or set environment variables to override these values globally. Any command can still override them ad-hoc:
 
@@ -133,8 +114,6 @@ uv run corva timelog \
   --company-id 99 \
   --start-time auto_6h \
   --end-time auto_0d \
-  --step-minutes 30 \
-  --statuses online,idle \
   --limit 500 \
   --skip 100
 ```

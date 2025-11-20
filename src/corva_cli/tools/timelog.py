@@ -31,15 +31,13 @@ def _build_timelog_pipeline(
     start_dt: Optional[datetime],
     end_dt: Optional[datetime],
     depth_range: Optional[Tuple[float, float]],
-    statuses: List[str],
-    step_minutes: int,
     limit: int,
     skip: int,
     time_field: Optional[str] = None,
     depth_field: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
-    effective_time_field = time_field or "data.start_time"
-    effective_depth_field = depth_field or "data.depth"
+    effective_time_field = time_field
+    effective_depth_field = depth_field
     window_filter: Dict[str, Any] = {}
     if assets:
         asset_filter: Any
@@ -50,11 +48,11 @@ def _build_timelog_pipeline(
         window_filter["asset_id"] = asset_filter
     if company_id is not None:
         window_filter["company_id"] = company_id
-    if start_dt and end_dt:
+    if effective_time_field and start_dt and end_dt:
         start_epoch = _to_unix_seconds(start_dt)
         end_epoch = _to_unix_seconds(end_dt)
         window_filter[effective_time_field] = {"$gte": start_epoch, "$lte": end_epoch}
-    if depth_range:
+    if depth_range and effective_depth_field:
         depth_start, depth_end = depth_range
         window_filter[effective_depth_field] = {"$gte": depth_start, "$lte": depth_end}
 
@@ -62,32 +60,33 @@ def _build_timelog_pipeline(
     if skip > 0:
         stages.append({"$skip": skip})
     stages.append({"$limit": limit})
-    stages.append({"$sort": {effective_time_field: -1}})
-    iso_field_name = f"{effective_time_field}_iso"
-    add_fields: Dict[str, Any] = {
-        iso_field_name: {
-            "$dateToString": {
-                "date": {
-                    "$toDate": {
-                        "$multiply": [f"${effective_time_field}", 1000],
-                    }
-                },
-                "format": "%Y-%m-%dT%H:%M:%S.000Z",
+    if effective_time_field:
+        stages.append({"$sort": {effective_time_field: -1}})
+        iso_field_name = f"{effective_time_field}_iso"
+        add_fields: Dict[str, Any] = {
+            iso_field_name: {
+                "$dateToString": {
+                    "date": {
+                        "$toDate": {
+                            "$multiply": [f"${effective_time_field}", 1000],
+                        }
+                    },
+                    "format": "%Y-%m-%dT%H:%M:%S.000Z",
+                }
             }
         }
-    }
-    if effective_time_field.endswith("start_time"):
-        add_fields["data.end_time_iso"] = {
-            "$dateToString": {
-                "date": {
-                    "$toDate": {
-                        "$multiply": ["$data.end_time", 1000],
-                    }
-                },
-                "format": "%Y-%m-%dT%H:%M:%S.000Z",
+        if effective_time_field.endswith("start_time"):
+            add_fields["data.end_time_iso"] = {
+                "$dateToString": {
+                    "date": {
+                        "$toDate": {
+                            "$multiply": ["$data.end_time", 1000],
+                        }
+                    },
+                    "format": "%Y-%m-%dT%H:%M:%S.000Z",
+                }
             }
-        }
-    stages.append({"$addFields": add_fields})
+        stages.append({"$addFields": add_fields})
     return stages
 
 
@@ -103,19 +102,6 @@ def _common_optionals(company_spec: ParameterSpec) -> List[ParameterSpec]:
         ParameterSpec(
             "end_time",
             help="Window end in auto_* syntax (e.g. auto_0d)",
-            required=False,
-            default=None,
-        ),
-        ParameterSpec(
-            "step_minutes",
-            type=int,
-            help="Override step size in minutes (defaults to settings)",
-            required=False,
-            default=None,
-        ),
-        ParameterSpec(
-            "statuses",
-            help="Override comma-separated statuses (defaults to settings)",
             required=False,
             default=None,
         ),
@@ -183,6 +169,8 @@ TIMELOG_PARAMETERS = [
             default=None,
         )
     ),
+    DEPTH_START_OPTIONAL,
+    DEPTH_END_OPTIONAL,
 ]
 
 ASSETS_PARAMETERS = [
@@ -197,51 +185,64 @@ ASSETS_PARAMETERS = [
             callback=_require_company_when_no_assets,
         )
     ),
+    DEPTH_START_OPTIONAL,
+    DEPTH_END_OPTIONAL,
 ]
 
 
-DVD_DATASET_NAMES: Tuple[str, ...] = (
-    "activities",
-    "wits.summary-1m",
-    "wits",
-    "interventions.wits.summary-6h.metadata",
-    "wits.summary-30m",
-    "drillout.wits.summary-1m",
-    "wits.summary-30m.metadata",
-    "interventions.wits.summary-30m.metadata",
-    "drillout.activities",
-    "interventions.wits",
-    "drillout.wits",
-    "drillout.wits.summary-6h.metadata",
-    "interventions.wits.summary-30m",
-    "activities.summary-2tours",
-    "wits.summary-6h",
-    "drillout.activities.summary-2tours",
-    "activities.summary-continuous",
-    "wits.summary-6h.metadata",
-    "interventions.wits.summary-1m.metadata",
-    "drillout.wits.summary-6h",
-    "drillout.wits.summary-30m",
-    "drillout.activities.summary-continuous",
-    "drillout.wits.summary-1m.metadata",
-    "interventions.activities",
-    "wits.summary-1m.metadata",
-    "drillout.wits.summary-30m.metadata",
-    "interventions.wits.summary-1m",
-    "interventions.wits.summary-6h",
+DVD_DATASET_COMMANDS: Tuple[str, ...] = (
+    "dataset-data-costs",
+    "dataset-data-afe",
+    "dataset-data-custom-curves",
+    "dataset-data-casing",
+    "dataset-data-drillstring",
+    "dataset-data-formations",
+    "dataset-data-well-sections",
+    "dataset-activity-groups",
+    "dataset-well-design-optimization",
+    "dataset-well-design-optimization-timelog",
+    "dataset-composite-curves",
+    "dataset-assets",
 )
 
 
-def _dvd_dataset_metas() -> List[DatasetMeta]:
-    metas_by_dataset = {meta.dataset: meta for meta in load_corva_company_datasets()}
-    missing = [name for name in DVD_DATASET_NAMES if name not in metas_by_dataset]
+TIME_FIELD_OVERRIDES_BY_DATASET: Dict[str, Optional[str]] = {
+    "activity-groups": "data.start_time",
+    "well.design_optimization": "data.start_time",
+    "well.design_optimization.timelog": "data.start_time",
+    "assets": None,
+}
+
+TIME_FIELD_OVERRIDES_BY_SLUG: Dict[str, Optional[str]] = {
+    "activity-groups": "data.start_time",
+    "well-design-optimization": "data.start_time",
+    "well-design-optimization-timelog": "data.start_time",
+    "assets": None,
+}
+
+
+def _dvd_dataset_metas() -> List[Tuple[str, DatasetMeta]]:
+    metas = load_corva_company_datasets()
+    metas_by_slug = {meta.slug: meta for meta in metas}
+    missing: List[str] = []
+    resolved: List[Tuple[str, DatasetMeta]] = []
+    for command_name in DVD_DATASET_COMMANDS:
+        if not command_name.startswith("dataset-"):
+            missing.append(command_name)
+            continue
+        slug = command_name[len("dataset-") :]
+        meta = metas_by_slug.get(slug)
+        if not meta:
+            missing.append(command_name)
+            continue
+        resolved.append((command_name, meta))
     if missing:
         missing_list = ", ".join(missing)
         raise ValueError(
             f"Missing dataset metadata for dvd datasets: {missing_list}. "
-            "Update docs/dataset.json or adjust DVD_DATASET_NAMES."
+            "Update docs/dataset.json or adjust DVD_DATASET_COMMANDS."
         )
-    return [metas_by_dataset[name] for name in DVD_DATASET_NAMES]
+    return resolved
 
 
 @lru_cache()
@@ -303,6 +304,12 @@ def _iter_index_fields(meta: DatasetMeta) -> Iterable[str]:
 
 
 def _resolve_time_field(meta: DatasetMeta) -> Optional[str]:
+    if meta.dataset in TIME_FIELD_OVERRIDES_BY_DATASET:
+        return TIME_FIELD_OVERRIDES_BY_DATASET[meta.dataset]
+    slug = meta.slug
+    if slug and slug in TIME_FIELD_OVERRIDES_BY_SLUG:
+        return TIME_FIELD_OVERRIDES_BY_SLUG[slug]
+
     fields = list(_iter_index_fields(meta))
     for field_name in fields:
         if "timestamp" in field_name.lower():
@@ -404,8 +411,6 @@ def _run_dataset_query(
     company_id: Optional[int] = None,
     start_time: Optional[str] = None,
     end_time: Optional[str] = None,
-    step_minutes: Optional[int] = None,
-    statuses: Optional[str] = None,
     limit: Optional[int] = 1000,
     skip: Optional[int] = 0,
     require_assets: bool = True,
@@ -439,16 +444,8 @@ def _run_dataset_query(
                 effective_time_field = _resolve_time_field(meta)
             if effective_depth_field is None:
                 effective_depth_field = _resolve_depth_field(meta)
-    effective_step = max(step_minutes or 60, 1)
     effective_limit = max(limit or 1000, 1)
     effective_skip = max(skip or 0, 0)
-    if statuses:
-        status_choices = [item.strip() for item in statuses.split(",") if item.strip()]
-        if not status_choices:
-            status_choices = ["online", "maintenance", "offline"]
-    else:
-        status_choices = ["online", "maintenance", "offline"]
-
     if bool(start_time) ^ bool(end_time):
         raise ValueError("Provide both start_time and end_time, or omit both.")
 
@@ -469,8 +466,6 @@ def _run_dataset_query(
         start_dt,
         end_dt,
         depth_range,
-        status_choices,
-        effective_step,
         effective_limit,
         effective_skip,
         time_field=effective_time_field,
@@ -490,8 +485,6 @@ def _run_dataset_query(
         query_payload = {
             "assets": assets,
             "company_id": company_id,
-            "step_minutes": effective_step,
-            "statuses": status_choices,
             "limit": effective_limit,
             "provider": provider,
             "dataset": dataset,
@@ -526,10 +519,10 @@ def get_timelog_data(
     company_id: Optional[int] = None,
     start_time: Optional[str] = None,
     end_time: Optional[str] = None,
-    step_minutes: Optional[int] = None,
-    statuses: Optional[str] = None,
     limit: Optional[int] = 1000,
     skip: Optional[int] = 0,
+    depth_start: Optional[float] = None,
+    depth_end: Optional[float] = None,
 ) -> ToolResult:
     return _run_dataset_query(
         None,
@@ -538,10 +531,10 @@ def get_timelog_data(
         company_id,
         start_time,
         end_time,
-        step_minutes,
-        statuses,
         limit,
         skip,
+        depth_start=depth_start,
+        depth_end=depth_end,
     )
 
 
@@ -556,10 +549,10 @@ def get_assets(
     company_id: Optional[int] = None,
     start_time: Optional[str] = None,
     end_time: Optional[str] = None,
-    step_minutes: Optional[int] = None,
-    statuses: Optional[str] = None,
     limit: Optional[int] = 1000,
     skip: Optional[int] = 0,
+    depth_start: Optional[float] = None,
+    depth_end: Optional[float] = None,
 ) -> ToolResult:
     return _run_dataset_query(
         "assets",
@@ -568,11 +561,11 @@ def get_assets(
         company_id,
         start_time,
         end_time,
-        step_minutes,
-        statuses,
         limit,
         skip,
         require_assets=False,
+        depth_start=depth_start,
+        depth_end=depth_end,
     )
 
 
@@ -587,38 +580,15 @@ def run_dvd(
     company_id: Optional[int] = None,
     start_time: Optional[str] = None,
     end_time: Optional[str] = None,
-    step_minutes: Optional[int] = None,
-    statuses: Optional[str] = None,
     limit: Optional[int] = 1000,
     skip: Optional[int] = 0,
+    depth_start: Optional[float] = None,
+    depth_end: Optional[float] = None,
 ) -> ToolResult:
-    assets_result = get_assets(
-        context,
-        asset_ids=asset_ids,
-        company_id=company_id,
-        start_time=start_time,
-        end_time=end_time,
-        step_minutes=step_minutes,
-        statuses=statuses,
-        limit=limit,
-        skip=skip,
-    )
-    timelog_result = get_timelog_data(
-        context,
-        asset_ids=asset_ids,
-        company_id=company_id,
-        start_time=start_time,
-        end_time=end_time,
-        step_minutes=step_minutes,
-        statuses=statuses,
-        limit=limit,
-        skip=skip,
-    )
-
     dataset_payloads: Dict[str, Any] = {}
     dataset_metadata: Dict[str, Any] = {}
     dataset_command_names: List[str] = []
-    for meta in _dvd_dataset_metas():
+    for command_name, meta in _dvd_dataset_metas():
         requirement_groups = _dataset_requirement_groups(meta)
         time_field = _resolve_time_field(meta)
         depth_field = _resolve_depth_field(meta)
@@ -629,8 +599,8 @@ def run_dvd(
             company_id,
             start_time,
             end_time,
-            depth_start=None,
-            depth_end=None,
+            depth_start,
+            depth_end,
         )
         dataset_result = _run_dataset_query(
             meta.dataset,
@@ -639,33 +609,27 @@ def run_dvd(
             company_id,
             start_time,
             end_time,
-            step_minutes=step_minutes,
-            statuses=statuses,
             limit=limit,
             skip=skip,
             require_assets=False,
             provider_override=meta.provider,
             time_field=time_field,
             depth_field=depth_field,
+            depth_start=depth_start,
+            depth_end=depth_end,
         )
-        dataset_payloads[meta.dataset] = dataset_result.payload
-        dataset_metadata[meta.dataset] = dataset_result.metadata
-        dataset_slug = meta.slug or f"{meta.company_id}-{meta.dataset}"
-        dataset_command_names.append(f"dataset-{dataset_slug}")
+        dataset_payloads[command_name] = dataset_result.payload
+        dataset_metadata[command_name] = dataset_result.metadata
+        dataset_command_names.append(command_name)
 
     payload: Dict[str, Any] = {
-        "assets": assets_result.payload,
-        "timelog": timelog_result.payload,
         "datasets": dataset_payloads,
     }
     if context.verbose:
         payload["debug"] = {
-            "assets_metadata": assets_result.metadata,
-            "timelog_metadata": timelog_result.metadata,
             "datasets_metadata": dataset_metadata,
         }
-    command_list = ["assets", "timelog", *dataset_command_names]
-    return ToolResult(payload=payload, metadata={"commands": command_list})
+    return ToolResult(payload=payload, metadata={"commands": dataset_command_names})
 
 
 # ---------------------------------------------------------------------------
