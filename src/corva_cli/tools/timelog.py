@@ -428,8 +428,8 @@ def _run_dataset_query(
             raise ValueError("Asset ids must be integers.") from exc
 
     settings = get_settings()
-    dataset = dataset_name or settings.timelog_dataset
-    provider = provider_override or settings.timelog_provider
+    dataset = dataset_name or "drilling.timelog.data"
+    provider = provider_override or "corva"
     effective_time_field = time_field
     effective_depth_field = depth_field
     if effective_time_field is None or effective_depth_field is None:
@@ -439,16 +439,15 @@ def _run_dataset_query(
                 effective_time_field = _resolve_time_field(meta)
             if effective_depth_field is None:
                 effective_depth_field = _resolve_depth_field(meta)
-    effective_step = max(step_minutes or settings.timelog_step_minutes, 1)
+    effective_step = max(step_minutes or 60, 1)
     effective_limit = max(limit or 1000, 1)
     effective_skip = max(skip or 0, 0)
-    status_choices: List[str]
     if statuses:
         status_choices = [item.strip() for item in statuses.split(",") if item.strip()]
         if not status_choices:
-            status_choices = settings.timelog_statuses
+            status_choices = ["online", "maintenance", "offline"]
     else:
-        status_choices = settings.timelog_statuses
+        status_choices = ["online", "maintenance", "offline"]
 
     if bool(start_time) ^ bool(end_time):
         raise ValueError("Provide both start_time and end_time, or omit both.")
@@ -494,7 +493,7 @@ def _run_dataset_query(
             "step_minutes": effective_step,
             "statuses": status_choices,
             "limit": effective_limit,
-            "provider": settings.timelog_provider,
+            "provider": provider,
             "dataset": dataset,
             "window": (
                 {
