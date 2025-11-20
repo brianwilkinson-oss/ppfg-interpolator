@@ -104,6 +104,16 @@ uv run corva assets \
 
 To query any other Corva dataset owned by company 3, find its friendly name in `docs/dataset.json` and use the matching `dataset-<slug>` command. Time-indexed datasets require `--start-time/--end-time`; depth-indexed datasets require `--depth-start/--depth-end`.
 
+### Build a standalone binary
+
+Ship the CLI as a single executable (per platform) by running the helper script from the repo root:
+
+```bash
+./build_binary.sh
+```
+
+The script runs `uv sync` and then invokes `pyinstaller` via `uv run`, bundling `docs/dataset.json` and `groups/generated_groups.json` so dataset commands and generated group commands work offline. The resulting binary lands in `dist/corva` (or `corva.exe` on Windows). Copy it to your target machine, `chmod +x dist/corva`, and run it just like the Python version.
+
 ### Settings & Overrides
 
 Configuration lives in `src/corva_cli/settings.py` with sensible defaults:

@@ -15,6 +15,7 @@ from corva_cli.auth import AuthError, resolve_auth
 from corva_cli.datasets import DatasetMeta, load_corva_company_datasets
 from corva_cli.grouping import GroupConfigError, GroupItem, GroupSpec, load_groups
 from corva_cli.output import format_result, preview_plot
+from corva_cli.paths import get_project_root
 from corva_cli.tools.base import OutputFormat, ParameterSpec, ToolContext, ToolResult
 from corva_cli.tools.timelog import _dataset_requirement_groups, _ensure_dataset_requirements
 from corva_cli.tools.registry import load_builtin_tools, registry
@@ -149,7 +150,7 @@ def _parse_group_file(path: Path):
         raise typer.Exit(code=1) from exc
 
 
-DEFAULT_GROUPS_FILE = Path("groups/generated_groups.json")
+DEFAULT_GROUPS_FILE = get_project_root() / "groups" / "generated_groups.json"
 DATASET_FILTER_URL = "https://api.corva.ai/v2/datasets/filtered_by_apps"
 
 

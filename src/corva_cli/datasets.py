@@ -4,11 +4,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from functools import lru_cache
 import json
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from corva_cli.paths import get_project_root
 
-DATASET_FILE = Path(__file__).resolve().parents[2] / "docs" / "dataset.json"
+DATASET_FILE = get_project_root() / "docs" / "dataset.json"
 
 
 @dataclass(frozen=True)
