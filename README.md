@@ -8,7 +8,7 @@ CLI scaffold for Corva-style pluggable tools using Python 3.14, Typer, and optio
 | --- | --- |
 | `timelog` | Resolves `auto_*` windows (or uses a record limit) and proxies an aggregate pipeline to the Corva Data API for timelog entries. |
 | `assets` | Shares the same interface but queries the `assets` dataset for asset metadata. |
-| `dvd` | Group command that runs `assets`, `timelog`, and the curated dataset commands listed below (verbose shows metadata for each). |
+| `dvd` | Auto-generated group command (see `groups/generated_groups.json`) that runs the curated dataset list below and returns a combined JSON payload. |
 | `dataset-<name>` | Auto-generated per Corva company 3 dataset (e.g., `dataset-activities`, `dataset-directional-tool-face`). These commands accept `--asset-ids`, `--company-id`, `--start-time/--end-time`, `--depth-start/--depth-end`, or `--limit`/`--skip` in any combination. (Some datasets may still require specific filters in the future.) |
 
 Example:
@@ -39,10 +39,13 @@ The `dvd` command returns a payload shaped like `{"datasets": {...}}`. The `data
 - `well.design_optimization.timelog`
 - `composite.curves`
 - `assets`
+- `data.metrics` (the default `dvd` group invokes this with `metric_type=bha` and `metric_keys=[on_bottom_percentage, drilled_feet_rotary_percentage, drilled_feet_slide_percentage, rop]`)
 
 #### Dataset filter requirements
 
 Each dataset command inspects the index metadata stored in `docs/dataset.json` and enforces whichever filter combinations are supported by indexes on `asset_id`, `company_id`, `timestamp`/`start_time`, or `depth`. When you invoke a dataset (or the `dvd` group), the CLI lists the acceptable combinations (for example, `--asset-ids + --start-time/--end-time` or simply `--company-id`) and raises an error until you provide enough parameters to satisfy one of them. Depth-oriented datasets therefore require both `--depth-start` and `--depth-end`, while time-series datasets typically expect a time window together with asset identifiers.
+
+`dataset-data-metrics` also accepts `--metric-type` (maps to `data.type`) and `--metric-keys` (comma-separated list mapping to `data.key`). The `dvd` group uses `metric_type=bha` and the key list shown above, but you can override them when running the dataset command directly.
 
 ### Auto-generate groups
 

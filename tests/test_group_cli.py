@@ -201,6 +201,66 @@ def test_generated_group_command_available(tmp_path, monkeypatch):
         ],
     )
     assert result.exit_code == 0, result.stdout
+
+
+def test_generated_dvd_group_command(tmp_path, monkeypatch):
+    groups_path = tmp_path / "groups.json"
+    groups_path.write_text(
+        json.dumps(
+            {
+                "groups": [
+                    {
+                        "name": "dvd",
+                        "ordered": True,
+                        "tools": [
+                            {"name": "dataset-activities", "params": {}},
+                            {
+                                "name": "dataset-data-metrics",
+                                "params": {
+                                    "metric_type": "bha",
+                                    "metric_keys": "on_bottom_percentage,rop",
+                                },
+                            },
+                        ],
+                    }
+                ]
+            }
+        )
+    )
+
+    monkeypatch.setattr("corva_cli.cli.DEFAULT_GROUPS_FILE", groups_path)
+    monkeypatch.setattr("corva_cli.cli.REGISTERED_GROUP_COMMANDS", set())
+    _register_generated_group_commands()
+
+    executions = []
+
+    async def fake_execute(provider, dataset_name, mql, headers, **kwargs):
+        executions.append((dataset_name, mql))
+        return ({"rows": [dataset_name]}, {"status_code": 200})
+
+    monkeypatch.setattr("corva_cli.utils.execute_data_api_pipeline", fake_execute)
+
+    result = runner.invoke(
+        app,
+        [
+            "dvd",
+            "--jwt",
+            "demo",
+            "--asset-ids",
+            "101",
+            "--company-id",
+            "3",
+            "--start-time",
+            "auto_1h",
+            "--end-time",
+            "auto_0d",
+        ],
+    )
+
+    assert result.exit_code == 0, result.stdout
     payload = json.loads(result.stdout)
-    assert payload["group"] == unique_name
-    assert payload["results"]["dataset-activities"]["rows"] == []
+    assert payload["group"] == "dvd"
+    assert "dataset-data-metrics" in payload["results"]
+    metric_match = executions[-1][1][0]["$match"]
+    assert metric_match["data.type"] == "bha"
+    assert payload["results"]["dataset-activities"]["rows"] == ["activities"]

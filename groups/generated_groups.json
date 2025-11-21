@@ -1,6 +1,31 @@
 {
   "groups": [
     {
+      "name": "dvd",
+      "ordered": true,
+      "tools": [
+        { "name": "dataset-data-costs", "params": {} },
+        { "name": "dataset-data-afe", "params": {} },
+        { "name": "dataset-data-custom-curves", "params": {} },
+        { "name": "dataset-data-casing", "params": {} },
+        { "name": "dataset-data-drillstring", "params": {} },
+        { "name": "dataset-data-formations", "params": {} },
+        { "name": "dataset-data-well-sections", "params": {} },
+        { "name": "dataset-activity-groups", "params": {} },
+        { "name": "dataset-well-design-optimization", "params": {} },
+        { "name": "dataset-well-design-optimization-timelog", "params": {} },
+        { "name": "dataset-composite-curves", "params": {} },
+        { "name": "dataset-assets", "params": {} },
+        {
+          "name": "dataset-data-metrics",
+          "params": {
+            "metric_type": "bha",
+            "metric_keys": "on_bottom_percentage,drilled_feet_rotary_percentage,drilled_feet_slide_percentage,rop"
+          }
+        }
+      ]
+    },
+    {
       "name": "rig-activity",
       "ordered": true,
       "tools": [

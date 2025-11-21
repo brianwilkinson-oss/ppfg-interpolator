@@ -35,6 +35,7 @@ def _build_timelog_pipeline(
     skip: int,
     time_field: Optional[str] = None,
     depth_field: Optional[str] = None,
+    extra_filters: Optional[Dict[str, Any]] = None,
 ) -> List[Dict[str, Any]]:
     effective_time_field = time_field
     effective_depth_field = depth_field
@@ -55,6 +56,9 @@ def _build_timelog_pipeline(
     if depth_range and effective_depth_field:
         depth_start, depth_end = depth_range
         window_filter[effective_depth_field] = {"$gte": depth_start, "$lte": depth_end}
+    if extra_filters:
+        for key, value in extra_filters.items():
+            window_filter[key] = value
 
     stages: List[Dict[str, Any]] = [{"$match": window_filter}]
     if skip > 0:
@@ -190,22 +194,6 @@ ASSETS_PARAMETERS = [
 ]
 
 
-DVD_DATASET_COMMANDS: Tuple[str, ...] = (
-    "dataset-data-costs",
-    "dataset-data-afe",
-    "dataset-data-custom-curves",
-    "dataset-data-casing",
-    "dataset-data-drillstring",
-    "dataset-data-formations",
-    "dataset-data-well-sections",
-    "dataset-activity-groups",
-    "dataset-well-design-optimization",
-    "dataset-well-design-optimization-timelog",
-    "dataset-composite-curves",
-    "dataset-assets",
-)
-
-
 TIME_FIELD_OVERRIDES_BY_DATASET: Dict[str, Optional[str]] = {
     "activity-groups": "data.start_time",
     "well.design_optimization": "data.start_time",
@@ -221,28 +209,27 @@ TIME_FIELD_OVERRIDES_BY_SLUG: Dict[str, Optional[str]] = {
 }
 
 
-def _dvd_dataset_metas() -> List[Tuple[str, DatasetMeta]]:
-    metas = load_corva_company_datasets()
-    metas_by_slug = {meta.slug: meta for meta in metas}
-    missing: List[str] = []
-    resolved: List[Tuple[str, DatasetMeta]] = []
-    for command_name in DVD_DATASET_COMMANDS:
-        if not command_name.startswith("dataset-"):
-            missing.append(command_name)
-            continue
-        slug = command_name[len("dataset-") :]
-        meta = metas_by_slug.get(slug)
-        if not meta:
-            missing.append(command_name)
-            continue
-        resolved.append((command_name, meta))
-    if missing:
-        missing_list = ", ".join(missing)
-        raise ValueError(
-            f"Missing dataset metadata for dvd datasets: {missing_list}. "
-            "Update docs/dataset.json or adjust DVD_DATASET_COMMANDS."
+METRICS_PARAMETERS = [
+    ASSET_ID_OPTIONAL,
+    *_common_optionals(
+        ParameterSpec(
+            "company_id",
+            type=int,
+            help="Single company identifier",
+            required=False,
+            default=None,
+            callback=_require_company_when_no_assets,
         )
-    return resolved
+    ),
+    ParameterSpec(
+        "metric_type",
+        help="Metric type (maps to data.type)",
+    ),
+    ParameterSpec(
+        "metric_keys",
+        help="Comma-separated metric keys (maps to data.key)",
+    ),
+]
 
 
 @lru_cache()
@@ -419,6 +406,7 @@ def _run_dataset_query(
     provider_override: Optional[str] = None,
     time_field: Optional[str] = None,
     depth_field: Optional[str] = None,
+    extra_match: Optional[Dict[str, Any]] = None,
 ) -> ToolResult:
     asset_ids = asset_ids or ""
     raw_assets = [asset.strip() for asset in asset_ids.split(",") if asset.strip()]
@@ -459,6 +447,10 @@ def _run_dataset_query(
     depth_range = None
     if depth_start is not None and depth_end is not None:
         depth_range = (float(depth_start), float(depth_end))
+    if extra_match:
+        for key, value in extra_match.items():
+            window_filter_key = key  # placeholder for readability
+    # Wait: we need window_filter, but we only have it inside pipeline builder earlier. need restructure.
 
     pipeline = _build_timelog_pipeline(
         assets,
@@ -470,6 +462,7 @@ def _run_dataset_query(
         effective_skip,
         time_field=effective_time_field,
         depth_field=effective_depth_field,
+        extra_filters=extra_match,
     )
 
     (api_result, api_debug) = asyncio.run(
@@ -569,69 +562,6 @@ def get_assets(
     )
 
 
-@registry.tool(
-    name="dvd",
-    description="Convenience group that runs assets, timelog, and key dataset queries.",
-    parameters=TIMELOG_PARAMETERS,
-)
-def run_dvd(
-    context: ToolContext,
-    asset_ids: str,
-    company_id: Optional[int] = None,
-    start_time: Optional[str] = None,
-    end_time: Optional[str] = None,
-    limit: Optional[int] = 1000,
-    skip: Optional[int] = 0,
-    depth_start: Optional[float] = None,
-    depth_end: Optional[float] = None,
-) -> ToolResult:
-    dataset_payloads: Dict[str, Any] = {}
-    dataset_metadata: Dict[str, Any] = {}
-    dataset_command_names: List[str] = []
-    for command_name, meta in _dvd_dataset_metas():
-        requirement_groups = _dataset_requirement_groups(meta)
-        time_field = _resolve_time_field(meta)
-        depth_field = _resolve_depth_field(meta)
-        _ensure_dataset_requirements(
-            meta,
-            requirement_groups,
-            asset_ids,
-            company_id,
-            start_time,
-            end_time,
-            depth_start,
-            depth_end,
-        )
-        dataset_result = _run_dataset_query(
-            meta.dataset,
-            context,
-            asset_ids,
-            company_id,
-            start_time,
-            end_time,
-            limit=limit,
-            skip=skip,
-            require_assets=False,
-            provider_override=meta.provider,
-            time_field=time_field,
-            depth_field=depth_field,
-            depth_start=depth_start,
-            depth_end=depth_end,
-        )
-        dataset_payloads[command_name] = dataset_result.payload
-        dataset_metadata[command_name] = dataset_result.metadata
-        dataset_command_names.append(command_name)
-
-    payload: Dict[str, Any] = {
-        "datasets": dataset_payloads,
-    }
-    if context.verbose:
-        payload["debug"] = {
-            "datasets_metadata": dataset_metadata,
-        }
-    return ToolResult(payload=payload, metadata={"commands": dataset_command_names})
-
-
 # ---------------------------------------------------------------------------
 # Dataset-driven commands
 # ---------------------------------------------------------------------------
@@ -708,8 +638,12 @@ def _register_dataset_tools() -> None:
     if not metas:
         return
     used: Set[str] = set()
+    metrics_meta: Optional[DatasetMeta] = None
 
     for meta in metas:
+        if meta.dataset == "data.metrics":
+            metrics_meta = meta
+            continue
         slug = meta.slug or meta.name.split("#")[-1]
         command_name = f"dataset-{slug}"
         if command_name in used:
@@ -772,6 +706,75 @@ def _register_dataset_tools() -> None:
             description=meta.description or f"Corva dataset {meta.friendly_name}",
             parameters=params,
         )(make_callback(meta, requirement_groups, time_field, depth_field))
+
+    _register_metrics_tool(metrics_meta)
+
+
+def _register_metrics_tool(meta: Optional[DatasetMeta]) -> None:
+    dataset_name = meta.dataset if meta else "metrics"
+    provider = meta.provider if meta else "corva"
+    requirement_groups = _dataset_requirement_groups(meta) if meta else []
+    time_field = _resolve_time_field(meta) if meta else None
+    depth_field = _resolve_depth_field(meta) if meta else None
+    description = meta.description if meta else "Corva dataset data.metrics"
+
+    @registry.tool(
+        name="dataset-data-metrics",
+        description=description,
+        parameters=METRICS_PARAMETERS,
+    )
+    def dataset_data_metrics(
+        context: ToolContext,
+        asset_ids: str = "",
+        company_id: Optional[int] = None,
+        start_time: Optional[str] = None,
+        end_time: Optional[str] = None,
+        metric_type: Optional[str] = None,
+        metric_keys: Optional[str] = None,
+        limit: Optional[int] = 1000,
+        skip: Optional[int] = 0,
+        depth_start: Optional[float] = None,
+        depth_end: Optional[float] = None,
+    ) -> ToolResult:
+        if meta:
+            _ensure_dataset_requirements(
+                meta,
+                requirement_groups,
+                asset_ids,
+                company_id,
+                start_time,
+                end_time,
+                depth_start,
+                depth_end,
+            )
+        if not metric_type:
+            raise ValueError("Provide --metric-type for metrics.")
+        if not metric_keys:
+            raise ValueError("Provide --metric-keys for metrics.")
+        keys_list = [key.strip() for key in metric_keys.split(",") if key.strip()]
+        if not keys_list:
+            raise ValueError("Provide at least one metric key.")
+        extra_match = {
+            "data.type": metric_type,
+            "data.key": {"$in": keys_list},
+        }
+        return _run_dataset_query(
+            dataset_name,
+            context,
+            asset_ids,
+            company_id,
+            start_time,
+            end_time,
+            limit=limit,
+            skip=skip,
+            depth_start=depth_start,
+            depth_end=depth_end,
+            provider_override=provider,
+            require_assets=False,
+            time_field=time_field,
+            depth_field=depth_field,
+            extra_match=extra_match,
+        )
 
 
 _register_dataset_tools()
