@@ -37,6 +37,7 @@ The `dvd` command returns a payload shaped like `{"datasets": {...}}`. The `data
 - `activity-groups`
 - `well.design_optimization`
 - `well.design_optimization.timelog`
+- `wits.summary-30m`
 - `composite.curves`
 - `assets`
 - `data.metrics` (the default `dvd` group invokes this with `metric_type=bha` and `metric_keys=[on_bottom_percentage, drilled_feet_rotary_percentage, drilled_feet_slide_percentage, rop]`)
