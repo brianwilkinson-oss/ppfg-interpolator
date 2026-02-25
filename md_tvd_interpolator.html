@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPFG Interpolator — Corva-Style</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #14161e;
+  --bg-deep: #0e1017;
+  --surface: #1c1f2e;
+  --surface2: #252839;
+  --surface3: #2e3248;
+  --border: #353950;
+  --border-light: #444966;
+  --accent: #03dac6;
+  --accent-dim: rgba(3,218,198,.10);
+  --accent-glow: rgba(3,218,198,.25);
+  --blue: #5b8def;
+  --blue-dim: rgba(91,141,239,.12);
+  --green: #4caf50;
+  --green-dim: rgba(76,175,80,.10);
+  --orange: #ff9800;
+  --orange-dim: rgba(255,152,0,.10);
+  --red: #ef5350;
+  --red-dim: rgba(239,83,80,.10);
+  --purple: #b388ff;
+  --purple-dim: rgba(179,136,255,.10);
+  --yellow: #fdd835;
+  --text: #e8eaf6;
+  --text-secondary: #9fa8c7;
+  --muted: #6b7394;
+  --dim: #4a5070;
+  --r: 10px;
+  --r-sm: 6px;
+  --shadow: 0 2px 8px rgba(0,0,0,.3);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.4);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* ── Top Nav ── */
+.topnav{background:var(--bg-deep);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:52px;gap:16px}
+.topnav .logo{display:flex;align-items:center;gap:10px}
+.topnav .logo-icon{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--accent),#03a896);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:var(--bg-deep)}
+.topnav .logo-text{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.2px}
+.topnav .logo-tag{font-size:11px;color:var(--muted);font-weight:500;margin-left:4px;padding:2px 8px;background:var(--surface2);border-radius:20px}
+.topnav .nav-sep{width:1px;height:24px;background:var(--border)}
+.topnav .nav-item{color:var(--muted);font-size:13px;font-weight:500;cursor:default;padding:4px 10px;border-radius:6px;transition:.15s}
+.topnav .nav-item:hover{color:var(--text);background:var(--surface)}
+.topnav .nav-item.active{color:var(--accent)}
+.topnav .spacer{flex:1}
+.topnav .status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.topnav .status .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+
+/* ── Steps ribbon ── */
+.steps-ribbon{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto}
+.step-pill{display:flex;align-items:center;gap:8px;padding:12px 20px;font-size:12.5px;font-weight:600;color:var(--dim);cursor:default;position:relative;white-space:nowrap;transition:.15s}
+.step-pill .s-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:1.5px solid var(--border);color:var(--dim);transition:.15s}
+.step-pill.done .s-num{background:var(--green-dim);border-color:var(--green);color:var(--green)}
+.step-pill.done{color:var(--green)}
+.step-pill.active .s-num{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.step-pill.active{color:var(--text)}
+.step-pill.active::after{content:'';position:absolute;bottom:0;left:12px;right:12px;height:2px;background:var(--accent);border-radius:2px 2px 0 0}
+.step-pill .s-check{display:none;font-size:13px;color:var(--green)}
+.step-pill.done .s-check{display:inline}
+.step-pill.done .s-num{display:none}
+
+/* ── Layout ── */
+.app-body{display:flex;min-height:calc(100vh - 104px)}
+.sidebar{width:360px;min-width:360px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;max-height:calc(100vh - 104px)}
+.sidebar-section{padding:18px 20px;border-bottom:1px solid var(--border)}
+.sidebar-section:last-child{border-bottom:none}
+.main-content{flex:1;padding:20px;overflow-y:auto;max-height:calc(100vh - 104px);background:var(--bg)}
+
+/* ── Section titles ── */
+.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-title .sec-icon{font-size:14px}
+
+/* ── Upload zone ── */
+.upload-zone{border:1.5px dashed var(--border);border-radius:var(--r);padding:22px 14px;text-align:center;cursor:pointer;transition:.2s;background:var(--bg)}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--accent);background:var(--accent-dim)}
+.upload-zone.loaded{border-color:var(--green);border-style:solid;background:var(--green-dim)}
+.upload-zone input[type=file]{display:none}
+.upload-zone .uz-icon{font-size:28px;margin-bottom:2px;opacity:.6}
+.upload-zone .uz-text{font-size:12px;color:var(--muted)}
+.upload-zone .uz-file{font-size:12px;color:var(--green);margin-top:4px;font-weight:600;word-break:break-all}
+
+/* ── Form controls ── */
+label.ctrl-label{display:block;font-size:11px;color:var(--muted);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+select,input[type=number],input[type=text]{width:100%;background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 10px;color:var(--text);font-size:13px;font-family:inherit;margin-bottom:8px;outline:none;transition:.15s}
+select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim)}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--r-sm);border:none;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:.12s;letter-spacing:-.1px}
+.btn-primary{background:var(--accent);color:var(--bg-deep)}
+.btn-primary:hover{background:#00f0d6;box-shadow:0 0 16px var(--accent-glow)}
+.btn-primary:disabled{opacity:.3;cursor:not-allowed;box-shadow:none}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:#43a047}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{background:var(--surface2);border-color:var(--border-light)}
+.btn-orange{background:var(--orange);color:var(--bg-deep)}
+.btn-orange:hover{background:#ffa726}
+.btn-sm{padding:6px 12px;font-size:11.5px}
+.btn-block{width:100%}
+
+/* ── KPI cards ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.kpi{background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px;text-align:center}
+.kpi .kv{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .kl{font-size:10px;color:var(--muted);margin-top:1px;text-transform:uppercase;letter-spacing:.04em}
+
+/* ── Mapping row ── */
+.mrow{margin-bottom:6px}
+
+/* ── Main tabs ── */
+.main-tabs{display:flex;gap:2px;margin-bottom:16px;background:var(--surface);border-radius:var(--r);padding:3px;border:1px solid var(--border)}
+.main-tab{flex:1;padding:9px 10px;text-align:center;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;color:var(--dim);border:none;background:none;font-family:inherit;transition:.12s}
+.main-tab.on{background:var(--accent);color:var(--bg-deep)}
+.main-tab:not(.on):hover{color:var(--text);background:var(--surface2)}
+.tpane{display:none}
+.tpane.on{display:block}
+
+/* ── Table ── */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--surface2);padding:9px 10px;text-align:left;font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:2}
+td{padding:6px 10px;border-bottom:1px solid rgba(53,57,80,.4);font-variant-numeric:tabular-nums}
+tr:hover td{background:rgba(3,218,198,.02)}
+.twrap{overflow:auto;border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow)}
+.c-md{color:var(--blue)}
+.c-tvd{color:var(--accent)}
+.c-inc{color:var(--orange)}
+.c-pp{color:var(--purple)}
+.c-fg{color:var(--yellow)}
+
+/* ── Chart container ── */
+.chart-container{position:relative;height:500px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;box-shadow:var(--shadow)}
+
+/* ── Toolbar ── */
+.toolbar{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.toolbar .spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.chip-accent{background:var(--accent-dim);color:var(--accent)}
+.chip-green{background:var(--green-dim);color:var(--green)}
+.chip-blue{background:var(--blue-dim);color:var(--blue)}
+.chip-purple{background:var(--purple-dim);color:var(--purple)}
+
+/* ── Empty state ── */
+.empty-state{text-align:center;padding:80px 24px;color:var(--dim)}
+.empty-state .es-icon{font-size:48px;margin-bottom:8px;opacity:.3}
+.empty-state p{font-size:13px}
+
+/* ── Quick calc ── */
+.calc-row{display:flex;gap:8px;align-items:flex-end}
+.calc-row>div{flex:1}
+.calc-row .btn{margin-bottom:0;white-space:nowrap}
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.res-box{background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;text-align:center}
+.res-box .rv{font-size:22px;font-weight:700;margin:2px 0}
+.res-box .ru{color:var(--muted);font-size:11px}
+.res-box .rl{color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+.formula-box{background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;font-family:'JetBrains Mono','Fira Code','Consolas',monospace;font-size:12px;color:var(--accent);margin-top:8px;line-height:1.8}
+.station-info{background:var(--bg-deep);border-radius:var(--r-sm);padding:8px 12px;margin-top:8px;font-size:12px;color:var(--muted)}
+.station-info strong{color:var(--text)}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--accent);color:var(--accent);padding:12px 20px;border-radius:var(--r);font-size:13px;font-weight:600;z-index:200;transform:translateY(80px);opacity:0;transition:.3s;box-shadow:var(--shadow-lg)}
+.toast.on{transform:translateY(0);opacity:1}
+.toast.err{border-color:var(--red);color:var(--red)}
+
+/* ── PPFG Column chips in table header ── */
+th.th-pp{color:var(--purple)}
+th.th-fg{color:var(--yellow)}
+
+/* ── Units sub-header row ── */
+tr.units-row th{background:var(--surface);font-size:9.5px;font-weight:500;font-style:italic;color:var(--dim);padding:4px 10px;text-transform:none;letter-spacing:0;border-bottom:2px solid var(--border)}
+
+/* ── Responsive ── */
+@media(max-width:960px){
+  .app-body{flex-direction:column}
+  .sidebar{width:100%;min-width:0;max-height:none;border-right:none;border-bottom:1px solid var(--border)}
+  .main-content{max-height:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ TOP NAVIGATION ═══ -->
+<nav class="topnav">
+  <div class="logo">
+    <div class="logo-icon">P</div>
+    <span class="logo-text">PPFG Interpolator</span>
+    <span class="logo-tag">v2.0</span>
+  </div>
+  <div class="nav-sep"></div>
+  <span class="nav-item active">Well Plan &amp; PPFG</span>
+  <span class="spacer"></span>
+  <div class="status"><div class="dot" id="statusDot" style="background:var(--dim)"></div><span id="statusText">No data loaded</span></div>
+</nav>
+
+<!-- ═══ STEPS RIBBON ═══ -->
+<div class="steps-ribbon" id="stepsRibbon">
+  <div class="step-pill active" id="step1"><span class="s-num">1</span><span class="s-check">&#10003;</span> Well Plan</div>
+  <div class="step-pill" id="step2"><span class="s-num">2</span><span class="s-check">&#10003;</span> PPFG Document</div>
+  <div class="step-pill" id="step3"><span class="s-num">3</span><span class="s-check">&#10003;</span> Interpolate</div>
+</div>
+
+<div class="app-body">
+<!-- ═══ SIDEBAR ═══ -->
+<div class="sidebar">
+
+  <!-- STEP 1: Well Plan -->
+  <div class="sidebar-section">
+    <div class="sec-title"><span class="sec-icon">&#9883;</span> Step 1 — Well Plan / Survey</div>
+    <div class="upload-zone" id="zSurvey" onclick="document.getElementById('fSurvey').click()">
+      <input type="file" id="fSurvey" accept=".xlsx,.xls,.csv">
+      <div class="uz-icon">&#128209;</div>
+      <div class="uz-text">Drop well plan Excel / CSV here</div>
+      <div class="uz-file" id="fnSurvey"></div>
+    </div>
+    <div id="mapSurvey" style="display:none;margin-top:12px">
+      <div class="mrow"><label class="ctrl-label">Sheet</label><select id="sSheet" onchange="onSheetChange()"></select></div>
+      <div class="mrow"><label class="ctrl-label">Header Row</label><input type="number" id="sHdr" value="1" min="1" max="100" onchange="onSheetChange()"></div>
+      <div class="mrow"><label class="ctrl-label">MD Column</label><select id="cMD"></select></div>
+      <div class="mrow"><label class="ctrl-label">Inclination Column</label><select id="cInc"></select></div>
+      <div class="mrow"><label class="ctrl-label">Azimuth Column (optional)</label><select id="cAzm"></select></div>
+      <div class="mrow"><label class="ctrl-label">TVD Column</label><select id="cTVD"></select></div>
+      <button class="btn btn-primary btn-block" onclick="loadSurvey()">Load Survey</button>
+    </div>
+    <div id="surveyOk" style="display:none">
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kv" id="xN">-</div><div class="kl">Stations</div></div>
+        <div class="kpi"><div class="kv" id="xMD">-</div><div class="kl">Max MD</div></div>
+        <div class="kpi"><div class="kv" id="xTVD">-</div><div class="kl">Max TVD</div></div>
+        <div class="kpi"><div class="kv" id="xInc">-</div><div class="kl">Max Inc</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: PPFG Document -->
+  <div class="sidebar-section">
+    <div class="sec-title"><span class="sec-icon">&#128202;</span> Step 2 — PPFG Document</div>
+    <div class="upload-zone" id="zPpfg" onclick="document.getElementById('fPpfg').click()">
+      <input type="file" id="fPpfg" accept=".xlsx,.xls,.csv,.txt">
+      <div class="uz-icon">&#128200;</div>
+      <div class="uz-text">Drop PPFG Excel / CSV here</div>
+      <div class="uz-file" id="fnPpfg"></div>
+    </div>
+    <div id="mapPpfg" style="display:none;margin-top:12px">
+      <div class="mrow"><label class="ctrl-label">Sheet</label><select id="pSheet" onchange="onPpfgSheetChange()"></select></div>
+      <div class="mrow"><label class="ctrl-label">Header Row</label><input type="number" id="pHdr" value="1" min="1" max="100" onchange="onPpfgSheetChange()"></div>
+      <div class="mrow"><label class="ctrl-label">TVD Column</label><select id="pTvdCol"></select></div>
+      <div id="ppfgColList" style="margin-top:8px"></div>
+      <button class="btn btn-green btn-block" style="margin-top:8px" onclick="loadPpfgData()">Load PPFG Data</button>
+    </div>
+    <div id="ppfgOk" style="display:none">
+      <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="kpi"><div class="kv" id="xPRows">-</div><div class="kl">Rows</div></div>
+        <div class="kpi"><div class="kv" id="xPCols">-</div><div class="kl">Curves</div></div>
+        <div class="kpi"><div class="kv" id="xPRange">-</div><div class="kl">TVD Range</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: Interpolate -->
+  <div class="sidebar-section">
+    <div class="sec-title"><span class="sec-icon">&#9881;</span> Step 3 — Interpolate MDs</div>
+    <button class="btn btn-primary btn-block" id="btnInterp" onclick="runInterpolation()" disabled>Interpolate Measured Depths</button>
+    <div id="interpOk" style="display:none;margin-top:10px">
+      <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr)">
+        <div class="kpi"><div class="kv c-tvd" id="xIRows">-</div><div class="kl">Depths</div></div>
+        <div class="kpi"><div class="kv c-md" id="xIMDR">-</div><div class="kl">MD Range</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Lookup -->
+  <div class="sidebar-section">
+    <div class="sec-title"><span class="sec-icon">&#128269;</span> Quick TVD &rarr; MD Lookup</div>
+    <div class="calc-row">
+      <div>
+        <label class="ctrl-label">TVD (ft)</label>
+        <input type="number" id="qIn" step="any" placeholder="e.g. 14000" style="margin:0">
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="calcOne()" style="margin-bottom:0">Calc</button>
+    </div>
+    <div id="qOut" style="display:none">
+      <div class="res-grid">
+        <div class="res-box"><div class="rl">Interp. MD</div><div class="rv c-md" id="qMD">-</div><div class="ru">ft</div></div>
+        <div class="res-box"><div class="rl">Station Inc</div><div class="rv c-inc" id="qInc">-</div><div class="ru">deg</div></div>
+      </div>
+      <div class="station-info" id="qStn"></div>
+      <div class="formula-box" id="qForm"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ MAIN CONTENT ═══ -->
+<div class="main-content">
+  <div class="main-tabs">
+    <button class="main-tab on" onclick="goTab('pChart')">Well Profile</button>
+    <button class="main-tab" onclick="goTab('pSurvey')">Survey Table</button>
+    <button class="main-tab" onclick="goTab('pPpfg')">PPFG Data</button>
+    <button class="main-tab" onclick="goTab('pResults')">Export Results</button>
+  </div>
+
+  <!-- Well Profile Chart -->
+  <div id="pChart" class="tpane on">
+    <div id="eChart" class="empty-state"><div class="es-icon">&#128200;</div><p>Load a well plan to view the MD vs TVD profile</p></div>
+    <div id="aChart" style="display:none">
+      <div class="toolbar"><span class="chip chip-accent" id="bChart">-</span><span class="spacer"></span></div>
+      <div class="chart-container"><canvas id="cvs"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Survey Table -->
+  <div id="pSurvey" class="tpane">
+    <div id="eSurvey" class="empty-state"><div class="es-icon">&#128203;</div><p>No survey loaded yet</p></div>
+    <div id="aSurvey" style="display:none">
+      <div class="toolbar">
+        <span class="chip chip-accent" id="bSurvey">-</span><span class="spacer"></span>
+        <button class="btn btn-outline btn-sm" onclick="expSurveyCSV()">Export CSV</button>
+      </div>
+      <div class="twrap" style="max-height:calc(100vh - 260px)">
+        <table><thead>
+          <tr><th>#</th><th>MD</th><th>Inc</th><th>Azm</th><th>TVD</th></tr>
+          <tr class="units-row"><th></th><th>FT</th><th>deg</th><th>deg</th><th>FT</th></tr>
+        </thead>
+        <tbody id="tbSurvey"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PPFG Data -->
+  <div id="pPpfg" class="tpane">
+    <div id="ePpfg" class="empty-state"><div class="es-icon">&#128202;</div><p>Import a PPFG document to view pressure &amp; gradient data</p></div>
+    <div id="aPpfg" style="display:none">
+      <div class="toolbar">
+        <span class="chip chip-purple" id="bPpfg">-</span><span class="spacer"></span>
+        <button class="btn btn-outline btn-sm" onclick="expPpfgCSV()">Export PPFG CSV</button>
+      </div>
+      <!-- Sub-tabs: table and chart -->
+      <div class="main-tabs" style="margin-bottom:12px">
+        <button class="main-tab on" onclick="goPpfgSub('ppfgTable')">Data Table</button>
+        <button class="main-tab" onclick="goPpfgSub('ppfgChart')">Pressure Plot</button>
+      </div>
+      <div id="ppfgTable" class="tpane on">
+        <div class="twrap" style="max-height:calc(100vh - 340px)">
+          <table id="tblPpfg"><thead id="thPpfg"></thead><tbody id="tbPpfg"></tbody></table>
+        </div>
+      </div>
+      <div id="ppfgChart" class="tpane">
+        <div class="chart-container" style="height:550px"><canvas id="cvsPpfg"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Results -->
+  <div id="pResults" class="tpane">
+    <div id="eResults" class="empty-state"><div class="es-icon">&#128290;</div><p>Complete all 3 steps to see interpolation results</p></div>
+    <div id="aResults" style="display:none">
+      <div class="toolbar">
+        <span class="chip chip-green" id="bResults">-</span><span class="spacer"></span>
+        <button class="btn btn-outline btn-sm" onclick="expResultsCSV()">Export CSV</button>
+        <button class="btn btn-orange btn-sm" onclick="expResultsXLSX()">Export Excel</button>
+      </div>
+      <div class="twrap" style="max-height:calc(100vh - 260px)">
+        <table id="tblResults"><thead id="thResults"></thead><tbody id="tbResults"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════
+   State
+   ═══════════════════════════════════════════ */
+let survey = [];
+let surveyByMD = [];
+let ppfgData = [];
+let ppfgCols = [];
+let ppfgTvdUnit = 'FT';
+let results = [];
+let wbSurvey = null;
+let wbPpfg = null;
+let chart = null;
+let ppfgChart = null;
+
+/* ═══════════════════════════════════════════
+   File Upload Wiring
+   ═══════════════════════════════════════════ */
+function wire(zoneId, inputId, cb) {
+  const z = document.getElementById(zoneId);
+  const f = document.getElementById(inputId);
+  z.addEventListener('dragover', e => { e.preventDefault(); z.classList.add('dragover'); });
+  z.addEventListener('dragleave', () => z.classList.remove('dragover'));
+  z.addEventListener('drop', e => {
+    e.preventDefault(); z.classList.remove('dragover');
+    if (e.dataTransfer.files.length) { f.files = e.dataTransfer.files; cb(e.dataTransfer.files[0]); }
+  });
+  f.addEventListener('change', () => { if (f.files.length) cb(f.files[0]); });
+}
+wire('zSurvey', 'fSurvey', onSurveyFile);
+wire('zPpfg', 'fPpfg', onPpfgFile);
+
+function readFile(file, cb) {
+  const r = new FileReader();
+  const isCSV = /\.(csv|txt)$/i.test(file.name);
+  r.onload = e => {
+    const wb = isCSV
+      ? XLSX.read(e.target.result, { type: 'string' })
+      : XLSX.read(e.target.result, { type: 'array' });
+    cb(wb);
+  };
+  isCSV ? r.readAsText(file) : r.readAsArrayBuffer(file);
+}
+
+/* ═══════════════════════════════════════════
+   Step 1: Well Plan
+   ═══════════════════════════════════════════ */
+function onSurveyFile(file) {
+  document.getElementById('fnSurvey').textContent = file.name;
+  document.getElementById('zSurvey').classList.add('loaded');
+  readFile(file, wb => {
+    wbSurvey = wb;
+    const sel = document.getElementById('sSheet');
+    sel.innerHTML = wb.SheetNames.map(n => `<option>${n}</option>`).join('');
+    const pref = wb.SheetNames.find(n => /survey|basic|plan|100ft|traj|direct/i.test(n));
+    if (pref) sel.value = pref;
+    show('mapSurvey');
+    onSheetChange();
+  });
+}
+
+function onSheetChange() {
+  const hdrs = getHeaders(wbSurvey, document.getElementById('sSheet').value, +document.getElementById('sHdr').value || 1);
+  fillSel('cMD', hdrs, ['md', 'measured depth', 'measured']);
+  fillSel('cInc', hdrs, ['inc', 'incl', 'inclination']);
+  fillSel('cAzm', hdrs, ['azm', 'azim', 'azimuth'], true);
+  fillSel('cTVD', hdrs, ['tvd', 'true vertical', 'vertical depth']);
+}
+
+function loadSurvey() {
+  const sh = document.getElementById('sSheet').value;
+  const hr = +document.getElementById('sHdr').value || 1;
+  const iMD = +document.getElementById('cMD').value;
+  const iInc = +document.getElementById('cInc').value;
+  const iAzm = document.getElementById('cAzm').value;
+  const iTVD = +document.getElementById('cTVD').value;
+  if (isNaN(iMD) || isNaN(iInc) || isNaN(iTVD)) { toast('Select MD, Inc, and TVD columns', true); return; }
+
+  const ws = wbSurvey.Sheets[sh];
+  const rng = XLSX.utils.decode_range(ws['!ref']);
+  const raw = [];
+  for (let r = hr; r <= rng.e.r; r++) {
+    const md = cellNum(ws, r, iMD);
+    const inc = cellNum(ws, r, iInc);
+    const azm = iAzm !== '' ? cellNum(ws, r, +iAzm) : 0;
+    const tvd = cellNum(ws, r, iTVD);
+    if (md == null || inc == null || tvd == null) continue;
+    raw.push({ md, inc, azm: azm || 0, tvd });
+  }
+  raw.sort((a, b) => a.md - b.md);
+  const seen = new Set();
+  surveyByMD = raw.filter(s => { if (seen.has(s.md)) return false; seen.add(s.md); return true; });
+  survey = [...surveyByMD].sort((a, b) => a.tvd - b.tvd);
+
+  if (survey.length < 2) { toast('Need at least 2 survey stations', true); return; }
+
+  const n = survey.length;
+  show('surveyOk');
+  document.getElementById('xN').textContent = n;
+  document.getElementById('xMD').textContent = fmt0(surveyByMD[surveyByMD.length - 1].md);
+  document.getElementById('xTVD').textContent = fmt0(survey[survey.length - 1].tvd);
+  document.getElementById('xInc').textContent = Math.max(...survey.map(s => s.inc)).toFixed(1) + '\u00B0';
+
+  document.getElementById('tbSurvey').innerHTML = surveyByMD.map((s, i) =>
+    `<tr><td>${i+1}</td><td>${s.md.toFixed(2)}</td><td>${s.inc.toFixed(2)}</td><td>${s.azm.toFixed(2)}</td><td>${s.tvd.toFixed(3)}</td></tr>`
+  ).join('');
+  show('aSurvey'); hide('eSurvey');
+  document.getElementById('bSurvey').textContent = n + ' stations';
+
+  drawChart();
+  show('aChart'); hide('eChart');
+  document.getElementById('bChart').textContent = n + ' stations';
+
+  markStep(1, 'done');
+  markStep(2, 'active');
+  updateStatus('Survey loaded', true);
+  checkReady();
+  toast(`Loaded ${n} survey stations`);
+}
+
+/* ═══════════════════════════════════════════
+   Step 2: PPFG Document
+   ═══════════════════════════════════════════ */
+function onPpfgFile(file) {
+  document.getElementById('fnPpfg').textContent = file.name;
+  document.getElementById('zPpfg').classList.add('loaded');
+  readFile(file, wb => {
+    wbPpfg = wb;
+    const sel = document.getElementById('pSheet');
+    sel.innerHTML = wb.SheetNames.map(n => `<option>${n}</option>`).join('');
+    const pref = wb.SheetNames.find(n => /dep|ppfg|pore|frac|pressure/i.test(n));
+    if (pref) sel.value = pref;
+    show('mapPpfg');
+    onPpfgSheetChange();
+  });
+}
+
+function onPpfgSheetChange() {
+  const hdrs = getHeaders(wbPpfg, document.getElementById('pSheet').value, +document.getElementById('pHdr').value || 1);
+  fillSel('pTvdCol', hdrs, ['tvd', 'tvdkb', 'true vertical', 'vertical depth']);
+
+  const list = document.getElementById('ppfgColList');
+  const ppfgPatterns = ['ppg', 'fg', 'bhs', 'obg', 'pp_', 'fp_', 'seawater', 'mw', 'mud'];
+  const matched = hdrs.filter(h => {
+    const l = h.lbl.toLowerCase();
+    return ppfgPatterns.some(p => l.includes(p)) || /^(pp|fg|fracture|pore|gradient|overburden|mud)/i.test(l);
+  });
+
+  if (matched.length > 0) {
+    list.innerHTML = `<label class="ctrl-label" style="margin-bottom:6px">Detected PPFG Columns (${matched.length})</label>` +
+      `<div style="max-height:100px;overflow-y:auto;font-size:11px;color:var(--text-secondary);line-height:1.8;background:var(--bg-deep);border-radius:var(--r-sm);padding:6px 10px;border:1px solid var(--border)">`+
+      matched.map(h => `<span style="color:var(--purple)">${h.letter}</span>: ${h.lbl}`).join('<br>') +
+      `</div>`;
+  } else {
+    list.innerHTML = `<div style="font-size:11px;color:var(--muted);padding:4px 0">All non-TVD numeric columns will be imported as pressure/gradient data.</div>`;
+  }
+}
+
+function loadPpfgData() {
+  const sh = document.getElementById('pSheet').value;
+  const hr = +document.getElementById('pHdr').value || 1;
+  const iTvd = +document.getElementById('pTvdCol').value;
+  if (isNaN(iTvd)) { toast('Select the TVD column', true); return; }
+
+  const ws = wbPpfg.Sheets[sh];
+  const rng = XLSX.utils.decode_range(ws['!ref']);
+
+  const allHdrs = getHeaders(wbPpfg, sh, hr);
+  ppfgCols = [];
+  for (const h of allHdrs) {
+    if (h.c === iTvd) continue;
+    const l = h.lbl.toLowerCase();
+    if (/unit|date|well|name|api|operator|field/i.test(l)) continue;
+    ppfgCols.push({ c: h.c, name: h.lbl, unit: '' });
+  }
+
+  // Check the row immediately after headers for a units row (FT, ppg, psi, etc.)
+  let unitsRow = null;
+  const unitCheck = cellStr(ws, hr, iTvd);
+  const unitCheck2 = ppfgCols.length > 0 ? cellStr(ws, hr, ppfgCols[0].c) : null;
+  const isUnitsRow = (unitCheck && /^(ft|ppg|psi|sg|kpa|bar|m|deg|degrees)$/i.test(unitCheck.trim())) ||
+                     (unitCheck2 && /^(ft|ppg|psi|sg|kpa|bar|m|deg|degrees)$/i.test(unitCheck2.trim()));
+  if (isUnitsRow) {
+    unitsRow = hr;
+    ppfgTvdUnit = (cellStr(ws, hr, iTvd) || 'FT').trim();
+    for (const col of ppfgCols) {
+      const u = cellStr(ws, hr, col.c);
+      col.unit = u ? u.trim() : '';
+    }
+  } else {
+    ppfgTvdUnit = 'FT';
+  }
+
+  ppfgData = [];
+  const startRow = unitsRow != null ? hr + 1 : hr;
+  for (let r = startRow; r <= rng.e.r; r++) {
+    const tvd = cellNum(ws, r, iTvd);
+    if (tvd == null || tvd <= 0) continue;
+
+    // Skip rows where all PPFG values are null/zero (trailing empty rows)
+    let hasData = false;
+    const row = { tvd };
+    for (const col of ppfgCols) {
+      const v = cellNum(ws, r, col.c);
+      row[col.name] = v;
+      if (v != null && v !== 0) hasData = true;
+    }
+    if (!hasData) continue;
+
+    ppfgData.push(row);
+  }
+
+  if (ppfgData.length === 0) { toast('No valid PPFG rows found', true); return; }
+
+  show('ppfgOk');
+  document.getElementById('xPRows').textContent = ppfgData.length;
+  document.getElementById('xPCols').textContent = ppfgCols.length;
+  const tvds = ppfgData.map(r => r.tvd);
+  document.getElementById('xPRange').textContent = fmt0(Math.min(...tvds)) + '–' + fmt0(Math.max(...tvds));
+
+  renderPpfgTable();
+  renderPpfgChart();
+  show('aPpfg'); hide('ePpfg');
+  document.getElementById('bPpfg').textContent = ppfgData.length + ' rows, ' + ppfgCols.length + ' curves';
+
+  markStep(2, 'done');
+  markStep(3, 'active');
+  updateStatus('PPFG loaded', true);
+  checkReady();
+  toast(`Loaded ${ppfgData.length} PPFG rows with ${ppfgCols.length} curves`);
+}
+
+function renderPpfgTable() {
+  const isPP = name => /ppg|pp_|pore|mud|mw/i.test(name);
+  const isFG = name => /fg|frac|lot|obg|bhs|seawater|fp_/i.test(name);
+
+  let hdrRow = '<tr><th>#</th><th>TVD</th>' +
+    ppfgCols.map(c => {
+      const cls = isPP(c.name) ? 'th-pp' : isFG(c.name) ? 'th-fg' : '';
+      return `<th class="${cls}">${c.name}</th>`;
+    }).join('') + '</tr>';
+
+  let unitsRowHtml = '<tr class="units-row"><th></th><th>' + ppfgTvdUnit + '</th>' +
+    ppfgCols.map(c => `<th>${c.unit || ''}</th>`).join('') + '</tr>';
+
+  document.getElementById('thPpfg').innerHTML = hdrRow + unitsRowHtml;
+
+  document.getElementById('tbPpfg').innerHTML = ppfgData.map((r, i) => {
+    let html = `<tr><td>${i+1}</td><td class="c-tvd">${r.tvd.toFixed(2)}</td>`;
+    for (const c of ppfgCols) {
+      const v = r[c.name];
+      const cls = isPP(c.name) ? 'c-pp' : isFG(c.name) ? 'c-fg' : '';
+      html += `<td class="${cls}">${v != null ? v.toFixed(4) : ''}</td>`;
+    }
+    return html + '</tr>';
+  }).join('');
+}
+
+function renderPpfgChart() {
+  const ctx = document.getElementById('cvsPpfg').getContext('2d');
+  if (ppfgChart) ppfgChart.destroy();
+
+  const palette = ['#b388ff','#fdd835','#ef5350','#4caf50','#5b8def','#ff9800','#03dac6','#e91e63','#00bcd4','#8bc34a','#ff5722','#9c27b0','#607d8b'];
+  const datasets = ppfgCols.map((c, idx) => {
+    const data = ppfgData.filter(r => r[c.name] != null && r[c.name] > -900).map(r => ({ x: r[c.name], y: r.tvd }));
+    return {
+      label: c.name,
+      data,
+      borderColor: palette[idx % palette.length],
+      backgroundColor: 'transparent',
+      borderWidth: 1.2,
+      pointRadius: 0,
+      tension: .1,
+      hidden: idx > 6
+    };
+  });
+
+  ppfgChart = new Chart(ctx, {
+    type: 'line',
+    data: { datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'nearest', intersect: false },
+      plugins: {
+        legend: { position: 'right', labels: { color: '#9fa8c7', font: { size: 10, family: 'Inter' }, boxWidth: 12, padding: 8 } },
+        tooltip: { backgroundColor: '#1c1f2e', titleColor: '#e8eaf6', bodyColor: '#e8eaf6', borderColor: '#353950', borderWidth: 1 }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Pressure / Gradient (ppg)', color: '#9fa8c7' }, grid: { color: 'rgba(53,57,80,.4)' }, ticks: { color: '#9fa8c7' } },
+        y: { reverse: true, title: { display: true, text: 'TVD (ft)', color: '#9fa8c7' }, grid: { color: 'rgba(53,57,80,.4)' }, ticks: { color: '#9fa8c7' } }
+      }
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════
+   Step 3: Interpolation
+   ═══════════════════════════════════════════ */
+function checkReady() {
+  const ready = survey.length >= 2 && ppfgData.length > 0;
+  document.getElementById('btnInterp').disabled = !ready;
+}
+
+function runInterpolation() {
+  if (survey.length < 2) { toast('Load a well plan first (Step 1)', true); return; }
+  if (ppfgData.length === 0) { toast('Load PPFG data first (Step 2)', true); return; }
+
+  results = [];
+  for (const row of ppfgData) {
+    const res = interpTVDtoMD(row.tvd);
+    if (!res) continue;
+    const entry = { tvd: row.tvd, md: res.md, inc: res.inc, sMD: res.sMD, sTVD: res.sTVD };
+    for (const c of ppfgCols) {
+      entry[c.name] = row[c.name];
+    }
+    results.push(entry);
+  }
+
+  if (results.length === 0) { toast('No valid interpolation results', true); return; }
+
+  renderResults();
+  updateChartPoints();
+
+  show('interpOk');
+  document.getElementById('xIRows').textContent = results.length;
+  const mds = results.map(r => r.md);
+  document.getElementById('xIMDR').textContent = fmt0(Math.min(...mds)) + '–' + fmt0(Math.max(...mds));
+
+  markStep(3, 'done');
+  updateStatus('Interpolation complete', true);
+  goTab('pResults');
+  toast(`Interpolated ${results.length} depths with PPFG data`);
+}
+
+/* ═══════════════════════════════════════════
+   Interpolation Engine
+   ═══════════════════════════════════════════ */
+function interpTVDtoMD(tvd) {
+  let stn = survey[0];
+  for (const s of survey) {
+    if (s.tvd <= tvd) stn = s;
+    else break;
+  }
+  const cosI = Math.cos(stn.inc * Math.PI / 180);
+  if (Math.abs(cosI) < 1e-10) return null;
+  const md = (tvd - stn.tvd) / cosI + stn.md;
+  return { tvd, md, inc: stn.inc, sMD: stn.md, sTVD: stn.tvd };
+}
+
+/* ═══════════════════════════════════════════
+   Quick Lookup
+   ═══════════════════════════════════════════ */
+function calcOne() {
+  if (survey.length < 2) { toast('Load a well plan first', true); return; }
+  const v = parseFloat(document.getElementById('qIn').value);
+  if (isNaN(v)) { toast('Enter a TVD value', true); return; }
+  const r = interpTVDtoMD(v);
+  if (!r) { toast('Out of range', true); return; }
+
+  show('qOut');
+  document.getElementById('qMD').textContent = r.md.toFixed(3);
+  document.getElementById('qInc').textContent = r.inc.toFixed(2);
+  document.getElementById('qStn').innerHTML =
+    `Bracketing station: MD = <strong>${r.sMD.toFixed(2)}</strong> ft, TVD = <strong>${r.sTVD.toFixed(3)}</strong> ft, Inc = <strong>${r.inc.toFixed(2)}</strong>&deg;`;
+  document.getElementById('qForm').innerHTML =
+    `MD = (TVD &minus; TVD<sub>stn</sub>) / cos(Inc) + MD<sub>stn</sub><br>` +
+    `MD = (${v.toFixed(2)} &minus; ${r.sTVD.toFixed(3)}) / cos(${r.inc.toFixed(2)}&deg;) + ${r.sMD.toFixed(2)}<br>` +
+    `<strong style="color:var(--accent)">MD = ${r.md.toFixed(3)} ft</strong>`;
+}
+document.getElementById('qIn').addEventListener('keydown', e => { if (e.key === 'Enter') calcOne(); });
+
+/* ═══════════════════════════════════════════
+   Results Rendering
+   ═══════════════════════════════════════════ */
+function renderResults() {
+  const isPP = name => /ppg|pp_|pore|mud|mw/i.test(name);
+  const isFG = name => /fg|frac|lot|obg|bhs|seawater|fp_/i.test(name);
+
+  let hdrRow = '<tr><th>#</th><th>Depth</th><th>TVDKB</th><th>Inc</th>' +
+    ppfgCols.map(c => {
+      const cls = isPP(c.name) ? 'th-pp' : isFG(c.name) ? 'th-fg' : '';
+      return `<th class="${cls}">${c.name}</th>`;
+    }).join('') + '<th>Stn MD</th><th>Stn TVD</th></tr>';
+
+  let unitsRowHtml = '<tr class="units-row"><th></th><th>FT</th><th>' + ppfgTvdUnit + '</th><th>deg</th>' +
+    ppfgCols.map(c => `<th>${c.unit || ''}</th>`).join('') + '<th>FT</th><th>FT</th></tr>';
+
+  document.getElementById('thResults').innerHTML = hdrRow + unitsRowHtml;
+
+  document.getElementById('tbResults').innerHTML = results.map((r, i) => {
+    let html = `<tr><td>${i+1}</td><td class="c-md">${r.md.toFixed(3)}</td><td class="c-tvd">${r.tvd.toFixed(2)}</td><td class="c-inc">${r.inc.toFixed(2)}</td>`;
+    for (const c of ppfgCols) {
+      const v = r[c.name];
+      const cls = isPP(c.name) ? 'c-pp' : isFG(c.name) ? 'c-fg' : '';
+      html += `<td class="${cls}">${v != null ? v.toFixed(4) : ''}</td>`;
+    }
+    html += `<td>${r.sMD.toFixed(2)}</td><td>${r.sTVD.toFixed(3)}</td></tr>`;
+    return html;
+  }).join('');
+
+  show('aResults'); hide('eResults');
+  document.getElementById('bResults').textContent = results.length + ' results';
+}
+
+/* ═══════════════════════════════════════════
+   Chart
+   ═══════════════════════════════════════════ */
+function drawChart() {
+  const ctx = document.getElementById('cvs').getContext('2d');
+  if (chart) chart.destroy();
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      datasets: [
+        {
+          label: 'Well Plan (MD vs TVD)', data: surveyByMD.map(s => ({ x: s.md, y: s.tvd })),
+          borderColor: 'var(--accent)', backgroundColor: 'rgba(3,218,198,.06)', borderWidth: 1.5,
+          pointRadius: 0, fill: true, tension: .1
+        },
+        {
+          label: 'Interpolated Points', data: [],
+          borderColor: 'transparent', backgroundColor: '#ff9800',
+          pointRadius: 4, pointStyle: 'circle', showLine: false
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'nearest', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#9fa8c7', font: { size: 11, family: 'Inter' } } },
+        tooltip: {
+          backgroundColor: '#1c1f2e', titleColor: '#e8eaf6', bodyColor: '#e8eaf6',
+          borderColor: '#353950', borderWidth: 1,
+          callbacks: { label: c => `MD: ${c.raw.x.toFixed(1)} ft | TVD: ${c.raw.y.toFixed(1)} ft` }
+        }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Measured Depth (ft)', color: '#9fa8c7' }, grid: { color: 'rgba(53,57,80,.4)' }, ticks: { color: '#9fa8c7' } },
+        y: { title: { display: true, text: 'True Vertical Depth (ft)', color: '#9fa8c7' }, grid: { color: 'rgba(53,57,80,.4)' }, ticks: { color: '#9fa8c7' } }
+      }
+    }
+  });
+}
+
+function updateChartPoints() {
+  if (!chart) return;
+  chart.data.datasets[1].data = results.map(r => ({ x: r.md, y: r.tvd }));
+  chart.update();
+}
+
+/* ═══════════════════════════════════════════
+   Export
+   ═══════════════════════════════════════════ */
+function expSurveyCSV() {
+  dl('MD,Inc,Azm,TVD\n' + surveyByMD.map(s => `${s.md},${s.inc},${s.azm},${s.tvd}`).join('\n'), 'survey.csv', 'text/csv');
+}
+
+function expPpfgCSV() {
+  const hdr = ['TVD', ...ppfgCols.map(c => c.name)].join(',');
+  const units = [ppfgTvdUnit, ...ppfgCols.map(c => c.unit || '')].join(',');
+  const rows = ppfgData.map(r => [r.tvd, ...ppfgCols.map(c => r[c.name] ?? '')].join(',')).join('\n');
+  dl(hdr + '\n' + units + '\n' + rows, 'ppfg_data.csv', 'text/csv');
+}
+
+function expResultsCSV() {
+  const hdr = ['Depth', 'TVDKB', ...ppfgCols.map(c => c.name)].join(',');
+  const units = ['FT', ppfgTvdUnit, ...ppfgCols.map(c => c.unit || '')].join(',');
+  const rows = results.map(r => [r.md, r.tvd, ...ppfgCols.map(c => r[c.name] ?? '')].join(',')).join('\n');
+  dl(hdr + '\n' + units + '\n' + rows, 'ppfg_interpolated.csv', 'text/csv');
+}
+
+function expResultsXLSX() {
+  const header = ['Depth', 'TVDKB', ...ppfgCols.map(c => c.name), 'Inc', 'Station_MD', 'Station_TVD'];
+  const units = ['FT', ppfgTvdUnit, ...ppfgCols.map(c => c.unit || ''), 'deg', 'FT', 'FT'];
+  const rows = [header, units];
+  results.forEach(r => {
+    rows.push([r.md, r.tvd, ...ppfgCols.map(c => r[c.name] ?? ''), r.inc, r.sMD, r.sTVD]);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = header.map(() => ({ wch: 16 }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'PPFG Interpolated');
+  XLSX.writeFile(wb, 'ppfg_interpolated.xlsx');
+}
+
+function dl(txt, name, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], { type }));
+  a.download = name;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+/* ═══════════════════════════════════════════
+   Utilities
+   ═══════════════════════════════════════════ */
+function getHeaders(wb, sheet, hdrRow) {
+  const ws = wb.Sheets[sheet];
+  if (!ws) return [];
+  const rng = XLSX.utils.decode_range(ws['!ref']);
+  const out = [];
+  for (let c = rng.s.c; c <= rng.e.c; c++) {
+    const a = XLSX.utils.encode_cell({ r: hdrRow - 1, c });
+    const cell = ws[a];
+    const lbl = cell ? String(cell.v || '').trim() : '';
+    out.push({ c, lbl: lbl || `Col ${XLSX.utils.encode_col(c)}`, letter: XLSX.utils.encode_col(c) });
+  }
+  return out;
+}
+
+function fillSel(id, hdrs, pats, optional) {
+  const sel = document.getElementById(id);
+  sel.innerHTML = optional ? '<option value="">-- None --</option>' : '<option value="">-- Select --</option>';
+  hdrs.forEach(h => { const o = document.createElement('option'); o.value = h.c; o.textContent = `${h.letter}: ${h.lbl}`; sel.appendChild(o); });
+  if (pats) {
+    const lp = pats.map(p => p.toLowerCase());
+    for (const h of hdrs) {
+      const l = h.lbl.toLowerCase();
+      if (lp.some(p => l.includes(p) || l === p)) { sel.value = h.c; break; }
+    }
+  }
+}
+
+function cellNum(ws, r, c) {
+  const a = XLSX.utils.encode_cell({ r, c });
+  const cell = ws[a];
+  if (!cell) return null;
+  const v = typeof cell.v === 'number' ? cell.v : parseFloat(cell.v);
+  return isNaN(v) ? null : v;
+}
+
+function cellStr(ws, r, c) {
+  const a = XLSX.utils.encode_cell({ r, c });
+  const cell = ws[a];
+  return cell ? String(cell.v || '') : null;
+}
+
+function fmt0(n) { return Math.round(n).toLocaleString(); }
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+/* Tabs */
+function goTab(id) {
+  document.querySelectorAll('.main-content > .tpane').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.main-content > .main-tabs:first-child .main-tab').forEach(t => t.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  const map = ['pChart', 'pSurvey', 'pPpfg', 'pResults'];
+  const idx = map.indexOf(id);
+  if (idx >= 0) document.querySelectorAll('.main-content > .main-tabs')[0].querySelectorAll('.main-tab')[idx].classList.add('on');
+}
+
+function goPpfgSub(id) {
+  ['ppfgTable', 'ppfgChart'].forEach(n => {
+    document.getElementById(n).classList.remove('on');
+  });
+  document.querySelectorAll('#aPpfg .main-tabs .main-tab').forEach(t => t.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  const idx = id === 'ppfgTable' ? 0 : 1;
+  document.querySelectorAll('#aPpfg .main-tabs .main-tab')[idx].classList.add('on');
+  if (id === 'ppfgChart' && ppfgChart) ppfgChart.resize();
+}
+
+/* Steps */
+function markStep(n, state) {
+  const el = document.getElementById('step' + n);
+  el.classList.remove('active', 'done');
+  if (state === 'done') el.classList.add('done');
+  if (state === 'active') el.classList.add('active');
+}
+
+/* Status */
+function updateStatus(msg, ok) {
+  document.getElementById('statusText').textContent = msg;
+  document.getElementById('statusDot').style.background = ok ? 'var(--green)' : 'var(--dim)';
+}
+
+/* Toast */
+function toast(msg, err) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast on' + (err ? ' err' : '');
+  clearTimeout(t._tm);
+  t._tm = setTimeout(() => t.className = 'toast', 3000);
+}
+</script>
+</body>
+</html>
