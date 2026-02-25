@@ -1,0 +1,10 @@
+{
+  "extends": "@corva/eslint-config-browser",
+  "parserOptions": {
+    "requireConfigFile": false,
+    "babelOptions": {
+      "presets": ["@babel/preset-react"],
+      "plugins": ["@babel/plugin-proposal-class-properties"]
+    }
+  }
+}

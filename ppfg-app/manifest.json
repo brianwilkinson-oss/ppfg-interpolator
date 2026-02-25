@@ -1,0 +1,43 @@
+{
+  "format": 1,
+  "license": {
+    "type": "MIT",
+    "url": "https://www.oandgexample.com/license/"
+  },
+  "developer": {
+    "name": "Corva",
+    "identifier": "corva",
+    "authors": []
+  },
+  "application": {
+    "type": "ui",
+    "key": "corva.ppfg_template_importer.ui",
+    "visibility": "private",
+    "name": "PPFG Template Importer",
+    "category": "analytics",
+    "segments": [
+      "drilling"
+    ],
+    "ui": {
+      "initial_size": {
+        "w": 12,
+        "h": 12
+      },
+      "multi_rig": false,
+      "full_screen_report": false,
+      "use_app_header_v3": true
+    }
+  },
+  "settings": {
+    "entrypoint": {
+      "file": "src/index.js",
+      "function": "handler"
+    },
+    "environment": {},
+    "runtime": "ui",
+    "app": {
+      "log_type": "time"
+    }
+  },
+  "datasets": {}
+}

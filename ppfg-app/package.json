@@ -1,0 +1,102 @@
+{
+  "name": "ppfg-model-importer-test",
+  "version": "0.0.7",
+  "description": "PPFG Model Importer Test - MD/TVD Interpolation Tool",
+  "main": "src/index.js",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18",
+    "yarn": "*"
+  },
+  "scripts": {
+    "build": "webpack --config=./config-overrides.js --mode production",
+    "start": "webpack-dev-server --config=./config-overrides.js --mode development",
+    "zip": "create-corva-app zip .",
+    "lint": "eslint --cache ./src/",
+    "release": "create-corva-app release .",
+    "test": "jest",
+    "coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "@corva/ui": "latest",
+    "@material-ui/core": "4.11.2",
+    "@material-ui/icons": "4.9.1",
+    "@material-ui/lab": "4.0.0-alpha.57",
+    "@material-ui/pickers": "3.2.10",
+    "@icon-park/react": "1.4.2",
+    "classnames": "2.2.6",
+    "corva-convert-units": "1.10.33",
+    "highcharts": "8.1.2",
+    "highcharts-react-official": "2.2.2",
+    "lodash": "^4.17.21",
+    "mapbox.js": "3.2.1",
+    "moment": "2.29.4",
+    "moment-timezone": "0.5.43",
+    "react": "17.0.1",
+    "react-dom": "17.0.1"
+  },
+  "devDependencies": {
+    "@corva/dc-platform-shared": "latest",
+    "@corva/eslint-config-browser": "latest",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^12.1.5",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/user-event": "^13.2.1",
+    "jest-watch-typeahead": "^1.0.0",
+    "jest": "^27.4.3",
+    "babel-jest": "^27.4.2",
+    "babel-preset-react-app": "^10.0.1",
+    "eslint": "7.32.0",
+    "postcss-loader": "4.1.0"
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!src/**/*.d.ts"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 60,
+        "functions": 60,
+        "lines": 60,
+        "statements": 60
+      }
+    },
+    "setupFilesAfterEnv": [
+      "<rootDir>/config/jest/setupTests.js"
+    ],
+    "globalSetup": "<rootDir>/config/jest/globalSetup.js",
+    "testMatch": [
+      "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
+      "<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"
+    ],
+    "testEnvironment": "jsdom",
+    "transform": {
+      "^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": "<rootDir>/config/jest/babelTransform.js",
+      "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
+      "^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!.*@babel/runtime|@icon-park/react/es).+\\.(js|jsx|mjs|cjs|ts|tsx)$",
+      "^.+\\.module\\.(css|sass|scss)$"
+    ],
+    "modulePaths": [],
+    "moduleNameMapper": {
+      "~(.*)": "<rootDir>/src/$1",
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
+      "@corva/ui(.*)": "@corva/ui/cjs-bundle/$1"
+    },
+    "watchPlugins": [
+      "jest-watch-typeahead/filename",
+      "jest-watch-typeahead/testname"
+    ],
+    "resetMocks": true
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx}": "eslint --fix"
+  }
+}
