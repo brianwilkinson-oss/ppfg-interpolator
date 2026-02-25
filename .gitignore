@@ -11,6 +11,7 @@ venv/
 # Dependency / package managers
 *.lock
 pip-wheel-metadata/
+node_modules/
 
 # IDE & editors
 .idea/

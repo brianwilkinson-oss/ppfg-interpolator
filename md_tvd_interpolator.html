@@ -91,7 +91,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
 
 /* ── Form controls ── */
 label.ctrl-label{display:block;font-size:11px;color:var(--muted);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-select,input[type=number],input[type=text]{width:100%;background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 10px;color:var(--text);font-size:13px;font-family:inherit;margin-bottom:8px;outline:none;transition:.15s}
+select,input[type=number],input[type=text],input[type=password]{width:100%;background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 10px;color:var(--text);font-size:13px;font-family:inherit;margin-bottom:8px;outline:none;transition:.15s}
 select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim)}
 
 /* ── Buttons ── */
@@ -105,6 +105,9 @@ select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--a
 .btn-outline:hover{background:var(--surface2);border-color:var(--border-light)}
 .btn-orange{background:var(--orange);color:var(--bg-deep)}
 .btn-orange:hover{background:#ffa726}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:hover{background:#6f9ef3;box-shadow:0 0 16px var(--blue-dim)}
+.btn-blue:disabled{opacity:.3;cursor:not-allowed;box-shadow:none}
 .btn-sm{padding:6px 12px;font-size:11.5px}
 .btn-block{width:100%}
 
@@ -229,6 +232,7 @@ tr.units-row th{background:var(--surface);font-size:9.5px;font-weight:500;font-s
       <div class="mrow"><label class="ctrl-label">Inclination Column</label><select id="cInc"></select></div>
       <div class="mrow"><label class="ctrl-label">Azimuth Column (optional)</label><select id="cAzm"></select></div>
       <div class="mrow"><label class="ctrl-label">TVD Column</label><select id="cTVD"></select></div>
+      <div class="mrow"><label class="ctrl-label">Depth Unit</label><select id="sSurveyUnit"><option value="ft">Feet (ft)</option><option value="m">Meters (m)</option></select></div>
       <button class="btn btn-primary btn-block" onclick="loadSurvey()">Load Survey</button>
     </div>
     <div id="surveyOk" style="display:none">
@@ -254,6 +258,7 @@ tr.units-row th{background:var(--surface);font-size:9.5px;font-weight:500;font-s
       <div class="mrow"><label class="ctrl-label">Sheet</label><select id="pSheet" onchange="onPpfgSheetChange()"></select></div>
       <div class="mrow"><label class="ctrl-label">Header Row</label><input type="number" id="pHdr" value="1" min="1" max="100" onchange="onPpfgSheetChange()"></div>
       <div class="mrow"><label class="ctrl-label">TVD Column</label><select id="pTvdCol"></select></div>
+      <div class="mrow"><label class="ctrl-label">Depth Unit</label><select id="sPpfgUnit"><option value="ft">Feet (ft)</option><option value="m">Meters (m)</option></select></div>
       <div id="ppfgColList" style="margin-top:8px"></div>
       <button class="btn btn-green btn-block" style="margin-top:8px" onclick="loadPpfgData()">Load PPFG Data</button>
     </div>
@@ -295,6 +300,23 @@ tr.units-row th{background:var(--surface);font-size:9.5px;font-weight:500;font-s
       </div>
       <div class="station-info" id="qStn"></div>
       <div class="formula-box" id="qForm"></div>
+    </div>
+  </div>
+
+  <!-- Upload to Corva -->
+  <div class="sidebar-section">
+    <div class="sec-title"><span class="sec-icon">&#9729;</span> Upload to Corva</div>
+    <div class="mrow"><label class="ctrl-label">Export File Name</label><input type="text" id="corvaFileName" value="ppfg_interpolated" placeholder="ppfg_interpolated"></div>
+    <div class="mrow"><label class="ctrl-label">Well Asset ID</label><input type="number" id="corvaAssetId" placeholder="e.g. 43550142"></div>
+    <div class="mrow"><label class="ctrl-label">Log Identifier</label><input type="text" id="corvaLogId" value="ppfg_interpolated" placeholder="ppfg_interpolated"></div>
+    <div class="mrow"><label class="ctrl-label">Provider</label><input type="text" id="corvaProvider" value="corva" placeholder="corva"></div>
+    <div class="mrow"><label class="ctrl-label">Dataset</label><input type="text" id="corvaDataset" value="drilling.wits.depth" placeholder="drilling.wits.depth"></div>
+    <button class="btn btn-blue btn-block" id="btnUploadCorva" onclick="uploadToCorva()" disabled>Upload to Corva Logs</button>
+    <div id="corvaUploadStatus" style="display:none;margin-top:8px">
+      <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr)">
+        <div class="kpi"><div class="kv c-tvd" id="xUpRows">-</div><div class="kl">Records</div></div>
+        <div class="kpi"><div class="kv c-md" id="xUpStatus">-</div><div class="kl">Status</div></div>
+      </div>
     </div>
   </div>
 
@@ -441,7 +463,7 @@ function onSurveyFile(file) {
 }
 
 function onSheetChange() {
-  const hdrs = getHeaders(wbSurvey, document.getElementById('sSheet').value, +document.getElementById('sHdr').value || 1);
+  const { headers: hdrs } = getHeaders(wbSurvey, document.getElementById('sSheet').value, +document.getElementById('sHdr').value || 1);
   fillSel('cMD', hdrs, ['md', 'measured depth', 'measured']);
   fillSel('cInc', hdrs, ['inc', 'incl', 'inclination']);
   fillSel('cAzm', hdrs, ['azm', 'azim', 'azimuth'], true);
@@ -457,16 +479,20 @@ function loadSurvey() {
   const iTVD = +document.getElementById('cTVD').value;
   if (isNaN(iMD) || isNaN(iInc) || isNaN(iTVD)) { toast('Select MD, Inc, and TVD columns', true); return; }
 
+  const surveyUnit = document.getElementById('sSurveyUnit').value;
+  const mToFt = surveyUnit === 'm' ? 3.28084 : 1;
+
   const ws = wbSurvey.Sheets[sh];
   const rng = XLSX.utils.decode_range(ws['!ref']);
+  const { detectedRow } = getHeaders(wbSurvey, sh, hr);
   const raw = [];
-  for (let r = hr; r <= rng.e.r; r++) {
+  for (let r = detectedRow + 1; r <= rng.e.r; r++) {
     const md = cellNum(ws, r, iMD);
     const inc = cellNum(ws, r, iInc);
     const azm = iAzm !== '' ? cellNum(ws, r, +iAzm) : 0;
     const tvd = cellNum(ws, r, iTVD);
     if (md == null || inc == null || tvd == null) continue;
-    raw.push({ md, inc, azm: azm || 0, tvd });
+    raw.push({ md: md * mToFt, inc, azm: azm || 0, tvd: tvd * mToFt });
   }
   raw.sort((a, b) => a.md - b.md);
   const seen = new Set();
@@ -517,7 +543,7 @@ function onPpfgFile(file) {
 }
 
 function onPpfgSheetChange() {
-  const hdrs = getHeaders(wbPpfg, document.getElementById('pSheet').value, +document.getElementById('pHdr').value || 1);
+  const { headers: hdrs } = getHeaders(wbPpfg, document.getElementById('pSheet').value, +document.getElementById('pHdr').value || 1);
   fillSel('pTvdCol', hdrs, ['tvd', 'tvdkb', 'true vertical', 'vertical depth']);
 
   const list = document.getElementById('ppfgColList');
@@ -546,39 +572,52 @@ function loadPpfgData() {
   const ws = wbPpfg.Sheets[sh];
   const rng = XLSX.utils.decode_range(ws['!ref']);
 
-  const allHdrs = getHeaders(wbPpfg, sh, hr);
+  const { headers: allHdrs, detectedRow } = getHeaders(wbPpfg, sh, hr);
+  const dataAfterHdr = detectedRow + 1;
+
   ppfgCols = [];
+  const usedNames = {};
   for (const h of allHdrs) {
     if (h.c === iTvd) continue;
     const l = h.lbl.toLowerCase();
     if (/unit|date|well|name|api|operator|field/i.test(l)) continue;
-    ppfgCols.push({ c: h.c, name: h.lbl, unit: '' });
+    const parsed = parseNameUnit(h.lbl);
+    let colName = parsed.name;
+    if (usedNames[colName]) {
+      usedNames[colName]++;
+      colName = colName + '_' + usedNames[colName];
+    } else {
+      usedNames[colName] = 1;
+    }
+    ppfgCols.push({ c: h.c, name: colName, unit: parsed.unit });
   }
 
-  // Check the row immediately after headers for a units row (FT, ppg, psi, etc.)
   let unitsRow = null;
-  const unitCheck = cellStr(ws, hr, iTvd);
-  const unitCheck2 = ppfgCols.length > 0 ? cellStr(ws, hr, ppfgCols[0].c) : null;
+  const unitCheck = cellStr(ws, dataAfterHdr, iTvd);
+  const unitCheck2 = ppfgCols.length > 0 ? cellStr(ws, dataAfterHdr, ppfgCols[0].c) : null;
   const isUnitsRow = (unitCheck && /^(ft|ppg|psi|sg|kpa|bar|m|deg|degrees)$/i.test(unitCheck.trim())) ||
                      (unitCheck2 && /^(ft|ppg|psi|sg|kpa|bar|m|deg|degrees)$/i.test(unitCheck2.trim()));
   if (isUnitsRow) {
-    unitsRow = hr;
-    ppfgTvdUnit = (cellStr(ws, hr, iTvd) || 'FT').trim();
+    unitsRow = dataAfterHdr;
+    ppfgTvdUnit = (cellStr(ws, dataAfterHdr, iTvd) || 'FT').trim();
     for (const col of ppfgCols) {
-      const u = cellStr(ws, hr, col.c);
-      col.unit = u ? u.trim() : '';
+      const u = cellStr(ws, dataAfterHdr, col.c);
+      if (u && u.trim()) col.unit = u.trim();
     }
   } else {
     ppfgTvdUnit = 'FT';
   }
 
-  ppfgData = [];
-  const startRow = unitsRow != null ? hr + 1 : hr;
-  for (let r = startRow; r <= rng.e.r; r++) {
-    const tvd = cellNum(ws, r, iTvd);
-    if (tvd == null || tvd <= 0) continue;
+  const ppfgUnit = document.getElementById('sPpfgUnit').value;
+  const ppfgMToFt = ppfgUnit === 'm' ? 3.28084 : 1;
 
-    // Skip rows where all PPFG values are null/zero (trailing empty rows)
+  ppfgData = [];
+  const startRow = unitsRow != null ? unitsRow + 1 : dataAfterHdr;
+  for (let r = startRow; r <= rng.e.r; r++) {
+    const rawTvd = cellNum(ws, r, iTvd);
+    if (rawTvd == null || rawTvd <= 0) continue;
+    const tvd = rawTvd * ppfgMToFt;
+
     let hasData = false;
     const row = { tvd };
     for (const col of ppfgCols) {
@@ -592,6 +631,8 @@ function loadPpfgData() {
   }
 
   if (ppfgData.length === 0) { toast('No valid PPFG rows found', true); return; }
+
+  ppfgCols = ppfgCols.filter(col => ppfgData.some(r => r[col.name] != null && r[col.name] !== 0));
 
   show('ppfgOk');
   document.getElementById('xPRows').textContent = ppfgData.length;
@@ -709,6 +750,7 @@ function runInterpolation() {
 
   markStep(3, 'done');
   updateStatus('Interpolation complete', true);
+  document.getElementById('btnUploadCorva').disabled = false;
   goTab('pResults');
   toast(`Interpolated ${results.length} depths with PPFG data`);
 }
@@ -844,25 +886,30 @@ function expPpfgCSV() {
   dl(hdr + '\n' + units + '\n' + rows, 'ppfg_data.csv', 'text/csv');
 }
 
+function getExportName() {
+  return (document.getElementById('corvaFileName').value.trim() || 'ppfg_interpolated').replace(/\.[^.]+$/, '');
+}
+
 function expResultsCSV() {
   const hdr = ['Depth', 'TVDKB', ...ppfgCols.map(c => c.name)].join(',');
   const units = ['FT', ppfgTvdUnit, ...ppfgCols.map(c => c.unit || '')].join(',');
   const rows = results.map(r => [r.md, r.tvd, ...ppfgCols.map(c => r[c.name] ?? '')].join(',')).join('\n');
-  dl(hdr + '\n' + units + '\n' + rows, 'ppfg_interpolated.csv', 'text/csv');
+  dl(hdr + '\n' + units + '\n' + rows, getExportName() + '.csv', 'text/csv');
 }
 
 function expResultsXLSX() {
-  const header = ['Depth', 'TVDKB', ...ppfgCols.map(c => c.name), 'Inc', 'Station_MD', 'Station_TVD'];
-  const units = ['FT', ppfgTvdUnit, ...ppfgCols.map(c => c.unit || ''), 'deg', 'FT', 'FT'];
+  const name = getExportName();
+  const header = ['Depth', 'TVDKB', ...ppfgCols.map(c => c.name)];
+  const units = ['FT', ppfgTvdUnit, ...ppfgCols.map(c => c.unit || '')];
   const rows = [header, units];
   results.forEach(r => {
-    rows.push([r.md, r.tvd, ...ppfgCols.map(c => r[c.name] ?? ''), r.inc, r.sMD, r.sTVD]);
+    rows.push([r.md, r.tvd, ...ppfgCols.map(c => r[c.name] ?? '')]);
   });
   const ws = XLSX.utils.aoa_to_sheet(rows);
   ws['!cols'] = header.map(() => ({ wch: 16 }));
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'PPFG Interpolated');
-  XLSX.writeFile(wb, 'ppfg_interpolated.xlsx');
+  XLSX.utils.book_append_sheet(wb, ws, name);
+  XLSX.writeFile(wb, name + '.xlsx');
 }
 
 function dl(txt, name, type) {
@@ -873,20 +920,114 @@ function dl(txt, name, type) {
 }
 
 /* ═══════════════════════════════════════════
+   Upload to Corva
+   ═══════════════════════════════════════════ */
+function getCorvaDataAPI() {
+  try {
+    const mod = window.corvaDataAPI;
+    if (mod && typeof mod.post === 'function') return mod;
+  } catch (e) {}
+  return null;
+}
+
+async function uploadToCorva() {
+  const assetId = +document.getElementById('corvaAssetId').value;
+  const logId = document.getElementById('corvaLogId').value.trim() || getExportName();
+  const provider = document.getElementById('corvaProvider').value.trim() || 'corva';
+  const dataset = document.getElementById('corvaDataset').value.trim() || 'drilling.wits.depth';
+
+  if (!assetId || isNaN(assetId)) { toast('Enter a valid Well Asset ID', true); return; }
+  if (results.length === 0) { toast('Run interpolation first (Step 3)', true); return; }
+
+  const api = getCorvaDataAPI();
+  if (!api) { toast('Corva Data API not available — run this app inside Corva Dev Center', true); return; }
+
+  const btn = document.getElementById('btnUploadCorva');
+  btn.disabled = true;
+  btn.textContent = 'Uploading...';
+
+  const BATCH_SIZE = 500;
+  const records = results.map(r => {
+    const data = {};
+    for (const c of ppfgCols) {
+      data[c.name] = r[c.name] ?? null;
+    }
+    data.tvd = r.tvd;
+    return {
+      asset_id: assetId,
+      measured_depth: r.md,
+      log_identifier: logId,
+      data
+    };
+  });
+
+  const path = `/api/v1/data/${provider}/${dataset}/`;
+  let uploaded = 0;
+
+  try {
+    for (let i = 0; i < records.length; i += BATCH_SIZE) {
+      const batch = records.slice(i, i + BATCH_SIZE);
+      await api.post(path, batch);
+      uploaded += batch.length;
+      btn.textContent = `Uploading... ${uploaded}/${records.length}`;
+    }
+
+    show('corvaUploadStatus');
+    document.getElementById('xUpRows').textContent = uploaded;
+    document.getElementById('xUpStatus').textContent = 'OK';
+    document.getElementById('xUpStatus').style.color = 'var(--green)';
+    toast(`Uploaded ${uploaded} records to Corva`);
+  } catch (err) {
+    failed = true;
+    show('corvaUploadStatus');
+    document.getElementById('xUpRows').textContent = uploaded;
+    document.getElementById('xUpStatus').textContent = 'Error';
+    document.getElementById('xUpStatus').style.color = 'var(--red)';
+    toast(`Upload failed: ${err.message}`, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Upload to Corva Logs';
+  }
+}
+
+/* ═══════════════════════════════════════════
    Utilities
    ═══════════════════════════════════════════ */
 function getHeaders(wb, sheet, hdrRow) {
   const ws = wb.Sheets[sheet];
-  if (!ws) return [];
+  if (!ws) return { headers: [], detectedRow: hdrRow - 1 };
   const rng = XLSX.utils.decode_range(ws['!ref']);
+
+  const bestRow = findBestHeaderRow(ws, rng, hdrRow - 1);
+
   const out = [];
   for (let c = rng.s.c; c <= rng.e.c; c++) {
-    const a = XLSX.utils.encode_cell({ r: hdrRow - 1, c });
+    const a = XLSX.utils.encode_cell({ r: bestRow, c });
     const cell = ws[a];
     const lbl = cell ? String(cell.v || '').trim() : '';
     out.push({ c, lbl: lbl || `Col ${XLSX.utils.encode_col(c)}`, letter: XLSX.utils.encode_col(c) });
   }
-  return out;
+  return { headers: out, detectedRow: bestRow };
+}
+
+function findBestHeaderRow(ws, rng, requestedRow) {
+  const maxScan = Math.min(requestedRow + 10, rng.e.r);
+  let best = requestedRow, bestScore = 0;
+
+  for (let r = requestedRow; r <= maxScan; r++) {
+    let textCols = 0, totalCols = 0;
+    for (let c = rng.s.c; c <= rng.e.c; c++) {
+      const cell = ws[XLSX.utils.encode_cell({ r, c })];
+      if (!cell) continue;
+      totalCols++;
+      const v = String(cell.v || '').trim();
+      if (v && isNaN(Number(v))) textCols++;
+    }
+    if (totalCols === 0) continue;
+    const score = textCols / totalCols;
+    if (score > bestScore) { bestScore = score; best = r; }
+  }
+  return best;
 }
 
 function fillSel(id, hdrs, pats, optional) {
@@ -900,6 +1041,14 @@ function fillSel(id, hdrs, pats, optional) {
       if (lp.some(p => l.includes(p) || l === p)) { sel.value = h.c; break; }
     }
   }
+}
+
+function parseNameUnit(raw) {
+  const m = raw.match(/^(.+?)\s*\[([^\]]+)\]\s*$/);
+  if (m) return { name: m[1].trim(), unit: m[2].trim() };
+  const m2 = raw.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+  if (m2) return { name: m2[1].trim(), unit: m2[2].trim() };
+  return { name: raw, unit: '' };
 }
 
 function cellNum(ws, r, c) {
