@@ -308,9 +308,8 @@ tr.units-row th{background:var(--surface);font-size:9.5px;font-weight:500;font-s
     <div class="sec-title"><span class="sec-icon">&#9729;</span> Upload to Corva</div>
     <div class="mrow"><label class="ctrl-label">Export File Name</label><input type="text" id="corvaFileName" value="ppfg_interpolated" placeholder="ppfg_interpolated"></div>
     <div class="mrow"><label class="ctrl-label">Well Asset ID</label><input type="number" id="corvaAssetId" placeholder="e.g. 43550142"></div>
-    <div class="mrow"><label class="ctrl-label">Log Identifier</label><input type="text" id="corvaLogId" value="ppfg_interpolated" placeholder="ppfg_interpolated"></div>
     <div class="mrow"><label class="ctrl-label">Provider</label><input type="text" id="corvaProvider" value="corva" placeholder="corva"></div>
-    <div class="mrow"><label class="ctrl-label">Dataset</label><input type="text" id="corvaDataset" value="drilling.wits.depth" placeholder="drilling.wits.depth"></div>
+    <div class="mrow"><label class="ctrl-label">Dataset</label><input type="text" id="corvaDataset" value="formation-evaluation.data" placeholder="formation-evaluation.data"></div>
     <button class="btn btn-blue btn-block" id="btnUploadCorva" onclick="uploadToCorva()" disabled>Upload to Corva Logs</button>
     <div id="corvaUploadStatus" style="display:none;margin-top:8px">
       <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr)">
@@ -932,9 +931,9 @@ function getCorvaDataAPI() {
 
 async function uploadToCorva() {
   const assetId = +document.getElementById('corvaAssetId').value;
-  const logId = document.getElementById('corvaLogId').value.trim() || getExportName();
   const provider = document.getElementById('corvaProvider').value.trim() || 'corva';
-  const dataset = document.getElementById('corvaDataset').value.trim() || 'drilling.wits.depth';
+  const dataset = document.getElementById('corvaDataset').value.trim() || 'formation-evaluation.data';
+  const fileName = (document.getElementById('corvaFileName').value.trim() || 'ppfg_interpolated') + '.csv';
 
   if (!assetId || isNaN(assetId)) { toast('Enter a valid Well Asset ID', true); return; }
   if (results.length === 0) { toast('Run interpolation first (Step 3)', true); return; }
@@ -946,27 +945,138 @@ async function uploadToCorva() {
   btn.disabled = true;
   btn.textContent = 'Uploading...';
 
+  const CORVA_FIELD_MAP = {
+    'Min': 'ppg_min', 'Reasonable Low': 'ppg_rl', 'Reference': 'ppg_ref',
+    'Reasonable High': 'ppg_rh', 'Max': 'ppg_max', 'Shmin': 'fg_s3',
+    'FG': 'fg_lot', 'Reasonable Low_2': 'fg_low', 'Reference_2': 'fg__res_ref',
+    'Reasonable High_2': 'fg_rh_2', 'BSEE FG': 'fg_bsee',
+    'Reasonable Low_3': 'ppg_rl_3', 'Reference_3': 'ppg_ref_3',
+    'Min mudweight to prevent hole collapse': 'bhs_min_bml'
+  };
+
+  const APP_KEY = 'tasks.formation-evaluation-importer-task';
+  const APP_NAME = 'Formation Evaluation Importer Task App';
+  const META_DATASET = 'formation-evaluation.metadata';
   const BATCH_SIZE = 500;
   const version = Math.floor(Date.now() / 1000);
-  const records = results.map(r => {
-    const data = {};
-    for (const c of ppfgCols) {
-      data[c.name] = r[c.name] ?? null;
-    }
-    data.tvd = r.tvd;
-    return {
-      asset_id: assetId,
-      version,
-      measured_depth: r.md,
-      log_identifier: logId,
-      data
-    };
-  });
 
-  const path = `/api/v1/data/${provider}/${dataset}/`;
-  let uploaded = 0;
+  function mapColKey(colName) {
+    return CORVA_FIELD_MAP[colName] || colName.toLowerCase().replace(/\s+/g, '_');
+  }
+
+  function guessBucket(key) {
+    if (/^(md|tvd|depth)/i.test(key)) return 'Length';
+    return 'Density';
+  }
+
+  function guessUnit(col) {
+    if (col.unit && col.unit.trim()) return col.unit.trim();
+    const k = mapColKey(col.name);
+    if (/^(md|tvd|depth)/i.test(k)) return 'ft';
+    return 'ppg';
+  }
 
   try {
+    btn.textContent = 'Looking up well...';
+
+    // Step 1: Get company_id from existing data for this asset
+    let companyId = null;
+    try {
+      const existing = await api.get(`/api/v1/data/${provider}/${META_DATASET}/`, {
+        limit: 1,
+        sort: JSON.stringify({ timestamp: -1 }),
+        query: JSON.stringify({ asset_id: assetId }),
+        fields: 'company_id'
+      });
+      if (existing && existing.length > 0) companyId = existing[0].company_id;
+    } catch (e) {}
+
+    if (!companyId) {
+      try {
+        const existing = await api.get(`/api/v1/data/${provider}/${dataset}/`, {
+          limit: 1,
+          sort: JSON.stringify({ timestamp: -1 }),
+          query: JSON.stringify({ asset_id: assetId }),
+          fields: 'company_id'
+        });
+        if (existing && existing.length > 0) companyId = existing[0].company_id;
+      } catch (e) {}
+    }
+
+    // Step 2: Create formation-evaluation.metadata record
+    btn.textContent = 'Creating log metadata...';
+
+    const curveData = [
+      { data: { mnemonic: 'Depth', unit: 'F', value: '' }, mapping: { mnemonic: 'md', unit: 'ft', bucket: 'Length' } },
+      { data: { mnemonic: 'TVDKB', unit: 'FT', value: '' }, mapping: { mnemonic: 'TVDKB', unit: 'ft', bucket: 'Length' } }
+    ];
+    for (const col of ppfgCols) {
+      const key = mapColKey(col.name);
+      const unit = guessUnit(col);
+      curveData.push({
+        data: { mnemonic: key.toUpperCase(), unit, value: '' },
+        mapping: { mnemonic: key.toUpperCase(), unit, bucket: guessBucket(key) }
+      });
+    }
+
+    const metaRecord = {
+      version: 1,
+      provider,
+      collection: META_DATASET,
+      timestamp: version,
+      asset_id: assetId,
+      data: {
+        params: {},
+        well: {},
+        curve: { data: curveData },
+        other: {},
+        empty_channels: []
+      }
+    };
+    if (companyId) metaRecord.company_id = companyId;
+
+    const metaResult = await api.post(`/api/v1/data/${provider}/${META_DATASET}/`, [metaRecord]);
+    const formationEvalId = metaResult.inserted_ids[0];
+
+    // Step 3: Patch metadata with custom top-level fields (app, file, records_count)
+    btn.textContent = 'Registering log source...';
+    await api.patch(`/api/v1/data/${provider}/${META_DATASET}/batch_update_with_object/`, {
+      query: JSON.stringify({ _id: formationEvalId, asset_id: assetId }),
+      data: {
+        version: 1,
+        app: APP_NAME,
+        file: fileName,
+        records_count: results.length
+      }
+    });
+
+    // Step 4: Upload data records linked to the metadata
+    btn.textContent = 'Uploading data...';
+    const records = results.map(r => {
+      const data = { md: r.md, tvdkb: r.tvd };
+      for (const c of ppfgCols) {
+        const val = r[c.name];
+        if (val == null) continue;
+        data[mapColKey(c.name)] = val;
+      }
+      const rec = {
+        asset_id: assetId,
+        version: 1,
+        timestamp: version,
+        app_key: APP_KEY,
+        metadata: {
+          formation_evaluation_id: formationEvalId,
+          file: fileName
+        },
+        data
+      };
+      if (companyId) rec.company_id = companyId;
+      return rec;
+    });
+
+    const path = `/api/v1/data/${provider}/${dataset}/`;
+    let uploaded = 0;
+
     for (let i = 0; i < records.length; i += BATCH_SIZE) {
       const batch = records.slice(i, i + BATCH_SIZE);
       await api.post(path, batch);
@@ -978,11 +1088,10 @@ async function uploadToCorva() {
     document.getElementById('xUpRows').textContent = uploaded;
     document.getElementById('xUpStatus').textContent = 'OK';
     document.getElementById('xUpStatus').style.color = 'var(--green)';
-    toast(`Uploaded ${uploaded} records to Corva`);
+    toast(`Uploaded ${uploaded} records to Corva Logs`);
   } catch (err) {
-    failed = true;
     show('corvaUploadStatus');
-    document.getElementById('xUpRows').textContent = uploaded;
+    document.getElementById('xUpRows').textContent = '0';
     document.getElementById('xUpStatus').textContent = 'Error';
     document.getElementById('xUpStatus').style.color = 'var(--red)';
     toast(`Upload failed: ${err.message}`, true);
