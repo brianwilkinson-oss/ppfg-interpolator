@@ -1,6 +1,6 @@
 {
   "name": "ppfg-model-importer-test",
-  "version": "0.0.7",
+  "version": "0.0.9",
   "description": "PPFG Model Importer Test - MD/TVD Interpolation Tool",
   "main": "src/index.js",
   "private": true,

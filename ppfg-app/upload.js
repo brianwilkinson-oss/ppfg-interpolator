@@ -2,7 +2,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const zipPath = path.resolve(__dirname, 'corva_ppfg_template_importer_ui-0.0.7-iumbgdsm.zip');
+const zipPath = path.resolve(__dirname, 'corva_ppfg_template_importer_ui-0.0.9-ibl9krhn.zip');
 const token = process.argv[2];
 const appKey = 'corva.ppfg_template_importer.ui';
 

@@ -947,6 +947,7 @@ async function uploadToCorva() {
   btn.textContent = 'Uploading...';
 
   const BATCH_SIZE = 500;
+  const version = Math.floor(Date.now() / 1000);
   const records = results.map(r => {
     const data = {};
     for (const c of ppfgCols) {
@@ -955,6 +956,7 @@ async function uploadToCorva() {
     data.tvd = r.tvd;
     return {
       asset_id: assetId,
+      version,
       measured_depth: r.md,
       log_identifier: logId,
       data
