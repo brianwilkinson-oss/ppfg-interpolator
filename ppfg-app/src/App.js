@@ -36,7 +36,7 @@ function App(props) {
           flex: 1,
           width: '100%',
           border: 'none',
-          background: '#14161e',
+          background: '#1c1c1e',
         }}
         sandbox="allow-scripts allow-same-origin allow-downloads"
       />

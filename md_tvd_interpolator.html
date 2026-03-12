@@ -9,130 +9,154 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #14161e;
-  --bg-deep: #0e1017;
-  --surface: #1c1f2e;
-  --surface2: #252839;
-  --surface3: #2e3248;
-  --border: #353950;
-  --border-light: #444966;
-  --accent: #03dac6;
-  --accent-dim: rgba(3,218,198,.10);
-  --accent-glow: rgba(3,218,198,.25);
+  --bg: #1c1c1e;
+  --bg-deep: #141416;
+  --surface: #222224;
+  --surface2: #2a2a2e;
+  --surface3: #333338;
+  --border: #2e2e32;
+  --border-light: #3c3c42;
+  --accent: #4a9eff;
+  --accent-dim: rgba(74,158,255,.10);
+  --accent-glow: rgba(74,158,255,.20);
   --blue: #5b8def;
   --blue-dim: rgba(91,141,239,.12);
-  --green: #4caf50;
-  --green-dim: rgba(76,175,80,.10);
+  --green: #2ec27e;
+  --green-dim: rgba(46,194,126,.12);
   --orange: #ff9800;
   --orange-dim: rgba(255,152,0,.10);
-  --red: #ef5350;
-  --red-dim: rgba(239,83,80,.10);
+  --red: #ff6b6b;
+  --red-dim: rgba(255,107,107,.10);
   --purple: #b388ff;
   --purple-dim: rgba(179,136,255,.10);
+  --pink: #e879a8;
+  --pink-dim: rgba(232,121,168,.10);
   --yellow: #fdd835;
-  --text: #e8eaf6;
-  --text-secondary: #9fa8c7;
-  --muted: #6b7394;
-  --dim: #4a5070;
-  --r: 10px;
-  --r-sm: 6px;
-  --shadow: 0 2px 8px rgba(0,0,0,.3);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,.4);
+  --text: #e5e5e8;
+  --text-secondary: #a0a0a6;
+  --muted: #707076;
+  --dim: #555558;
+  --r: 8px;
+  --r-sm: 4px;
+  --shadow: 0 2px 8px rgba(0,0,0,.35);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.5);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
 
-/* ── Top Nav ── */
-.topnav{background:var(--bg-deep);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:52px;gap:16px}
-.topnav .logo{display:flex;align-items:center;gap:10px}
-.topnav .logo-icon{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--accent),#03a896);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:var(--bg-deep)}
-.topnav .logo-text{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.2px}
-.topnav .logo-tag{font-size:11px;color:var(--muted);font-weight:500;margin-left:4px;padding:2px 8px;background:var(--surface2);border-radius:20px}
-.topnav .nav-sep{width:1px;height:24px;background:var(--border)}
-.topnav .nav-item{color:var(--muted);font-size:13px;font-weight:500;cursor:default;padding:4px 10px;border-radius:6px;transition:.15s}
+/* ── Top Nav (Corva-style dark header) ── */
+.topnav{background:var(--bg-deep);border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;height:48px;gap:12px}
+.topnav .logo{display:flex;align-items:center;gap:8px}
+.topnav .logo-icon{width:26px;height:26px;border-radius:4px;background:linear-gradient(135deg,#4a9eff,#3d7bd9);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff}
+.topnav .logo-text{font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.2px}
+.topnav .logo-tag{font-size:10px;color:#fff;font-weight:700;margin-left:6px;padding:2px 8px;background:var(--green);border-radius:3px;text-transform:uppercase;letter-spacing:.04em}
+.topnav .nav-sep{width:1px;height:20px;background:var(--border)}
+.topnav .nav-item{color:var(--muted);font-size:13px;font-weight:500;cursor:default;padding:4px 10px;border-radius:4px;transition:.15s}
 .topnav .nav-item:hover{color:var(--text);background:var(--surface)}
-.topnav .nav-item.active{color:var(--accent)}
+.topnav .nav-item.active{color:var(--text)}
 .topnav .spacer{flex:1}
 .topnav .status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
 .topnav .status .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
 
+/* ── Metrics summary bar (Corva-style) ── */
+.metrics-bar{background:var(--bg-deep);border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;height:44px;gap:24px}
+.metrics-bar .mb-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.metrics-bar .mb-val{font-size:15px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;margin-left:6px}
+.metrics-bar .mb-pair{display:flex;align-items:center;gap:4px}
+.metrics-bar .mb-sep{width:1px;height:20px;background:var(--border)}
+
 /* ── Steps ribbon ── */
-.steps-ribbon{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto}
-.step-pill{display:flex;align-items:center;gap:8px;padding:12px 20px;font-size:12.5px;font-weight:600;color:var(--dim);cursor:default;position:relative;white-space:nowrap;transition:.15s}
-.step-pill .s-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:1.5px solid var(--border);color:var(--dim);transition:.15s}
+.steps-ribbon{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;display:flex;gap:0;overflow-x:auto}
+.step-pill{display:flex;align-items:center;gap:8px;padding:10px 18px;font-size:12px;font-weight:600;color:var(--dim);cursor:default;position:relative;white-space:nowrap;transition:.15s}
+.step-pill .s-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:1.5px solid var(--border);color:var(--dim);transition:.15s}
 .step-pill.done .s-num{background:var(--green-dim);border-color:var(--green);color:var(--green)}
 .step-pill.done{color:var(--green)}
 .step-pill.active .s-num{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
 .step-pill.active{color:var(--text)}
 .step-pill.active::after{content:'';position:absolute;bottom:0;left:12px;right:12px;height:2px;background:var(--accent);border-radius:2px 2px 0 0}
-.step-pill .s-check{display:none;font-size:13px;color:var(--green)}
+.step-pill .s-check{display:none;font-size:12px;color:var(--green)}
 .step-pill.done .s-check{display:inline}
 .step-pill.done .s-num{display:none}
 
 /* ── Layout ── */
-.app-body{display:flex;min-height:calc(100vh - 104px)}
-.sidebar{width:360px;min-width:360px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;max-height:calc(100vh - 104px)}
-.sidebar-section{padding:18px 20px;border-bottom:1px solid var(--border)}
-.sidebar-section:last-child{border-bottom:none}
-.main-content{flex:1;padding:20px;overflow-y:auto;max-height:calc(100vh - 104px);background:var(--bg)}
+.app-body{display:flex;min-height:calc(100vh - 140px)}
+.sidebar{width:280px;min-width:280px;background:var(--bg-deep);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;max-height:calc(100vh - 140px)}
 
-/* ── Section titles ── */
-.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.sec-title .sec-icon{font-size:14px}
+/* ── Sidebar sections (Corva filter-panel style) ── */
+.sidebar-section{padding:14px 16px;border-bottom:1px solid var(--border)}
+.sidebar-section:last-child{border-bottom:none}
+.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary);margin-bottom:10px;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.sec-title .sec-icon{font-size:13px;opacity:.6}
+.sec-title .sec-chevron{margin-left:auto;font-size:10px;color:var(--dim);transition:transform .2s}
+.sec-title.collapsed .sec-chevron{transform:rotate(-90deg)}
+.sec-body{overflow:hidden;transition:max-height .25s ease}
+.sec-body.collapsed{max-height:0!important;padding:0}
+
+.main-content{flex:1;padding:16px;overflow-y:auto;max-height:calc(100vh - 140px);background:var(--bg)}
+
+/* ── Filter chips (Corva-style pill with X) ── */
+.filter-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--surface2);border:1px solid var(--border);color:var(--text-secondary);margin-bottom:6px;margin-right:4px}
+.filter-chip .fc-icon{font-size:12px;opacity:.5}
+.filter-chip .fc-x{font-size:10px;cursor:pointer;opacity:.4;margin-left:2px;transition:.15s}
+.filter-chip .fc-x:hover{opacity:1;color:var(--red)}
 
 /* ── Upload zone ── */
-.upload-zone{border:1.5px dashed var(--border);border-radius:var(--r);padding:22px 14px;text-align:center;cursor:pointer;transition:.2s;background:var(--bg)}
+.upload-zone{border:1.5px dashed var(--border);border-radius:var(--r);padding:18px 12px;text-align:center;cursor:pointer;transition:.2s;background:var(--surface)}
 .upload-zone:hover,.upload-zone.dragover{border-color:var(--accent);background:var(--accent-dim)}
 .upload-zone.loaded{border-color:var(--green);border-style:solid;background:var(--green-dim)}
 .upload-zone input[type=file]{display:none}
-.upload-zone .uz-icon{font-size:28px;margin-bottom:2px;opacity:.6}
-.upload-zone .uz-text{font-size:12px;color:var(--muted)}
-.upload-zone .uz-file{font-size:12px;color:var(--green);margin-top:4px;font-weight:600;word-break:break-all}
+.upload-zone .uz-icon{font-size:24px;margin-bottom:2px;opacity:.5}
+.upload-zone .uz-text{font-size:11px;color:var(--muted)}
+.upload-zone .uz-file{font-size:11px;color:var(--green);margin-top:4px;font-weight:600;word-break:break-all}
 
 /* ── Form controls ── */
-label.ctrl-label{display:block;font-size:11px;color:var(--muted);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-select,input[type=number],input[type=text],input[type=password]{width:100%;background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 10px;color:var(--text);font-size:13px;font-family:inherit;margin-bottom:8px;outline:none;transition:.15s}
+label.ctrl-label{display:block;font-size:10px;color:var(--muted);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+select,input[type=number],input[type=text],input[type=password]{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 10px;color:var(--text);font-size:12px;font-family:inherit;margin-bottom:6px;outline:none;transition:.15s;appearance:none;-webkit-appearance:none}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236e6e88' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
 select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim)}
 
 /* ── Buttons ── */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--r-sm);border:none;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:.12s;letter-spacing:-.1px}
-.btn-primary{background:var(--accent);color:var(--bg-deep)}
-.btn-primary:hover{background:#00f0d6;box-shadow:0 0 16px var(--accent-glow)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:var(--r-sm);border:none;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;transition:.12s;letter-spacing:-.1px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#5aabff;box-shadow:0 0 12px var(--accent-glow)}
 .btn-primary:disabled{opacity:.3;cursor:not-allowed;box-shadow:none}
 .btn-green{background:var(--green);color:#fff}
-.btn-green:hover{background:#43a047}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
-.btn-outline:hover{background:var(--surface2);border-color:var(--border-light)}
+.btn-green:hover{background:#38d68a}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-secondary)}
+.btn-outline:hover{background:var(--surface2);border-color:var(--border-light);color:var(--text)}
 .btn-orange{background:var(--orange);color:var(--bg-deep)}
 .btn-orange:hover{background:#ffa726}
 .btn-blue{background:var(--blue);color:#fff}
-.btn-blue:hover{background:#6f9ef3;box-shadow:0 0 16px var(--blue-dim)}
+.btn-blue:hover{background:#6f9ef3;box-shadow:0 0 12px var(--blue-dim)}
 .btn-blue:disabled{opacity:.3;cursor:not-allowed;box-shadow:none}
-.btn-sm{padding:6px 12px;font-size:11.5px}
+.btn-sm{padding:5px 10px;font-size:11px}
 .btn-block{width:100%}
+.btn-icon{width:32px;height:32px;padding:0;border-radius:var(--r-sm);border:1px solid var(--border);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:.12s}
+.btn-icon:hover{background:var(--surface2);color:var(--text);border-color:var(--border-light)}
+.btn-icon.active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent)}
 
 /* ── KPI cards ── */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
-.kpi{background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px;text-align:center}
-.kpi .kv{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
-.kpi .kl{font-size:10px;color:var(--muted);margin-top:1px;text-transform:uppercase;letter-spacing:.04em}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:8px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px;text-align:center}
+.kpi .kv{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .kl{font-size:9px;color:var(--muted);margin-top:1px;text-transform:uppercase;letter-spacing:.04em}
 
 /* ── Mapping row ── */
-.mrow{margin-bottom:6px}
+.mrow{margin-bottom:4px}
 
-/* ── Main tabs ── */
-.main-tabs{display:flex;gap:2px;margin-bottom:16px;background:var(--surface);border-radius:var(--r);padding:3px;border:1px solid var(--border)}
-.main-tab{flex:1;padding:9px 10px;text-align:center;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;color:var(--dim);border:none;background:none;font-family:inherit;transition:.12s}
-.main-tab.on{background:var(--accent);color:var(--bg-deep)}
+/* ── Main tabs (Corva-style view toggles) ── */
+.main-tabs{display:flex;gap:2px;margin-bottom:14px;background:var(--surface);border-radius:var(--r);padding:3px;border:1px solid var(--border)}
+.main-tab{flex:1;padding:8px 10px;text-align:center;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;color:var(--dim);border:none;background:none;font-family:inherit;transition:.12s}
+.main-tab.on{background:var(--accent);color:#fff}
 .main-tab:not(.on):hover{color:var(--text);background:var(--surface2)}
 .tpane{display:none}
 .tpane.on{display:block}
 
 /* ── Table ── */
-table{width:100%;border-collapse:collapse;font-size:12px}
-th{background:var(--surface2);padding:9px 10px;text-align:left;font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:2}
-td{padding:6px 10px;border-bottom:1px solid rgba(53,57,80,.4);font-variant-numeric:tabular-nums}
-tr:hover td{background:rgba(3,218,198,.02)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{background:var(--surface2);padding:8px 10px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:2}
+td{padding:5px 10px;border-bottom:1px solid rgba(255,255,255,.04);font-variant-numeric:tabular-nums;color:var(--text-secondary)}
+tr:hover td{background:rgba(255,255,255,.03)}
 .twrap{overflow:auto;border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow)}
 .c-md{color:var(--blue)}
 .c-tvd{color:var(--accent)}
@@ -143,9 +167,11 @@ tr:hover td{background:rgba(3,218,198,.02)}
 /* ── Chart container ── */
 .chart-container{position:relative;height:500px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;box-shadow:var(--shadow)}
 
-/* ── Toolbar ── */
+/* ── Toolbar (Corva-style with icon toggles) ── */
 .toolbar{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
 .toolbar .spacer{flex:1}
+.toolbar-group{display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:2px}
+.toolbar-group .btn-icon{border:none;border-radius:var(--r-sm);width:30px;height:28px;font-size:13px}
 .chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
 .chip-accent{background:var(--accent-dim);color:var(--accent)}
 .chip-green{background:var(--green-dim);color:var(--green)}
@@ -158,20 +184,20 @@ tr:hover td{background:rgba(3,218,198,.02)}
 .empty-state p{font-size:13px}
 
 /* ── Quick calc ── */
-.calc-row{display:flex;gap:8px;align-items:flex-end}
+.calc-row{display:flex;gap:6px;align-items:flex-end}
 .calc-row>div{flex:1}
 .calc-row .btn{margin-bottom:0;white-space:nowrap}
-.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-.res-box{background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;text-align:center}
-.res-box .rv{font-size:22px;font-weight:700;margin:2px 0}
-.res-box .ru{color:var(--muted);font-size:11px}
-.res-box .rl{color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:.04em}
-.formula-box{background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;font-family:'JetBrains Mono','Fira Code','Consolas',monospace;font-size:12px;color:var(--accent);margin-top:8px;line-height:1.8}
-.station-info{background:var(--bg-deep);border-radius:var(--r-sm);padding:8px 12px;margin-top:8px;font-size:12px;color:var(--muted)}
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.res-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;text-align:center}
+.res-box .rv{font-size:20px;font-weight:700;margin:2px 0}
+.res-box .ru{color:var(--muted);font-size:10px}
+.res-box .rl{color:var(--dim);font-size:9px;text-transform:uppercase;letter-spacing:.04em}
+.formula-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-family:'JetBrains Mono','Fira Code','Consolas',monospace;font-size:11px;color:var(--accent);margin-top:8px;line-height:1.8}
+.station-info{background:var(--surface);border-radius:var(--r-sm);padding:6px 10px;margin-top:8px;font-size:11px;color:var(--muted)}
 .station-info strong{color:var(--text)}
 
 /* ── Toast ── */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--accent);color:var(--accent);padding:12px 20px;border-radius:var(--r);font-size:13px;font-weight:600;z-index:200;transform:translateY(80px);opacity:0;transition:.3s;box-shadow:var(--shadow-lg)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--accent);color:var(--accent);padding:10px 18px;border-radius:var(--r);font-size:12px;font-weight:600;z-index:200;transform:translateY(80px);opacity:0;transition:.3s;box-shadow:var(--shadow-lg)}
 .toast.on{transform:translateY(0);opacity:1}
 .toast.err{border-color:var(--red);color:var(--red)}
 
@@ -180,7 +206,13 @@ th.th-pp{color:var(--purple)}
 th.th-fg{color:var(--yellow)}
 
 /* ── Units sub-header row ── */
-tr.units-row th{background:var(--surface);font-size:9.5px;font-weight:500;font-style:italic;color:var(--dim);padding:4px 10px;text-transform:none;letter-spacing:0;border-bottom:2px solid var(--border)}
+tr.units-row th{background:var(--surface);font-size:9px;font-weight:500;font-style:italic;color:var(--dim);padding:4px 10px;text-transform:none;letter-spacing:0;border-bottom:2px solid var(--border)}
+
+/* ── Scrollbar (Corva-style thin dark) ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--border-light)}
 
 /* ── Responsive ── */
 @media(max-width:960px){
@@ -192,18 +224,31 @@ tr.units-row th{background:var(--surface);font-size:9.5px;font-weight:500;font-s
 </head>
 <body>
 
-<!-- ═══ TOP NAVIGATION ═══ -->
+<!-- ═══ TOP NAVIGATION (Corva-style) ═══ -->
 <nav class="topnav">
   <div class="logo">
     <div class="logo-icon">P</div>
     <span class="logo-text">PPFG Interpolator</span>
-    <span class="logo-tag">v2.0</span>
+    <span class="logo-tag">Beta</span>
   </div>
   <div class="nav-sep"></div>
   <span class="nav-item active">Well Plan &amp; PPFG</span>
   <span class="spacer"></span>
   <div class="status"><div class="dot" id="statusDot" style="background:var(--dim)"></div><span id="statusText">No data loaded</span></div>
 </nav>
+
+<!-- ═══ METRICS SUMMARY BAR (Corva-style) ═══ -->
+<div class="metrics-bar" id="metricsBar" style="display:none">
+  <div class="mb-pair"><span class="mb-label">Stations</span><span class="mb-val" id="mbStations">-</span></div>
+  <div class="mb-sep"></div>
+  <div class="mb-pair"><span class="mb-label">Max MD</span><span class="mb-val" id="mbMaxMD">-</span></div>
+  <div class="mb-sep"></div>
+  <div class="mb-pair"><span class="mb-label">Max TVD</span><span class="mb-val" id="mbMaxTVD">-</span></div>
+  <div class="mb-sep"></div>
+  <div class="mb-pair"><span class="mb-label">PPFG Curves</span><span class="mb-val" id="mbCurves">-</span></div>
+  <div class="mb-sep"></div>
+  <div class="mb-pair"><span class="mb-label">Results</span><span class="mb-val" id="mbResults" style="color:var(--green)">-</span></div>
+</div>
 
 <!-- ═══ STEPS RIBBON ═══ -->
 <div class="steps-ribbon" id="stepsRibbon">
@@ -213,108 +258,128 @@ tr.units-row th{background:var(--surface);font-size:9.5px;font-weight:500;font-s
 </div>
 
 <div class="app-body">
-<!-- ═══ SIDEBAR ═══ -->
+<!-- ═══ SIDEBAR (Corva filter-panel style) ═══ -->
 <div class="sidebar">
+
+  <!-- Sidebar header -->
+  <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.5"><path d="M1 3h12M3 7h8M5 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary)">Filters</span>
+    <span style="margin-left:auto;font-size:10px;color:var(--muted);cursor:pointer" onclick="clearAllFilters()">Clear All</span>
+  </div>
 
   <!-- STEP 1: Well Plan -->
   <div class="sidebar-section">
-    <div class="sec-title"><span class="sec-icon">&#9883;</span> Step 1 — Well Plan / Survey</div>
-    <div class="upload-zone" id="zSurvey" onclick="document.getElementById('fSurvey').click()">
-      <input type="file" id="fSurvey" accept=".xlsx,.xls,.csv">
-      <div class="uz-icon">&#128209;</div>
-      <div class="uz-text">Drop well plan Excel / CSV here</div>
-      <div class="uz-file" id="fnSurvey"></div>
-    </div>
-    <div id="mapSurvey" style="display:none;margin-top:12px">
-      <div class="mrow"><label class="ctrl-label">Sheet</label><select id="sSheet" onchange="onSheetChange()"></select></div>
-      <div class="mrow"><label class="ctrl-label">Header Row</label><input type="number" id="sHdr" value="1" min="1" max="100" onchange="onSheetChange()"></div>
-      <div class="mrow"><label class="ctrl-label">MD Column</label><select id="cMD"></select></div>
-      <div class="mrow"><label class="ctrl-label">Inclination Column</label><select id="cInc"></select></div>
-      <div class="mrow"><label class="ctrl-label">Azimuth Column (optional)</label><select id="cAzm"></select></div>
-      <div class="mrow"><label class="ctrl-label">TVD Column</label><select id="cTVD"></select></div>
-      <div class="mrow"><label class="ctrl-label">Depth Unit</label><select id="sSurveyUnit"><option value="ft">Feet (ft)</option><option value="m">Meters (m)</option></select></div>
-      <button class="btn btn-primary btn-block" onclick="loadSurvey()">Load Survey</button>
-    </div>
-    <div id="surveyOk" style="display:none">
-      <div class="kpi-grid">
-        <div class="kpi"><div class="kv" id="xN">-</div><div class="kl">Stations</div></div>
-        <div class="kpi"><div class="kv" id="xMD">-</div><div class="kl">Max MD</div></div>
-        <div class="kpi"><div class="kv" id="xTVD">-</div><div class="kl">Max TVD</div></div>
-        <div class="kpi"><div class="kv" id="xInc">-</div><div class="kl">Max Inc</div></div>
+    <div class="sec-title" onclick="toggleSection(this)"><span class="sec-icon">&#9883;</span> Well Plan / Survey<span class="sec-chevron">&#9660;</span></div>
+    <div class="sec-body">
+      <div class="upload-zone" id="zSurvey" onclick="document.getElementById('fSurvey').click()">
+        <input type="file" id="fSurvey" accept=".xlsx,.xls,.csv">
+        <div class="uz-icon">&#128209;</div>
+        <div class="uz-text">Drop well plan Excel / CSV here</div>
+        <div class="uz-file" id="fnSurvey"></div>
+      </div>
+      <div id="mapSurvey" style="display:none;margin-top:10px">
+        <div class="mrow"><label class="ctrl-label">Sheet</label><select id="sSheet" onchange="onSheetChange()"></select></div>
+        <div class="mrow"><label class="ctrl-label">Header Row</label><input type="number" id="sHdr" value="1" min="1" max="100" onchange="onSheetChange()"></div>
+        <div class="mrow"><label class="ctrl-label">MD Column</label><select id="cMD"></select></div>
+        <div class="mrow"><label class="ctrl-label">Inclination Column</label><select id="cInc"></select></div>
+        <div class="mrow"><label class="ctrl-label">Azimuth Column (optional)</label><select id="cAzm"></select></div>
+        <div class="mrow"><label class="ctrl-label">TVD Column</label><select id="cTVD"></select></div>
+        <div class="mrow"><label class="ctrl-label">Depth Unit</label><select id="sSurveyUnit"><option value="ft">Feet (ft)</option><option value="m">Meters (m)</option></select></div>
+        <button class="btn btn-primary btn-block" onclick="loadSurvey()">Load Survey</button>
+      </div>
+      <div id="surveyOk" style="display:none;margin-top:8px">
+        <div class="filter-chip"><span class="fc-icon">&#128202;</span> Survey Loaded <span class="fc-x" onclick="event.stopPropagation()">&#10005;</span></div>
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kv" id="xN">-</div><div class="kl">Stations</div></div>
+          <div class="kpi"><div class="kv" id="xMD">-</div><div class="kl">Max MD</div></div>
+          <div class="kpi"><div class="kv" id="xTVD">-</div><div class="kl">Max TVD</div></div>
+          <div class="kpi"><div class="kv" id="xInc">-</div><div class="kl">Max Inc</div></div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- STEP 2: PPFG Document -->
   <div class="sidebar-section">
-    <div class="sec-title"><span class="sec-icon">&#128202;</span> Step 2 — PPFG Document</div>
-    <div class="upload-zone" id="zPpfg" onclick="document.getElementById('fPpfg').click()">
-      <input type="file" id="fPpfg" accept=".xlsx,.xls,.csv,.txt">
-      <div class="uz-icon">&#128200;</div>
-      <div class="uz-text">Drop PPFG Excel / CSV here</div>
-      <div class="uz-file" id="fnPpfg"></div>
-    </div>
-    <div id="mapPpfg" style="display:none;margin-top:12px">
-      <div class="mrow"><label class="ctrl-label">Sheet</label><select id="pSheet" onchange="onPpfgSheetChange()"></select></div>
-      <div class="mrow"><label class="ctrl-label">Header Row</label><input type="number" id="pHdr" value="1" min="1" max="100" onchange="onPpfgSheetChange()"></div>
-      <div class="mrow"><label class="ctrl-label">TVD Column</label><select id="pTvdCol"></select></div>
-      <div class="mrow"><label class="ctrl-label">Depth Unit</label><select id="sPpfgUnit"><option value="ft">Feet (ft)</option><option value="m">Meters (m)</option></select></div>
-      <div id="ppfgColList" style="margin-top:8px"></div>
-      <button class="btn btn-green btn-block" style="margin-top:8px" onclick="loadPpfgData()">Load PPFG Data</button>
-    </div>
-    <div id="ppfgOk" style="display:none">
-      <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
-        <div class="kpi"><div class="kv" id="xPRows">-</div><div class="kl">Rows</div></div>
-        <div class="kpi"><div class="kv" id="xPCols">-</div><div class="kl">Curves</div></div>
-        <div class="kpi"><div class="kv" id="xPRange">-</div><div class="kl">TVD Range</div></div>
+    <div class="sec-title" onclick="toggleSection(this)"><span class="sec-icon">&#128202;</span> PPFG Document<span class="sec-chevron">&#9660;</span></div>
+    <div class="sec-body">
+      <div class="upload-zone" id="zPpfg" onclick="document.getElementById('fPpfg').click()">
+        <input type="file" id="fPpfg" accept=".xlsx,.xls,.csv,.txt">
+        <div class="uz-icon">&#128200;</div>
+        <div class="uz-text">Drop PPFG Excel / CSV here</div>
+        <div class="uz-file" id="fnPpfg"></div>
+      </div>
+      <div id="mapPpfg" style="display:none;margin-top:10px">
+        <div class="mrow"><label class="ctrl-label">Sheet</label><select id="pSheet" onchange="onPpfgSheetChange()"></select></div>
+        <div class="mrow"><label class="ctrl-label">Header Row</label><input type="number" id="pHdr" value="1" min="1" max="100" onchange="onPpfgSheetChange()"></div>
+        <div class="mrow"><label class="ctrl-label">TVD Column</label><select id="pTvdCol"></select></div>
+        <div class="mrow"><label class="ctrl-label">Depth Unit</label><select id="sPpfgUnit"><option value="ft">Feet (ft)</option><option value="m">Meters (m)</option></select></div>
+        <div id="ppfgColList" style="margin-top:6px"></div>
+        <button class="btn btn-green btn-block" style="margin-top:6px" onclick="loadPpfgData()">Load PPFG Data</button>
+      </div>
+      <div id="ppfgOk" style="display:none;margin-top:8px">
+        <div class="filter-chip"><span class="fc-icon">&#128200;</span> PPFG Loaded <span class="fc-x" onclick="event.stopPropagation()">&#10005;</span></div>
+        <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="kpi"><div class="kv" id="xPRows">-</div><div class="kl">Rows</div></div>
+          <div class="kpi"><div class="kv" id="xPCols">-</div><div class="kl">Curves</div></div>
+          <div class="kpi"><div class="kv" id="xPRange">-</div><div class="kl">TVD Range</div></div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- STEP 3: Interpolate -->
   <div class="sidebar-section">
-    <div class="sec-title"><span class="sec-icon">&#9881;</span> Step 3 — Interpolate MDs</div>
-    <button class="btn btn-primary btn-block" id="btnInterp" onclick="runInterpolation()" disabled>Interpolate Measured Depths</button>
-    <div id="interpOk" style="display:none;margin-top:10px">
-      <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr)">
-        <div class="kpi"><div class="kv c-tvd" id="xIRows">-</div><div class="kl">Depths</div></div>
-        <div class="kpi"><div class="kv c-md" id="xIMDR">-</div><div class="kl">MD Range</div></div>
+    <div class="sec-title" onclick="toggleSection(this)"><span class="sec-icon">&#9881;</span> Interpolate MDs<span class="sec-chevron">&#9660;</span></div>
+    <div class="sec-body">
+      <button class="btn btn-primary btn-block" id="btnInterp" onclick="runInterpolation()" disabled>Interpolate Measured Depths</button>
+      <div id="interpOk" style="display:none;margin-top:8px">
+        <div class="filter-chip" style="background:var(--green-dim);border-color:var(--green);color:var(--green)"><span class="fc-icon">&#10003;</span> Interpolated <span class="fc-x" onclick="event.stopPropagation()">&#10005;</span></div>
+        <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr)">
+          <div class="kpi"><div class="kv c-tvd" id="xIRows">-</div><div class="kl">Depths</div></div>
+          <div class="kpi"><div class="kv c-md" id="xIMDR">-</div><div class="kl">MD Range</div></div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Quick Lookup -->
   <div class="sidebar-section">
-    <div class="sec-title"><span class="sec-icon">&#128269;</span> Quick TVD &rarr; MD Lookup</div>
-    <div class="calc-row">
-      <div>
-        <label class="ctrl-label">TVD (ft)</label>
-        <input type="number" id="qIn" step="any" placeholder="e.g. 14000" style="margin:0">
+    <div class="sec-title" onclick="toggleSection(this)"><span class="sec-icon">&#128269;</span> Quick TVD &rarr; MD Lookup<span class="sec-chevron">&#9660;</span></div>
+    <div class="sec-body">
+      <div class="calc-row">
+        <div>
+          <label class="ctrl-label">TVD (ft)</label>
+          <input type="number" id="qIn" step="any" placeholder="e.g. 14000" style="margin:0">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="calcOne()" style="margin-bottom:0">Calc</button>
       </div>
-      <button class="btn btn-primary btn-sm" onclick="calcOne()" style="margin-bottom:0">Calc</button>
-    </div>
-    <div id="qOut" style="display:none">
-      <div class="res-grid">
-        <div class="res-box"><div class="rl">Interp. MD</div><div class="rv c-md" id="qMD">-</div><div class="ru">ft</div></div>
-        <div class="res-box"><div class="rl">Station Inc</div><div class="rv c-inc" id="qInc">-</div><div class="ru">deg</div></div>
+      <div id="qOut" style="display:none">
+        <div class="res-grid">
+          <div class="res-box"><div class="rl">Interp. MD</div><div class="rv c-md" id="qMD">-</div><div class="ru">ft</div></div>
+          <div class="res-box"><div class="rl">Station Inc</div><div class="rv c-inc" id="qInc">-</div><div class="ru">deg</div></div>
+        </div>
+        <div class="station-info" id="qStn"></div>
+        <div class="formula-box" id="qForm"></div>
       </div>
-      <div class="station-info" id="qStn"></div>
-      <div class="formula-box" id="qForm"></div>
     </div>
   </div>
 
   <!-- Upload to Corva -->
   <div class="sidebar-section">
-    <div class="sec-title"><span class="sec-icon">&#9729;</span> Upload to Corva</div>
-    <div class="mrow"><label class="ctrl-label">Export File Name</label><input type="text" id="corvaFileName" value="ppfg_interpolated" placeholder="ppfg_interpolated"></div>
-    <div class="mrow"><label class="ctrl-label">Well Asset ID</label><input type="number" id="corvaAssetId" placeholder="e.g. 43550142"></div>
-    <div class="mrow"><label class="ctrl-label">Provider</label><input type="text" id="corvaProvider" value="corva" placeholder="corva"></div>
-    <div class="mrow"><label class="ctrl-label">Dataset</label><input type="text" id="corvaDataset" value="formation-evaluation.data" placeholder="formation-evaluation.data"></div>
-    <button class="btn btn-blue btn-block" id="btnUploadCorva" onclick="uploadToCorva()" disabled>Upload to Corva Logs</button>
-    <div id="corvaUploadStatus" style="display:none;margin-top:8px">
-      <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr)">
-        <div class="kpi"><div class="kv c-tvd" id="xUpRows">-</div><div class="kl">Records</div></div>
-        <div class="kpi"><div class="kv c-md" id="xUpStatus">-</div><div class="kl">Status</div></div>
+    <div class="sec-title" onclick="toggleSection(this)"><span class="sec-icon">&#9729;</span> Upload to Corva<span class="sec-chevron">&#9660;</span></div>
+    <div class="sec-body">
+      <div class="mrow"><label class="ctrl-label">Export File Name</label><input type="text" id="corvaFileName" value="ppfg_interpolated" placeholder="ppfg_interpolated"></div>
+      <div class="mrow"><label class="ctrl-label">Well Asset ID</label><input type="number" id="corvaAssetId" placeholder="e.g. 43550142"></div>
+      <div class="mrow"><label class="ctrl-label">Provider</label><input type="text" id="corvaProvider" value="corva" placeholder="corva"></div>
+      <div class="mrow"><label class="ctrl-label">Dataset</label><input type="text" id="corvaDataset" value="formation-evaluation.data" placeholder="formation-evaluation.data"></div>
+      <button class="btn btn-blue btn-block" id="btnUploadCorva" onclick="uploadToCorva()" disabled>Upload to Corva Logs</button>
+      <div id="corvaUploadStatus" style="display:none;margin-top:8px">
+        <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr)">
+          <div class="kpi"><div class="kv c-tvd" id="xUpRows">-</div><div class="kl">Records</div></div>
+          <div class="kpi"><div class="kv c-md" id="xUpStatus">-</div><div class="kl">Status</div></div>
+        </div>
       </div>
     </div>
   </div>
@@ -334,7 +399,14 @@ tr.units-row th{background:var(--surface);font-size:9.5px;font-weight:500;font-s
   <div id="pChart" class="tpane on">
     <div id="eChart" class="empty-state"><div class="es-icon">&#128200;</div><p>Load a well plan to view the MD vs TVD profile</p></div>
     <div id="aChart" style="display:none">
-      <div class="toolbar"><span class="chip chip-accent" id="bChart">-</span><span class="spacer"></span></div>
+      <div class="toolbar">
+        <span class="chip chip-accent" id="bChart">-</span>
+        <span class="spacer"></span>
+        <div class="toolbar-group">
+          <button class="btn-icon active" title="Chart view">&#128202;</button>
+          <button class="btn-icon" title="Table view" onclick="goTab('pSurvey')">&#9776;</button>
+        </div>
+      </div>
       <div class="chart-container"><canvas id="cvs"></canvas></div>
     </div>
   </div>
@@ -521,6 +593,7 @@ function loadSurvey() {
   markStep(2, 'active');
   updateStatus('Survey loaded', true);
   checkReady();
+  updateMetricsBar();
   toast(`Loaded ${n} survey stations`);
 }
 
@@ -648,6 +721,7 @@ function loadPpfgData() {
   markStep(3, 'active');
   updateStatus('PPFG loaded', true);
   checkReady();
+  updateMetricsBar();
   toast(`Loaded ${ppfgData.length} PPFG rows with ${ppfgCols.length} curves`);
 }
 
@@ -681,7 +755,7 @@ function renderPpfgChart() {
   const ctx = document.getElementById('cvsPpfg').getContext('2d');
   if (ppfgChart) ppfgChart.destroy();
 
-  const palette = ['#b388ff','#fdd835','#ef5350','#4caf50','#5b8def','#ff9800','#03dac6','#e91e63','#00bcd4','#8bc34a','#ff5722','#9c27b0','#607d8b'];
+  const palette = ['#4a9eff','#b388ff','#e879a8','#fdd835','#2ec27e','#ff9800','#5b8def','#ef5350','#00bcd4','#8bc34a','#ff5722','#9c27b0','#607d8b'];
   const datasets = ppfgCols.map((c, idx) => {
     const data = ppfgData.filter(r => r[c.name] != null && r[c.name] > -900).map(r => ({ x: r[c.name], y: r.tvd }));
     return {
@@ -703,12 +777,12 @@ function renderPpfgChart() {
       responsive: true, maintainAspectRatio: false,
       interaction: { mode: 'nearest', intersect: false },
       plugins: {
-        legend: { position: 'right', labels: { color: '#9fa8c7', font: { size: 10, family: 'Inter' }, boxWidth: 12, padding: 8 } },
-        tooltip: { backgroundColor: '#1c1f2e', titleColor: '#e8eaf6', bodyColor: '#e8eaf6', borderColor: '#353950', borderWidth: 1 }
+        legend: { position: 'right', labels: { color: '#a0a0a6', font: { size: 10, family: 'Inter' }, boxWidth: 12, padding: 8 } },
+        tooltip: { backgroundColor: '#222224', titleColor: '#e5e5e8', bodyColor: '#e5e5e8', borderColor: '#2e2e32', borderWidth: 1 }
       },
       scales: {
-        x: { title: { display: true, text: 'Pressure / Gradient (ppg)', color: '#9fa8c7' }, grid: { color: 'rgba(53,57,80,.4)' }, ticks: { color: '#9fa8c7' } },
-        y: { reverse: true, title: { display: true, text: 'TVD (ft)', color: '#9fa8c7' }, grid: { color: 'rgba(53,57,80,.4)' }, ticks: { color: '#9fa8c7' } }
+        x: { title: { display: true, text: 'Pressure / Gradient (ppg)', color: '#a0a0a6' }, grid: { color: 'rgba(255,255,255,.06)' }, ticks: { color: '#a0a0a6' } },
+        y: { reverse: true, title: { display: true, text: 'TVD (ft)', color: '#a0a0a6' }, grid: { color: 'rgba(255,255,255,.06)' }, ticks: { color: '#a0a0a6' } }
       }
     }
   });
@@ -750,6 +824,7 @@ function runInterpolation() {
   markStep(3, 'done');
   updateStatus('Interpolation complete', true);
   document.getElementById('btnUploadCorva').disabled = false;
+  updateMetricsBar();
   goTab('pResults');
   toast(`Interpolated ${results.length} depths with PPFG data`);
 }
@@ -836,7 +911,7 @@ function drawChart() {
       datasets: [
         {
           label: 'Well Plan (MD vs TVD)', data: surveyByMD.map(s => ({ x: s.md, y: s.tvd })),
-          borderColor: 'var(--accent)', backgroundColor: 'rgba(3,218,198,.06)', borderWidth: 1.5,
+          borderColor: '#4a9eff', backgroundColor: 'rgba(74,158,255,.06)', borderWidth: 1.5,
           pointRadius: 0, fill: true, tension: .1
         },
         {
@@ -850,16 +925,16 @@ function drawChart() {
       responsive: true, maintainAspectRatio: false,
       interaction: { mode: 'nearest', intersect: false },
       plugins: {
-        legend: { labels: { color: '#9fa8c7', font: { size: 11, family: 'Inter' } } },
+        legend: { labels: { color: '#a0a0a6', font: { size: 11, family: 'Inter' } } },
         tooltip: {
-          backgroundColor: '#1c1f2e', titleColor: '#e8eaf6', bodyColor: '#e8eaf6',
-          borderColor: '#353950', borderWidth: 1,
+          backgroundColor: '#222224', titleColor: '#e5e5e8', bodyColor: '#e5e5e8',
+          borderColor: '#2e2e32', borderWidth: 1,
           callbacks: { label: c => `MD: ${c.raw.x.toFixed(1)} ft | TVD: ${c.raw.y.toFixed(1)} ft` }
         }
       },
       scales: {
-        x: { title: { display: true, text: 'Measured Depth (ft)', color: '#9fa8c7' }, grid: { color: 'rgba(53,57,80,.4)' }, ticks: { color: '#9fa8c7' } },
-        y: { title: { display: true, text: 'True Vertical Depth (ft)', color: '#9fa8c7' }, grid: { color: 'rgba(53,57,80,.4)' }, ticks: { color: '#9fa8c7' } }
+        x: { title: { display: true, text: 'Measured Depth (ft)', color: '#a0a0a6' }, grid: { color: 'rgba(255,255,255,.06)' }, ticks: { color: '#a0a0a6' } },
+        y: { title: { display: true, text: 'True Vertical Depth (ft)', color: '#a0a0a6' }, grid: { color: 'rgba(255,255,255,.06)' }, ticks: { color: '#a0a0a6' } }
       }
     }
   });
@@ -1222,6 +1297,35 @@ function toast(msg, err) {
   t.className = 'toast on' + (err ? ' err' : '');
   clearTimeout(t._tm);
   t._tm = setTimeout(() => t.className = 'toast', 3000);
+}
+
+/* Collapsible sidebar sections */
+function toggleSection(titleEl) {
+  const body = titleEl.nextElementSibling;
+  if (!body || !body.classList.contains('sec-body')) return;
+  titleEl.classList.toggle('collapsed');
+  body.classList.toggle('collapsed');
+}
+
+function clearAllFilters() { /* placeholder */ }
+
+/* Metrics summary bar */
+function updateMetricsBar() {
+  const bar = document.getElementById('metricsBar');
+  const hasData = survey.length > 0 || ppfgData.length > 0 || results.length > 0;
+  bar.style.display = hasData ? 'flex' : 'none';
+
+  if (survey.length > 0) {
+    document.getElementById('mbStations').textContent = survey.length;
+    document.getElementById('mbMaxMD').textContent = fmt0(surveyByMD[surveyByMD.length - 1].md) + ' ft';
+    document.getElementById('mbMaxTVD').textContent = fmt0(survey[survey.length - 1].tvd) + ' ft';
+  }
+  if (ppfgCols.length > 0) {
+    document.getElementById('mbCurves').textContent = ppfgCols.length;
+  }
+  if (results.length > 0) {
+    document.getElementById('mbResults').textContent = results.length;
+  }
 }
 </script>
 </body>
